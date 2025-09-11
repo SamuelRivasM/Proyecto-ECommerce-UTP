@@ -1,4 +1,5 @@
 
+import { Link } from "react-router-dom";
 import "./Auth.css";
 import bgCafe from "../../assets/img/bg-cafe.jpg";
 import cafeImg from "../../assets/img/cafeteria-utp.jpeg";
@@ -44,10 +45,10 @@ const Register = () => {
 
                     <div className="auth-links">
                         <p>
-                            ¿Ya tienes cuenta? <a href="#">Iniciar Sesión</a>
+                            ¿Ya tienes cuenta? <Link to="/">Iniciar Sesión</Link>
                         </p>
                         <p>
-                            <a href="#">¿Olvidaste tu contraseña?</a>
+                            <Link to="/forgot-password">¿Has olvidado tu contraseña?</Link>
                         </p>
                     </div>
                 </div>
