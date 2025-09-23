@@ -1,15 +1,52 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import { Link } from "react-router-dom";
 import "./Auth.css";
 import bgCafe from "../../assets/img/bg-cafe.jpg";
 import cafeImg from "../../assets/img/cafeteria-utp.jpeg";
 
 const Register = () => {
+    const navigate = useNavigate();
+
+    const [nombre, setNombre] = useState("");
+    const [email, setEmail] = useState("");
+    const [telefono, setTelefono] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
+                nombre,
+                email,
+                telefono,
+                password,
+            });
+
+            toast.success("Registro exitoso. Ahora puedes iniciar sesión.");
+            setTimeout(() => navigate("/"), 2000); // te manda al login
+        } catch (error) {
+            const msg = error.response?.data?.message || "Error en el registro";
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-        <div className="auth-container"
+        <div
+            className="auth-container"
             style={{
-                backgroundImage: `linear-gradient(rgba(52, 52, 52, 0.5), rgba(52, 52, 52, 0.5)), url(${bgCafe})`
-            }}>
+                backgroundImage: `linear-gradient(rgba(52, 52, 52, 0.5), rgba(52, 52, 52, 0.5)), url(${bgCafe})`,
+            }}
+        >
+            <ToastContainer position="top-center" autoClose={3000} />
             <div className="auth-card login-card">
                 {/* Panel izquierdo */}
                 <div className="auth-left">
@@ -21,25 +58,50 @@ const Register = () => {
 
                 {/* Panel derecho */}
                 <div className="auth-right">
-
-                    {/* Solo en móvil */}
                     <div className="auth-overlay-mobile">
                         <h2 className="auth-title-mobile">UTP Coffee Point</h2>
                     </div>
 
                     <h2 className="auth-heading">¡Regístrate!</h2>
-                    <form>
+                    <form onSubmit={handleRegister}>
                         <label>Nombre:</label>
-                        <input type="text" placeholder="Tu nombre" required />
+                        <input
+                            type="text"
+                            placeholder="Tu nombre"
+                            value={nombre}
+                            onChange={(e) => setNombre(e.target.value)}
+                            required
+                        />
 
                         <label>Correo UTP:</label>
-                        <input type="email" placeholder="correo@utp.edu.pe" required />
+                        <input
+                            type="email"
+                            placeholder="correo@utp.edu.pe"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+
+                        <label>Teléfono:</label>
+                        <input
+                            type="text"
+                            placeholder="999999999"
+                            value={telefono}
+                            onChange={(e) => setTelefono(e.target.value)}
+                            required
+                        />
 
                         <label>Contraseña:</label>
-                        <input type="password" placeholder="********" required />
+                        <input
+                            type="password"
+                            placeholder="********"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
 
-                        <button type="submit" className="auth-btn">
-                            Registrarse
+                        <button type="submit" className="auth-btn" disabled={loading}>
+                            {loading ? "Procesando..." : "Registrarse"}
                         </button>
                     </form>
 
