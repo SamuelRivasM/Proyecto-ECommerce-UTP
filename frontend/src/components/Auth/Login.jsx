@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Iconos de ojito para la contraseña
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import "./Auth.css";
 import bgCafe from "../../assets/img/bg-cafe.jpg";

@@ -1,8 +1,9 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiClock, FiMapPin } from "react-icons/fi";
 import { FaUserCircle } from "react-icons/fa";
+import Perfil from "../Layout/Perfil";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -12,6 +13,7 @@ import cafeteriaMesa from "../../assets/img/cafeteria-mesa.jpeg";
 
 const ClienteDashboard = () => {
   const navigate = useNavigate();
+  const [showPerfil, setShowPerfil] = useState(false);
 
   useEffect(() => {
     // Inicializar el carrusel manualmente
@@ -101,9 +103,12 @@ const ClienteDashboard = () => {
                   aria-labelledby="userDropdown"
                 >
                   <li>
-                    <a className="dropdown-item" href="#">
+                    <button
+                      className="dropdown-item"
+                      onClick={() => setShowPerfil(true)}
+                    >
                       Perfil
-                    </a>
+                    </button>
                   </li>
                   <li>
                     <hr className="dropdown-divider" />
@@ -243,6 +248,9 @@ const ClienteDashboard = () => {
           </p>
         </div>
       </footer>
+
+      {/* Perfil modal */}
+      {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
     </div>
   );
 };
