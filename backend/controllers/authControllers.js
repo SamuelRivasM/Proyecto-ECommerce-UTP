@@ -27,6 +27,12 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
+    // ✅ Actualizar último login
+    await db.promise().query(
+      "UPDATE usuarios SET ultimo_login = NOW() WHERE id = ?",
+      [user.id]
+    );
+
     // Generar token
     const token = jwt.sign(
       {
@@ -48,6 +54,7 @@ exports.login = async (req, res) => {
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
+        ultimo_login: new Date() // opcional: enviar al frontend
       }
     });
   } catch (error) {
@@ -55,7 +62,6 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
-
 
 // === REGISTER ===
 exports.register = async (req, res) => {
