@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -21,6 +22,14 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
 
+        // 🔹 Validación del teléfono en frontend
+        const telefonoRegex = /^\+51\d{9}$/;
+        if (!telefonoRegex.test(telefono)) {
+            toast.error("El teléfono debe estar en formato +51 seguido de 9 dígitos");
+            setLoading(false);
+            return;
+        }
+
         try {
             await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, {
                 nombre,
@@ -30,7 +39,7 @@ const Register = () => {
             });
 
             toast.success("Registro exitoso. Ahora puedes iniciar sesión.");
-            setTimeout(() => navigate("/"), 2000); // te manda al login
+            setTimeout(() => navigate("/"), 2000);
         } catch (error) {
             const msg = error.response?.data?.message || "Error en el registro";
             toast.error(msg);
@@ -85,7 +94,7 @@ const Register = () => {
                         <label>Teléfono:</label>
                         <input
                             type="text"
-                            placeholder="999999999"
+                            placeholder="+51999888777"
                             value={telefono}
                             onChange={(e) => setTelefono(e.target.value)}
                             required

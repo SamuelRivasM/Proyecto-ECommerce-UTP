@@ -112,3 +112,121 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
+
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const twilio = require("twilio");
+
+// === FORGOT PASSWORD ===
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { method, value } = req.body;
+
+    // Buscar usuario por email o telefono
+    const query = `SELECT id, nombre, email, telefono FROM usuarios WHERE ${method} = ?`;
+    const [users] = await db.promise().query(query, [value]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const user = users[0];
+
+    // Generar token único
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // Guardar en tokens_recuperacion
+    await db
+      .promise()
+      .query(
+        "INSERT INTO tokens_recuperacion (usuario_id, token) VALUES (?, ?)",
+        [user.id, token]
+      );
+
+    // Enviar correo o SMS
+    if (method === "email") {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
+
+      await transporter.sendMail({
+        from: `"Cafetería UTP" <${process.env.EMAIL_USER}>`,
+        to: user.email,
+        subject: "Recuperación de contraseña",
+        html: `<p>Hola ${user.nombre},</p>
+               <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+               <a href="${resetUrl}">${resetUrl}</a>`,
+      });
+
+    } if (method === "telefono") {
+      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+      // Validación de que esté habilitado el teléfono de Twilio
+      if (!process.env.TWILIO_PHONE) {
+        return res.status(503).json({ message: "La opción por teléfono aún no está habilitada" });
+      }
+
+      await client.messages.create({
+        body: `Tu código de recuperación es: ${token}`,
+        from: process.env.TWILIO_PHONE,
+        to: user.telefono, // asegúrate que el número está en formato internacional (+51 para Perú)
+      });
+    }
+
+    res.json({ message: "Se envió el enlace/código de recuperación" });
+  } catch (error) {
+    console.error("Error en forgotPassword:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+// === RESET PASSWORD ===
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Buscar token
+    const [rows] = await db
+      .promise()
+      .query(
+        "SELECT usuario_id FROM tokens_recuperacion WHERE token = ? AND usado = 0",
+        [token]
+      );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ message: "Token inválido o usado" });
+    }
+
+    const usuarioId = rows[0].usuario_id;
+
+    // Encriptar contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar contraseña
+    await db
+      .promise()
+      .query("UPDATE usuarios SET password = ? WHERE id = ?", [
+        hashedPassword,
+        usuarioId,
+      ]);
+
+    // Marcar token como usado
+    await db
+      .promise()
+      .query("UPDATE tokens_recuperacion SET usado = 1 WHERE token = ?", [
+        token,
+      ]);
+
+    res.json({ message: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    console.error("Error en resetPassword:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};

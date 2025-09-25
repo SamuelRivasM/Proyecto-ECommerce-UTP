@@ -1,6 +1,8 @@
 
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiClock, FiMapPin } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -9,6 +11,8 @@ import cafeteriaComida from "../../assets/img/cafeteria-comida.jpeg";
 import cafeteriaMesa from "../../assets/img/cafeteria-mesa.jpeg";
 
 const ClienteDashboard = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     // Inicializar el carrusel manualmente
     const myCarousel = document.querySelector("#heroCarousel");
@@ -20,6 +24,12 @@ const ClienteDashboard = () => {
       });
     }
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/"); // redirige al login
+  };
 
   return (
     <div
@@ -50,13 +60,64 @@ const ClienteDashboard = () => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
+
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
-              <li className="nav-item"><a className="nav-link active" href="#">Inicio</a></li>
-              <li className="nav-item"><a className="nav-link" href="#">Productos</a></li>
-              <li className="nav-item"><a className="nav-link" href="#">Mis Pedidos</a></li>
-              <li className="nav-item"><a className="nav-link" href="#">Carrito</a></li>
-              <li className="nav-item ms-3"><span className="nav-link">👤</span></li>
+              <li className="nav-item">
+                <a className="nav-link active" href="#">
+                  Inicio
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">
+                  Productos
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">
+                  Mis Pedidos
+                </a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">
+                  Carrito
+                </a>
+              </li>
+
+              {/* Dropdown Usuario */}
+              <li className="nav-item dropdown ms-3">
+                <a
+                  className="nav-link dropdown-toggle d-flex align-items-center"
+                  href="#"
+                  id="userDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <FaUserCircle size={22} className="me-1" />
+                </a>
+                <ul
+                  className="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="userDropdown"
+                >
+                  <li>
+                    <a className="dropdown-item" href="#">
+                      Perfil
+                    </a>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item text-danger"
+                      onClick={handleLogout}
+                    >
+                      Cerrar sesión
+                    </button>
+                  </li>
+                </ul>
+              </li>
             </ul>
           </div>
         </div>
