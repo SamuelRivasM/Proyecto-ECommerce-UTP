@@ -22,10 +22,18 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
 
-        // 🔹 Validación del teléfono en frontend
+        // Validación del teléfono en frontend
         const telefonoRegex = /^\+51\d{9}$/;
         if (!telefonoRegex.test(telefono)) {
             toast.error("El teléfono debe estar en formato +51 seguido de 9 dígitos");
+            setLoading(false);
+            return;
+        }
+
+        // Validación del correo institucional
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@utp\.edu\.pe$/;
+        if (!emailRegex.test(email)) {
+            toast.error("El correo debe ser institucional (@utp.edu.pe)");
             setLoading(false);
             return;
         }

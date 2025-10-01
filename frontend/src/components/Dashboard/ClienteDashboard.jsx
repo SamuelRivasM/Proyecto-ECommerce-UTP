@@ -48,7 +48,7 @@ const ClienteDashboard = () => {
         style={{ backgroundColor: "#A4001D" }}
       >
         <div className="container">
-          <a className="navbar-brand fw-bold" href="#">
+          <a className="navbar-brand fw-bold" href="/cliente-dashboard">
             UTP COFFEE POINT
           </a>
           <button
@@ -66,7 +66,7 @@ const ClienteDashboard = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <a className="nav-link active" href="#">
+                <a className="nav-link active" href="/cliente-dashboard">
                   Inicio
                 </a>
               </li>

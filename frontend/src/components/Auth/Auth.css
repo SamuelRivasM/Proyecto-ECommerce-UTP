@@ -231,7 +231,7 @@ select.auth-select {
     /* espacio derecho extra para la flecha */
     border-radius: 6px;
     border: 1px solid #aaa;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     outline: none;
     font-size: 14px;
     background-color: #fff;

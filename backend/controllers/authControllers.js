@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    // ✅ Actualizar último login
+    // Actualizar último login
     await db.promise().query(
       "UPDATE usuarios SET ultimo_login = NOW() WHERE id = ?",
       [user.id]

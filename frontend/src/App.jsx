@@ -1,5 +1,8 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import ForgotPassword from "./components/Auth/ForgotPassword";
@@ -23,6 +26,7 @@ function App() {
         <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
         <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
       </Routes>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }

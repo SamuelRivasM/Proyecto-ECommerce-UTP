@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaUserCircle } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const Perfil = ({ onClose }) => {
     const navigate = useNavigate();
@@ -72,10 +73,10 @@ const Perfil = ({ onClose }) => {
 
             setEditable(false);
             setFormData({ ...formData, password: "" }); // limpiar password
-            alert("Perfil actualizado correctamente ✅");
+            toast.success("Perfil actualizado correctamente ✅");
         } catch (err) {
             console.error("Error actualizando perfil", err);
-            alert("Error al actualizar perfil ❌");
+            toast.error("Error al actualizar perfil ❌");
         }
     };
 
