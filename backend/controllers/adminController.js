@@ -1,73 +1,112 @@
 
 const db = require("../models/db");
 
-// === Dashboard completo ===
-exports.getStats = async (req, res) => {
+function getCondicionFecha(periodo) {
+  switch (periodo) {
+    case "dia":
+      return "DATE(fecha) = CURDATE()";
+    case "semana":
+      return "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+    case "mes":
+      return "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+    case "trimestre":
+      return "QUARTER(fecha) = QUARTER(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+    case "semestre":
+      return `
+        CEIL(MONTH(fecha) / 6) = CEIL(MONTH(CURDATE()) / 6)
+        AND YEAR(fecha) = YEAR(CURDATE())
+      `;
+    case "año":
+      return "YEAR(fecha) = YEAR(CURDATE())";
+    default:
+      return "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+  }
+}
+
+// === Total de usuarios ===
+exports.getUsuariosStats = async (req, res) => {
   try {
-    // === Usuarios ===
-    const [[usuariosTotal]] = await db.promise().query(
-      "SELECT COUNT(*) AS total FROM usuarios"
-    );
+    const [[usuariosTotal]] = await db.promise().query("SELECT COUNT(*) AS total FROM usuarios");
+    const [[clientes]] = await db.promise().query("SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'cliente'");
+    const [[admins]] = await db.promise().query("SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'admin'");
+    const [[cocina]] = await db.promise().query("SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'cocina'");
 
-    const [[clientes]] = await db.promise().query(
-      "SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'cliente'"
-    );
-    const [[admins]] = await db.promise().query(
-      "SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'admin'"
-    );
-    const [[cocina]] = await db.promise().query(
-      "SELECT COUNT(*) AS total FROM usuarios WHERE rol = 'cocina'"
-    );
+    res.json({
+      totalUsuarios: usuariosTotal.total,
+      clientes: clientes.total,
+      admins: admins.total,
+      cocina: cocina.total
+    });
+  } catch (error) {
+    console.error("Error en getUsuariosStats:", error);
+    res.status(500).json({ message: "Error al obtener usuarios" });
+  }
+};
 
-    // === Pedidos del mes actual ===
-    const [[pedidosMes]] = await db.promise().query(`
-      SELECT COUNT(*) AS total
-      FROM pedidos
-      WHERE MONTH(fecha) = MONTH(CURDATE()) 
-      AND YEAR(fecha) = YEAR(CURDATE())
+// === Pedidos ===
+exports.getPedidosStats = async (req, res) => {
+  try {
+    const periodo = req.query.periodo || "mes";
+    const condicionFecha = getCondicionFecha(periodo);
+    const [[pedidosPeriodo]] = await db.promise().query(`
+      SELECT COUNT(*) AS total FROM pedidos WHERE ${condicionFecha}
     `);
+    res.json({ total: pedidosPeriodo.total });
+  } catch (error) {
+    console.error("Error en getPedidosStats:", error);
+    res.status(500).json({ message: "Error al obtener pedidos" });
+  }
+};
 
-    // === Ventas del mes actual ===
-    const [[ventasMes]] = await db.promise().query(`
-      SELECT IFNULL(SUM(total), 0) AS total
-      FROM pedidos
-      WHERE MONTH(fecha) = MONTH(CURDATE()) 
-      AND YEAR(fecha) = YEAR(CURDATE())
+// === Ventas ===
+exports.getVentasStats = async (req, res) => {
+  try {
+    const periodo = req.query.periodo || "mes";
+    const condicionFecha = getCondicionFecha(periodo);
+    const [[ventasPeriodo]] = await db.promise().query(`
+      SELECT IFNULL(SUM(total), 0) AS total FROM pedidos WHERE ${condicionFecha}
     `);
+    res.json({ total: ventasPeriodo.total });
+  } catch (error) {
+    console.error("Error en getVentasStats:", error);
+    res.status(500).json({ message: "Error al obtener ventas" });
+  }
+};
 
-    // === Productos más vendidos (Top 5) ===
+// === Productos más vendidos ===
+exports.getProductosTop = async (req, res) => {
+  try {
+    const periodo = req.query.periodo || "mes";
+    const condicionFecha = getCondicionFecha(periodo);
     const [productosTop] = await db.promise().query(`
       SELECT p.nombre, SUM(dp.cantidad) AS cantidad
       FROM detalle_pedido dp
+      JOIN pedidos pe ON dp.pedido_id = pe.id
       JOIN productos p ON dp.producto_id = p.id
+      WHERE ${condicionFecha}
       GROUP BY p.id
       ORDER BY cantidad DESC
       LIMIT 5
     `);
+    res.json(productosTop);
+  } catch (error) {
+    console.error("Error en getProductosTop:", error);
+    res.status(500).json({ message: "Error al obtener productos más vendidos" });
+  }
+};
 
-    // === Últimos usuarios registrados (5) ===
+// === Últimos usuarios ===
+exports.getUsuariosRecientes = async (req, res) => {
+  try {
     const [usuariosRecientes] = await db.promise().query(`
       SELECT id, nombre, email, rol, fecha_registro
       FROM usuarios
       ORDER BY fecha_registro DESC
       LIMIT 5
     `);
-
-    // === Respuesta ===
-    res.json({
-      stats: {
-        totalUsuarios: usuariosTotal.total,
-        clientes: clientes.total,
-        admins: admins.total,
-        cocina: cocina.total,
-        pedidosMes: pedidosMes.total,
-        ventasMes: ventasMes.total || 0,
-      },
-      productosTop,
-      usuariosRecientes,
-    });
+    res.json(usuariosRecientes);
   } catch (error) {
-    console.error("Error en getStats:", error);
-    res.status(500).json({ message: "Error al obtener estadísticas" });
+    console.error("Error en getUsuariosRecientes:", error);
+    res.status(500).json({ message: "Error al obtener usuarios recientes" });
   }
 };
