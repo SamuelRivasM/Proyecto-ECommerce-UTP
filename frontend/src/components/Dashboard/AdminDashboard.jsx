@@ -4,14 +4,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
-import ContactoSection from "../Layout/ContactoSection";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const [showPerfil, setShowPerfil] = useState(false);
-  const [showContact, setShowContact] = useState(false);
 
   const [filtroPedidos, setFiltroPedidos] = useState("mes");
   const [filtroVentas, setFiltroVentas] = useState("mes");
@@ -150,7 +148,7 @@ const AdminDashboard = () => {
       <NavbarGeneral
         onPerfilClick={() => setShowPerfil(true)}
         onLogout={handleLogout}
-        onInicioClick={() => navigate("/cliente-dashboard")}
+        onInicioClick={() => navigate("/admin-dashboard")}
         activePage="inicio"
       />
 

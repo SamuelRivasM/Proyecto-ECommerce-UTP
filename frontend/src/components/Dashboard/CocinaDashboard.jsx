@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
-import ContactoSection from "../Layout/ContactoSection";
 
 // Imágenes (mantenemos las mismas que cliente)
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -14,7 +13,6 @@ import cafeteriaMesa from "../../assets/img/cafeteria-mesa.jpeg";
 const CocinaDashboard = () => {
   const navigate = useNavigate();
   const [showPerfil, setShowPerfil] = useState(false);
-  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     // Inicializar el carrusel manualmente
@@ -47,7 +45,7 @@ const CocinaDashboard = () => {
       <NavbarGeneral
         onPerfilClick={() => setShowPerfil(true)}
         onLogout={handleLogout}
-        onInicioClick={() => navigate("/cliente-dashboard")}
+        onInicioClick={() => navigate("/cocina-dashboard")}
         activePage="inicio"
       />
 

@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { FiClock, FiMapPin } from "react-icons/fi";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
-import ContactoSection from "../Layout/ContactoSection";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -15,7 +14,6 @@ import cafeteriaMesa from "../../assets/img/cafeteria-mesa.jpeg";
 const ClienteDashboard = () => {
   const navigate = useNavigate();
   const [showPerfil, setShowPerfil] = useState(false);
-  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
     const myCarousel = document.querySelector("#heroCarousel");
