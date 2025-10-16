@@ -12,10 +12,15 @@ import AdminDashboard from "./components/Dashboard/AdminDashboard";
 import ClienteDashboard from "./components/Dashboard/ClienteDashboard";
 import CocinaDashboard from "./components/Dashboard/CocinaDashboard";
 
+import ClienteProductos from "./components/Products/ClienteProductos";
+
+import ContactoSection from "./components/Layout/ContactoSection";
+
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Vista de Autenticación */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -25,6 +30,13 @@ function App() {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
         <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
+
+        {/* Vista de productos */}
+        <Route path="/cliente-productos" element={<ClienteProductos />} />
+
+        {/* Contacto global */}
+        <Route path="/contacto" element={<ContactoSection />} />
+
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
