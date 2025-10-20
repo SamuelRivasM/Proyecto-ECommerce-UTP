@@ -1,7 +1,8 @@
+
+/* frontend/App.css */
 .App {
   text-align: center;
 }
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -23,7 +24,6 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
 .App-link {
   color: #61dafb;
 }
@@ -34,5 +34,22 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ================================
+     Estilos globales adicionales
+   ================================ */
+
+/* Asegura que el contenido no quede oculto detrás del footer fijo */
+body {
+  margin: 0;
+  padding-bottom: 40px;
+  background-color: #faf7f5;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding-bottom: 70px;
   }
 }

@@ -6,10 +6,11 @@ USE cafeteria_utp;
 -- ==========================================================
 INSERT INTO usuarios (nombre, email, telefono, password, rol, ultimo_login)
 VALUES 
-('Carlos Cliente', 'cliente@utp.edu.pe', '999111222', '$2b$10$om/yOfd..Jp0VMHevOrLwuVj8dEHyqvHWvAwIen1afZ9W9EkgdHSW', 'cliente', NULL),
-('Ana Admin', 'admin@utp.edu.pe', '999333444', '$2b$10$63g.uv4a1JNsKPb.x3i9P.wGuDoPhZtBxgW2K/6NV.8NMYlM/sUTG', 'admin', NULL),
-('Pedro Cocina', 'cocina@utp.edu.pe', '999555666', '$2b$10$zHDRgJ0xQ4m00jd4KF3PkOG4YQbXkh1gBzYRvnP/jLHuBz73Wi.Yi', 'cocina', NULL),
-('Sergio', 'U22201712@utp.edu.pe', '+51967548512', '$2b$10$zhM5pKhnXmfbPm//mXR91./r7diatigNwlKU4ywjo7UP6W2UPNOdW', 'cliente', '2025-10-01 20:46:21');
+('Carlos Cliente', 'cliente@utp.edu.pe', '999111222', '$2b$10$om/yOfd..Jp0VMHevOrLwuVj8dEHyqvHWvAwIen1afZ9W9EkgdHSW', 'cliente', NULL), -- clave: cliente123
+('Ana Admin', 'admin@utp.edu.pe', '999333444', '$2b$10$63g.uv4a1JNsKPb.x3i9P.wGuDoPhZtBxgW2K/6NV.8NMYlM/sUTG', 'admin', NULL), -- clave: admin123
+('Pedro Cocina', 'cocina@utp.edu.pe', '999555666', '$2b$10$zHDRgJ0xQ4m00jd4KF3PkOG4YQbXkh1gBzYRvnP/jLHuBz73Wi.Yi', 'cocina', NULL), -- clave: cocina123 
+('Sergio', 'U22201712@utp.edu.pe', '+51967548512', '$2b$10$zhM5pKhnXmfbPm//mXR91./r7diatigNwlKU4ywjo7UP6W2UPNOdW', 'cliente', '2025-10-01 20:46:21'); -- clave: sergio123
+('Lucía Desactivada', 'lucia@utp.edu.pe', '999777888', '$2b$10$zhM5pKhnXmfbPm//mXR91./r7diatigNwlKU4ywjo7UP6W2UPNOdW', 'cliente', NULL, 0); -- clave: sergio123
 
 -- ==========================================================
 -- CATEGORÍAS
@@ -28,10 +29,10 @@ VALUES
 -- 1. Bebidas Calientes
 INSERT INTO productos (nombre, descripcion, precio, imagen, stock, categoria_id)
 VALUES
-('Café Americano', 'Café negro clásico', 5.00, 'americano.jpg', 50, 1),
-('Café Latte', 'Café con leche espumosa', 6.50, 'latte.jpg', 40, 1),
-('Capuchino', 'Café con espuma de leche y cacao', 7.00, 'capuchino.jpg', 30, 1),
-('Té Verde', 'Infusión de té verde natural', 4.00, 'teverde.jpg', 25, 1),
+('Café Americano', 'Café negro clásico', 5.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1760939529/cafeteria_utp/img_productos/if6e0dhl5togbjgyhhut.avif', 50, 1),
+('Café Latte', 'Café con leche espumosa', 6.50, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1760927750/cafeteria_utp/img_productos/stfdlqb5gjxezvqepymi.avif', 40, 1),
+('Capuchino', 'Café con espuma de leche y cacao', 7.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1760927904/cafeteria_utp/img_productos/hqj6p0sqcxsqytxhkniz.avif', 30, 1),
+('Té Verde', 'Infusión de té verde natural', 4.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1760939521/cafeteria_utp/img_productos/dcz6edkogya642fnqljf.avif', 25, 1),
 ('Chocolate Caliente', 'Bebida caliente de cacao', 6.00, 'chocolate.jpg', 20, 1);
 
 -- 2. Bebidas Frías
@@ -55,7 +56,7 @@ VALUES
 -- 4. Sandwiches
 INSERT INTO productos (nombre, descripcion, precio, imagen, stock, categoria_id)
 VALUES
-('Sandwich de Pollo', 'Sandwich con pollo y vegetales', 10.00, 'sandwich_pollo.jpg', 20, 4),
+('Sandwich de Pollo', 'Sandwich con pollo y vegetales', 10.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1760928336/cafeteria_utp/img_productos/wvvywgff5smjupjwo0yr.avif', 20, 4),
 ('Sandwich de Jamón y Queso', 'Clásico sandwich mixto', 8.00, 'sandwich_jamon.jpg', 25, 4),
 ('Panini de Vegetales', 'Panini con verduras grilladas', 9.50, 'panini_vegetales.jpg', 15, 4),
 ('Hamburguesa Clásica', 'Hamburguesa con carne de res', 12.00, 'hamburguesa.jpg', 30, 4),

@@ -1,4 +1,5 @@
 
+// controllers/adminController.js
 const db = require("../models/db");
 
 function getCondicionFecha(periodo) {

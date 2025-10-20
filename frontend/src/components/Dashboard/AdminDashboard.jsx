@@ -1,9 +1,11 @@
 
+// src/components/Dashboard/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
+import FooterGeneral from "../Layout/FooterGeneral";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -298,13 +300,7 @@ const AdminDashboard = () => {
       </main>
 
       {/* Footer */}
-      <footer className="text-white mt-auto py-3" style={{ backgroundColor: "#A4001D" }}>
-        <div className="container text-center">
-          <p className="mb-1">
-            &copy; {new Date().getFullYear()} Universidad Tecnológica del Perú - Todos los derechos reservados.
-          </p>
-        </div>
-      </footer>
+      <FooterGeneral />
 
       {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
     </div>

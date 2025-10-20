@@ -1,4 +1,5 @@
 
+// backend/generarHash.js
 const bcrypt = require('bcryptjs');
 
 const contraseñas = [

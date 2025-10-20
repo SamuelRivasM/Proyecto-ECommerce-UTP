@@ -1,4 +1,5 @@
 
+// controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../models/db');
@@ -9,7 +10,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const query = `
-      SELECT id, nombre, email, password, rol 
+      SELECT id, nombre, email, password, rol, estado 
       FROM usuarios
       WHERE email = ?
     `;
@@ -21,8 +22,13 @@ exports.login = async (req, res) => {
     }
 
     const user = users[0];
-    const isMatch = await bcrypt.compare(password, user.password.toString());
 
+    // Validar estado del usuario
+    if (user.estado === 0) {
+      return res.status(403).json({ message: 'Usuario desactivado. Comuníquese con Administración.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password.toString());
     if (!isMatch) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
@@ -45,7 +51,6 @@ exports.login = async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    // Respuesta al frontend
     res.json({
       message: `Bienvenido ${user.nombre}`,
       token,
@@ -54,7 +59,7 @@ exports.login = async (req, res) => {
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
-        ultimo_login: new Date() // opcional: enviar al frontend
+        ultimo_login: new Date()
       }
     });
   } catch (error) {

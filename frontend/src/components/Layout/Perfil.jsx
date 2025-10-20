@@ -1,4 +1,5 @@
 
+// src/components/Layout/Perfil.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -104,9 +105,14 @@ const Perfil = ({ onClose }) => {
             {/* Navbar */}
             <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: "#A4001D" }}>
                 <div className="container">
-                    <a className="navbar-brand fw-bold" href="#">
+                    <button
+                        type="button"
+                        className="navbar-brand fw-bold btn btn-link text-white text-decoration-none"
+                        style={{ cursor: "default" }}
+                    >
                         UTP COFFEE POINT - Perfil
-                    </a>
+                    </button>
+
                     <div className="ms-auto d-flex align-items-center">
                         <FaUserCircle size={28} className="text-white me-3" />
                         <button

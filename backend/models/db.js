@@ -1,4 +1,5 @@
 
+// models/db.js
 require('dotenv').config(); // Carga las variables de entorno
 
 const mysql = require('mysql2');

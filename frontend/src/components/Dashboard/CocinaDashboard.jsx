@@ -1,10 +1,12 @@
 
+// src/components/Dashboard/CocinaDashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
+import FooterGeneral from "../Layout/FooterGeneral";
 
-// Imágenes (mantenemos las mismas que cliente)
+// Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
 import cafeteriaInterior from "../../assets/img/cafeteria-interior.jpeg";
 import cafeteriaComida from "../../assets/img/cafeteria-comida.jpeg";
@@ -21,7 +23,7 @@ const CocinaDashboard = () => {
       new window.bootstrap.Carousel(myCarousel, {
         interval: 5000, // 5 seg por imagen
         ride: "carousel",
-        pause: false, // no detener con hover
+        pause: false,
       });
     }
   }, []);
@@ -50,11 +52,7 @@ const CocinaDashboard = () => {
       />
 
       {/* === Contenido principal === */}
-      {/* Hero Section con carrusel */}
-      <div
-        id="heroCarousel"
-        className="carousel slide carousel-fade flex-grow"
-      >
+      <div id="heroCarousel" className="carousel slide carousel-fade flex-grow">
         <div className="carousel-inner" style={{ height: "90vh" }}>
           <div className="carousel-item active">
             <img
@@ -109,19 +107,25 @@ const CocinaDashboard = () => {
               cafetería UTP Lima Sur para optimizar la atención a clientes.
             </p>
             <div className="mb-4">
-              <button className="btn btn-danger me-3">Ver Pedidos</button>
-              <button className="btn btn-danger">Gestionar Productos</button>
+              <button
+                className="btn btn-danger me-3"
+                onClick={() => navigate("/cocina-pedidos")}
+              >
+                Ver Pedidos
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={() => navigate("/cocina-productos")}
+              >
+                Gestionar Productos
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="text-white mt-auto py-3" style={{ backgroundColor: "#A4001D" }}>
-        <div className="container text-center">
-          <p className="mb-1">&copy; {new Date().getFullYear()} Universidad Tecnológica del Perú - Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <FooterGeneral />
 
       {/* Perfil modal */}
       {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}

@@ -1,19 +1,33 @@
 
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
 
+// Rutas Autenticación
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 
+// Rutas Dashboard
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
 import ClienteDashboard from "./components/Dashboard/ClienteDashboard";
 import CocinaDashboard from "./components/Dashboard/CocinaDashboard";
 
+// Rutas Admin
+import AdminUsuarios from "./components/Admin/AdminUsuarios";
+import AdminReportes from "./components/Admin/AdminReportes";
+
+// Rutas Cliente
 import ClienteProductos from "./components/Products/ClienteProductos";
 
+// Rutas Cocina
+import CocinaProductos from "./components/Cocina/CocinaProductos";
+import CocinaPedidos from "./components/Cocina/CocinaPedidos";
+
+// Rutas Globales
 import ContactoSection from "./components/Layout/ContactoSection";
 
 function App() {
@@ -26,13 +40,21 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* Dashboards por rol */}
+        {/* Vista de Dashboards por Rol */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
         <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
 
-        {/* Vista de productos */}
+        {/* Vista de Rol Admin */}
+        <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+        <Route path="/admin-reportes" element={<AdminReportes />} />
+
+        {/* Vista de Rol Clientes */}
         <Route path="/cliente-productos" element={<ClienteProductos />} />
+
+        {/* Vistas del Rol Cocina */}
+        <Route path="/cocina-productos" element={<CocinaProductos />} />
+        <Route path="/cocina-pedidos" element={<CocinaPedidos />} />
 
         {/* Contacto global */}
         <Route path="/contacto" element={<ContactoSection />} />

@@ -1,9 +1,11 @@
 
+// src/components/Dashboard/ClienteDashboard.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiClock, FiMapPin } from "react-icons/fi";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
+import FooterGeneral from "../Layout/FooterGeneral";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -84,13 +86,8 @@ const ClienteDashboard = () => {
         </div>
       </div>
 
-
       {/* Footer */}
-      <footer className="text-white mt-auto py-3" style={{ backgroundColor: "#A4001D" }}>
-        <div className="container text-center">
-          <p className="mb-1">&copy; {new Date().getFullYear()} Universidad Tecnológica del Perú - Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <FooterGeneral />
 
       {/* Perfil modal */}
       {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}

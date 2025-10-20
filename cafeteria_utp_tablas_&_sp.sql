@@ -18,7 +18,8 @@ CREATE TABLE usuarios (
   password VARCHAR(255) NOT NULL,
   rol ENUM('cliente','admin','cocina') DEFAULT 'cliente',
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  ultimo_login TIMESTAMP NULL
+  ultimo_login TIMESTAMP NULL,
+  estado TINYINT(1) DEFAULT 1 COMMENT '1 = activo, 0 = desactivado'
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------
@@ -91,3 +92,25 @@ CREATE TABLE tokens_recuperacion (
     ON DELETE CASCADE
     ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER $$
+
+CREATE EVENT IF NOT EXISTS actualizar_estado_productos_event
+ON SCHEDULE EVERY 10 SECOND
+DO
+BEGIN
+  -- Desactivar productos sin stock
+  UPDATE productos
+  SET disponible = 0
+  WHERE stock <= 0 AND disponible != 0;
+
+  -- Activar productos con stock positivo
+  UPDATE productos
+  SET disponible = 1
+  WHERE stock > 0 AND disponible != 1;
+END$$
+
+DELIMITER ;

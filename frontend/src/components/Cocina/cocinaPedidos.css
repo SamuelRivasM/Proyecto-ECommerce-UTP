@@ -1,0 +1,124 @@
+
+/* src/Cocina/cocinaStyles.css */
+.table-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ======== Tabla ======== */
+.table th,
+.table td {
+    vertical-align: middle !important;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Forzar color del encabezado aunque haya Bootstrap */
+.table thead.table-header tr th {
+    background-color: #a4001d !important;
+    color: white !important;
+}
+
+/* ======== Filtros y paginación ======== */
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.pagination button {
+    border: none;
+    background: #f1f1f1;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pagination button.active {
+    background: #a4001d;
+    color: white;
+}
+.pagination button:hover {
+    background: #ddd;
+}
+
+/* ======== Botones ======== */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.action-buttons button {
+    flex: 1 1 auto;
+    min-width: 90px;
+    margin: 0;
+}
+
+/* ======== Responsivo ======== */
+@media (max-width: 992px) {
+    .table thead {
+        display: none;
+    }
+    .table,
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+    .table tr {
+        margin-bottom: 16px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .table td {
+        text-align: left;
+        padding: 6px 10px;
+        position: relative;
+        white-space: normal;
+    }
+    .table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #555;
+        display: block;
+        margin-bottom: 4px;
+    }
+    .action-buttons {
+        justify-content: flex-start;
+    }
+    .action-buttons button {
+        flex: unset;
+        min-width: auto;
+        font-size: 12px;
+        padding: 5px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-container {
+        padding: 10px;
+    }
+    .table tr {
+        padding: 8px;
+    }
+    .table td {
+        font-size: 13px;
+    }
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .action-buttons button {
+        width: 100%;
+        font-size: 12px;
+    }
+}
