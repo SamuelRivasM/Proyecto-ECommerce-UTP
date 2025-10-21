@@ -1,0 +1,45 @@
+
+/* src/Cart/clienteCarrito.css */
+.table th,
+.table td {
+  vertical-align: middle;
+}
+.btn-outline-danger,
+.btn-outline-success {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+@media (max-width: 992px) {
+  .table thead {
+    display: none;
+  }
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+  .table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
+  }
+  .table td {
+    text-align: left;
+    position: relative;
+    padding: 8px 10px;
+  }
+  .table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #A4001D;
+    display: block;
+    margin-bottom: 4px;
+  }
+}

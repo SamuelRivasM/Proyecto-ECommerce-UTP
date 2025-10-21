@@ -31,8 +31,8 @@ const NavbarGeneral = ({
         cliente: [
             { nombre: "Inicio", accion: onInicioClick }, // aplicado
             { nombre: "Productos", accion: () => navigate("/cliente-productos") }, // aplicado
-            { nombre: "Mis Pedidos", accion: () => navigate("/cliente-dashboard#pedidos") }, // para luego
-            { nombre: "Carrito", accion: () => navigate("/cliente-dashboard#carrito") }, // para luego
+            { nombre: "Mis Pedidos", accion: () => navigate("/cliente-pedidos") }, // aplicado
+            { nombre: "Carrito", accion: () => navigate("/cliente-carrito") }, // aplicado
             { nombre: "Contacto", accion: () => navigate("/contacto") }, // aplicado
         ],
     };

@@ -1,5 +1,5 @@
 
-// routes/productoRoutes.js
+// backend/routes/productoRoutes.js
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -19,12 +19,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Rutas de productos
-router.get("/disponibles", productoController.obtenerProductosDisponibles);
-router.get("/todos", productoController.obtenerTodosProductos);
-router.post(
-    "/upload/:id",
-    upload.single("imagen"),
-    productoController.actualizarImagenProducto
-);
+router.get("/cliente", productoController.obtenerProductosDisponibles);
+router.get("/cocina", productoController.obtenerTodosProductos);
+router.post("/upload/:id", upload.single("imagen"), productoController.actualizarImagenProducto);
+router.get("/categorias", productoController.obtenerCategorias);
 
 module.exports = router;

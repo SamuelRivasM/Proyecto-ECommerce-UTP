@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require("./routes/adminRoutes");
 const perfilRoutes = require("./routes/perfilRoutes");
 const productoRoutes = require("./routes/productoRoutes");
+const pedidoRoutes = require("./routes/pedidoRoutes");
 
 const app = express();
 app.use(cors({
@@ -19,10 +20,11 @@ app.use(cors({
 app.use(express.json());
 
 // Rutas
-app.use('/api/auth', authRoutes);         // Autenticación
-app.use("/api/perfil", perfilRoutes);     // Configuración de Perfil Global
-app.use("/api/admin", adminRoutes);       // Funciones Admin
-app.use('/api/productos', productoRoutes); // Catalogo
+app.use('/api/auth', authRoutes);           // Autenticación
+app.use("/api/perfil", perfilRoutes);       // Configuración de Perfil Global
+app.use("/api/admin", adminRoutes);         // Funciones Admin
+app.use('/api/productos', productoRoutes);  // Catalogo de Productos
+app.use("/api/pedidos", pedidoRoutes);      // Lista de Pedidos
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

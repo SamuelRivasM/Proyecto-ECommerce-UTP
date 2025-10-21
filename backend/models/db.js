@@ -1,23 +1,29 @@
 
-// models/db.js
-require('dotenv').config(); // Carga las variables de entorno
+// backend/models/db.js
+const mysql = require("mysql2");
+require("dotenv").config();
 
-const mysql = require('mysql2');
-
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306
+// Crear pool de conexiones
+const db = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "cafeteria_utp",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-db.connect(err => {
+// === Log para confirmar conexión y detectar errores ===
+db.getConnection((err, connection) => {
   if (err) {
-    console.error('Error conectando a la base de datos:', err);
-    process.exit(1);
+    console.error("Error al conectar con la base de datos:");
+    if (err.code === "ECONNREFUSED") console.error("→ Conexión rechazada. ¿MySQL está activo?");
+    else if (err.code === "ER_ACCESS_DENIED_ERROR") console.error("→ Usuario o contraseña incorrectos.");
+    else console.error(err);
   } else {
-    console.log('Conexión a la base de datos exitosa');
+    console.log("Conexión a la base de datos establecida correctamente.");
+    connection.release();
   }
 });
 

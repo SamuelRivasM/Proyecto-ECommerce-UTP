@@ -20,7 +20,7 @@ const CocinaProductos = () => {
     useEffect(() => {
         const fetchProductos = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/productos/todos`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/productos/cocina`);
                 setProductos(response.data);
             } catch {
                 toast.error("Error al obtener productos");
@@ -57,10 +57,10 @@ const CocinaProductos = () => {
                     )
                 );
 
-                toast.success("✅ Imagen actualizada correctamente");
+                toast.success("Imagen actualizada correctamente");
             } catch (error) {
                 console.error("Error al subir imagen:", error);
-                toast.error("❌ Error al subir imagen");
+                toast.error("Error al subir imagen");
             }
         };
 

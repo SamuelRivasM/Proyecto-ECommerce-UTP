@@ -1,5 +1,5 @@
 
-// controllers/productoController.js
+// backend/controllers/productoController.js
 const db = require("../models/db");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
@@ -86,5 +86,20 @@ exports.actualizarImagenProducto = async (req, res) => {
   } catch (error) {
     console.error("Error al actualizar imagen:", error);
     res.status(500).json({ message: "Error al subir imagen" });
+  }
+};
+
+// === Obtener todas las categorías ===
+exports.obtenerCategorias = async (req, res) => {
+  try {
+    const [categorias] = await db.promise().query(`
+      SELECT id, nombre
+      FROM categorias
+      ORDER BY nombre ASC
+    `);
+    res.json(categorias);
+  } catch (error) {
+    console.error("Error al obtener categorías:", error);
+    res.status(500).json({ message: "Error al obtener categorías" });
   }
 };

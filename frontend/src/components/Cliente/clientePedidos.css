@@ -1,5 +1,5 @@
 
-/* src/Cocina/cocinaPedidos.css */
+/* src/Cliente/clientePedidos.css */
 .table-container {
     overflow-x: auto;
     background: white;
@@ -85,7 +85,7 @@
         white-space: normal;
     }
     .table td::before {
-        content: attr(data-label);
+        content: attr(data-label) !important;
         font-weight: bold;
         color: #555;
         display: block;

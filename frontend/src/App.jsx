@@ -21,7 +21,9 @@ import AdminUsuarios from "./components/Admin/AdminUsuarios";
 import AdminReportes from "./components/Admin/AdminReportes";
 
 // Rutas Cliente
-import ClienteProductos from "./components/Products/ClienteProductos";
+import ClienteProductos from "./components/Cliente/ClienteProductos";
+import ClientePedidos from "./components/Cliente/ClientePedidos";
+import ClienteCarrito from "./components/Cart/ClienteCarrito";
 
 // Rutas Cocina
 import CocinaProductos from "./components/Cocina/CocinaProductos";
@@ -51,6 +53,8 @@ function App() {
 
         {/* Vista de Rol Clientes */}
         <Route path="/cliente-productos" element={<ClienteProductos />} />
+        <Route path="/cliente-pedidos" element={<ClientePedidos />} />
+        <Route path="/cliente-carrito" element={<ClienteCarrito />} />
 
         {/* Vistas del Rol Cocina */}
         <Route path="/cocina-productos" element={<CocinaProductos />} />
@@ -60,7 +64,17 @@ function App() {
         <Route path="/contacto" element={<ContactoSection />} />
 
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </Router>
   );
 }
