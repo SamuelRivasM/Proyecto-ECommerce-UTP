@@ -1,0 +1,27 @@
+
+/* src/Layout/navbarGeneral.css */
+.carrito-icono-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.carrito-badge {
+    position: absolute;
+    left: -10px;
+    top: -6px;
+    background-color: #dc3545;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+.nav-link.active {
+    color: #ffddcc !important;
+}

@@ -108,6 +108,7 @@ const ClienteProductos = () => {
             subtotal: parseFloat(prod.precio),
         });
         localStorage.setItem("carrito", JSON.stringify(carrito));
+        window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
         toast.success("Se agregó el producto al carrito correctamente.");
     };
 

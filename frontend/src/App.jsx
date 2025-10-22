@@ -5,6 +5,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
+// Contexto del Carrito
+import { CartProvider } from "./context/CartContext";
+
 // Rutas Autenticación
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
@@ -34,48 +37,50 @@ import ContactoSection from "./components/Layout/ContactoSection";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Vista de Autenticación */}
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+    <CartProvider>
+      <Router>
+        <Routes>
+          {/* Vista de Autenticación */}
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* Vista de Dashboards por Rol */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
-        <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
+          {/* Vista de Dashboards por Rol */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
+          <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
 
-        {/* Vista de Rol Admin */}
-        <Route path="/admin-usuarios" element={<AdminUsuarios />} />
-        <Route path="/admin-reportes" element={<AdminReportes />} />
+          {/* Vista de Rol Admin */}
+          <Route path="/admin-usuarios" element={<AdminUsuarios />} />
+          <Route path="/admin-reportes" element={<AdminReportes />} />
 
-        {/* Vista de Rol Clientes */}
-        <Route path="/cliente-productos" element={<ClienteProductos />} />
-        <Route path="/cliente-pedidos" element={<ClientePedidos />} />
-        <Route path="/cliente-carrito" element={<ClienteCarrito />} />
+          {/* Vista de Rol Clientes */}
+          <Route path="/cliente-productos" element={<ClienteProductos />} />
+          <Route path="/cliente-pedidos" element={<ClientePedidos />} />
+          <Route path="/cliente-carrito" element={<ClienteCarrito />} />
 
-        {/* Vistas del Rol Cocina */}
-        <Route path="/cocina-productos" element={<CocinaProductos />} />
-        <Route path="/cocina-pedidos" element={<CocinaPedidos />} />
+          {/* Vistas del Rol Cocina */}
+          <Route path="/cocina-productos" element={<CocinaProductos />} />
+          <Route path="/cocina-pedidos" element={<CocinaPedidos />} />
 
-        {/* Contacto global */}
-        <Route path="/contacto" element={<ContactoSection />} />
+          {/* Contacto global */}
+          <Route path="/contacto" element={<ContactoSection />} />
 
-      </Routes>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
-    </Router>
+        </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+      </Router>
+    </CartProvider>
   );
 }
 

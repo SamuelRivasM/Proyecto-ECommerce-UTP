@@ -88,6 +88,7 @@ const ClienteCarrito = () => {
         setCarrito(nuevoCarrito);
         setNumero(nuevoCarrito.length + 1);
         localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+        window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
         toast.success("Producto agregado al carrito correctamente.");
     };
 
@@ -102,6 +103,7 @@ const ClienteCarrito = () => {
 
         setCarrito(nuevoCarrito);
         localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+        window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
 
         // Si ya no queda ningún producto, reiniciamos el contador a 1
         setNumero(nuevoCarrito.length > 0 ? nuevoCarrito.length + 1 : 1);
@@ -161,6 +163,7 @@ const ClienteCarrito = () => {
             // Limpiar carrito solo si se ejecuta bien
             setCarrito([]);
             localStorage.removeItem("carrito");
+            window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
             setNumero(1);
 
         } catch (error) {
