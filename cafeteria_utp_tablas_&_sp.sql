@@ -56,7 +56,8 @@ CREATE TABLE pedidos (
   metodo_pago ENUM('efectivo','tarjeta','billetera') NOT NULL,
   estado ENUM('pendiente','en preparación','listo','entregado') DEFAULT 'pendiente',
   total DECIMAL(10,2) NOT NULL,
-  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  fecha_entrega TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
     ON DELETE CASCADE
     ON UPDATE CASCADE

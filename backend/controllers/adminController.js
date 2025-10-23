@@ -3,24 +3,25 @@
 const db = require("../models/db");
 
 function getCondicionFecha(periodo) {
+  const campo = "fecha_creacion"; // o "fecha_entrega" si eliminaste la anterior
   switch (periodo) {
     case "dia":
-      return "DATE(fecha) = CURDATE()";
+      return `DATE(${campo}) = CURDATE()`;
     case "semana":
-      return "YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1)";
+      return `YEARWEEK(${campo}, 1) = YEARWEEK(CURDATE(), 1)`;
     case "mes":
-      return "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+      return `MONTH(${campo}) = MONTH(CURDATE()) AND YEAR(${campo}) = YEAR(CURDATE())`;
     case "trimestre":
-      return "QUARTER(fecha) = QUARTER(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+      return `QUARTER(${campo}) = QUARTER(CURDATE()) AND YEAR(${campo}) = YEAR(CURDATE())`;
     case "semestre":
       return `
-        CEIL(MONTH(fecha) / 6) = CEIL(MONTH(CURDATE()) / 6)
-        AND YEAR(fecha) = YEAR(CURDATE())
+        CEIL(MONTH(${campo}) / 6) = CEIL(MONTH(CURDATE()) / 6)
+        AND YEAR(${campo}) = YEAR(CURDATE())
       `;
     case "año":
-      return "YEAR(fecha) = YEAR(CURDATE())";
+      return `YEAR(${campo}) = YEAR(CURDATE())`;
     default:
-      return "MONTH(fecha) = MONTH(CURDATE()) AND YEAR(fecha) = YEAR(CURDATE())";
+      return `MONTH(${campo}) = MONTH(CURDATE()) AND YEAR(${campo}) = YEAR(CURDATE())`;
   }
 }
 

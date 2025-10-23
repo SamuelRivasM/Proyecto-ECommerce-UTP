@@ -18,6 +18,7 @@ const ClienteCarrito = () => {
     const [carrito, setCarrito] = useState([]);
     const [numero, setNumero] = useState(1);
     const [metodoPago, setMetodoPago] = useState("efectivo");
+    const [fechaEntrega, setFechaEntrega] = useState("");
 
     // === Obtener categorías y productos ===
     useEffect(() => {
@@ -129,9 +130,20 @@ const ClienteCarrito = () => {
     // === Calcular total ===
     const total = carrito.reduce((acc, item) => acc + parseFloat(item.subtotal || 0), 0).toFixed(2);
 
-    // === Solicitar pedido ===
+    // === Método para Solicitar un Pedido ===
     const handleSolicitarPedido = async () => {
         if (carrito.length === 0) return toast.warning("El carrito está vacío.");
+
+        if (!fechaEntrega) return toast.warning("Debe seleccionar la hora de entrega.");
+
+        const ahora = new Date();
+        const [horaSel, minSel] = fechaEntrega.split(":").map(Number);
+        const fechaSeleccionada = new Date();
+        fechaSeleccionada.setHours(horaSel, minSel, 0, 0);
+
+        if (fechaSeleccionada <= ahora) {
+            return toast.warning("Seleccione una hora posterior a la actual.");
+        }
 
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user || !user.id) return toast.error("Usuario no identificado.");
@@ -151,33 +163,51 @@ const ClienteCarrito = () => {
             // Crear pedido
             const totalPedido = parseFloat(total);
 
+            // Combinar fecha actual + hora seleccionada
+            const hoy = new Date();
+            const [horaSel, minSel] = fechaEntrega.split(":").map(Number);
+            const fechaEntregaCompleta = new Date(
+                hoy.getFullYear(),
+                hoy.getMonth(),
+                hoy.getDate(),
+                horaSel,
+                minSel,
+                0
+            );
+            // Formatear manualmente a "YYYY-MM-DD HH:mm:ss" en hora local (Perú)
+            const pad = (n) => (n < 10 ? "0" + n : n);
+            const fechaEntregaFormateada = `${fechaEntregaCompleta.getFullYear()}-${pad(
+                fechaEntregaCompleta.getMonth() + 1
+            )}-${pad(fechaEntregaCompleta.getDate())} ${pad(
+                fechaEntregaCompleta.getHours()
+            )}:${pad(fechaEntregaCompleta.getMinutes())}:00`;
+
+            // Enviar al backend la fecha completa
             await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
                 usuarioId: user.id,
                 metodoPago,
                 carrito,
                 total: totalPedido,
+                fechaEntrega: fechaEntregaFormateada,
             });
 
             toast.success("Pedido enviado correctamente.");
 
-            // Limpiar carrito solo si se ejecuta bien
+            // Limpiar carrito
             setCarrito([]);
             localStorage.removeItem("carrito");
-            window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
+            window.dispatchEvent(new Event("cartUpdated"));
             setNumero(1);
+            setFechaEntrega("");
 
         } catch (error) {
-            // Si el error viene de verificación de stock
             if (error.response && error.response.data && error.response.data.insuficientes) {
                 error.response.data.insuficientes.forEach((prod) => {
-                    toast.warning(`El producto "${prod.nombre}" no tiene suficiente stock (${prod.motivo}).`);
+                    toast.warning(`"${prod.nombre}" sin stock suficiente (${prod.motivo}).`);
                 });
             } else {
                 console.error("Error al solicitar pedido:", error);
-                if (error.response) {
-                    console.error("Respuesta del servidor:", error.response.data);
-                }
-                toast.error("Error del servidor al registrar el pedido. Revisa consola para más detalles.");
+                toast.error("Error del servidor al registrar el pedido.");
             }
         }
     };
@@ -352,22 +382,71 @@ const ClienteCarrito = () => {
                 </div>
 
                 {/* === Total y botón === */}
-                <div className="d-flex justify-content-end align-items-center mt-3 gap-3">
-                    <h5 className="fw-bold mb-0">Seleccionar Método de Pago:</h5>
-                    <select
-                        className="form-select w-auto"
-                        value={metodoPago}
-                        onChange={(e) => setMetodoPago(e.target.value)}
-                    >
-                        <option value="efectivo">Efectivo</option>
-                        <option value="tarjeta">Tarjeta</option>
-                        <option value="billetera">Billetera Digital</option>
-                    </select>
-                    <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
-                    <button className="btn btn-success" onClick={handleSolicitarPedido}>
-                        Solicitar Pedido
-                    </button>
+                <div className="d-flex flex-column align-items-end mt-4 gap-3">
+                    <div className="d-flex align-items-center gap-3">
+                        <h5 className="fw-bold mb-0">Método de Pago:</h5>
+                        <select
+                            className="form-select w-auto"
+                            value={metodoPago}
+                            onChange={(e) => setMetodoPago(e.target.value)}
+                        >
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="billetera">Billetera Digital</option>
+                        </select>
+                    </div>
+                    {/* Campo de fecha y hora de entrega */}
+                    <div className="d-flex align-items-center gap-3">
+                        <h5 className="fw-bold mb-0">Hora de entrega:</h5>
+
+                        {/* Selector de fecha (solo muestra el día actual y no editable) */}
+                        <div className="d-flex align-items-center gap-2">
+                            <select className="form-select w-auto" disabled>
+                                <option>
+                                    {new Date().toLocaleDateString("es-PE", {
+                                        weekday: "long",
+                                        day: "numeric",
+                                        month: "long",
+                                    })}
+                                </option>
+                            </select>
+
+                            {/* Selector de hora (solo horas futuras del día actual) */}
+                            <select
+                                className="form-select w-auto"
+                                value={fechaEntrega}
+                                onChange={(e) => setFechaEntrega(e.target.value)}
+                                required
+                            >
+                                <option value="">Selecciona hora</option>
+                                {(() => {
+                                    const ahora = new Date();
+                                    const horas = [];
+                                    const inicio = ahora.getHours() + (ahora.getMinutes() > 50 ? 1 : 0);
+                                    for (let h = inicio; h <= 23; h++) {
+                                        const hora = h.toString().padStart(2, "0");
+                                        horas.push(`${hora}:00`);
+                                        horas.push(`${hora}:15`);
+                                        horas.push(`${hora}:30`);
+                                        horas.push(`${hora}:45`);
+                                    }
+                                    return horas.map((hora) => (
+                                        <option key={hora} value={hora}>
+                                            {hora}
+                                        </option>
+                                    ));
+                                })()}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="d-flex align-items-center gap-3">
+                        <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
+                        <button className="btn btn-success" onClick={handleSolicitarPedido}>
+                            Solicitar Pedido
+                        </button>
+                    </div>
                 </div>
+
             </section>
 
             {/* Footer */}

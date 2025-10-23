@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "./NavbarGeneral";
+import FooterGeneral from "../Layout/FooterGeneral";
 import Perfil from "./Perfil";
 
 const ContactoSection = () => {
@@ -79,13 +80,7 @@ const ContactoSection = () => {
             </section>
 
             {/* Footer */}
-            <footer className="text-white mt-auto py-3" style={{ backgroundColor: "#A4001D" }}>
-                <div className="container text-center">
-                    <p className="mb-1">
-                        &copy; {new Date().getFullYear()} Universidad Tecnológica del Perú - Todos los derechos reservados.
-                    </p>
-                </div>
-            </footer>
+            <FooterGeneral />
 
             {/* Modal Perfil */}
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}

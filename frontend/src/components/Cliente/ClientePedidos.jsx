@@ -152,7 +152,8 @@ const ClientePedidos = () => {
                                 <th>Método de Pago</th>
                                 <th>Estado</th>
                                 <th>Total (S/)</th>
-                                <th>Fecha</th>
+                                <th>Fecha / Hora del Pedido</th>
+                                <th>Fecha / Hora de Entrega</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
@@ -170,8 +171,9 @@ const ClientePedidos = () => {
                                             </span>
                                         </td>
                                         <td data-label="Total (S/):">{p.total}</td>
-                                        <td data-label="Fecha:">{p.fecha}</td>
-                                        <td data-label="Acción:" className="action-buttons">
+                                        <td data-label="Fecha / Hora del Pedido:">{p.fecha_creacion}</td>
+                                        <td data-label="Fecha / Hora de Entrega:">{p.fecha_entrega || "—"}</td>
+                                        <td data-label="Acciones:" className="action-buttons">
                                             <button
                                                 className="btn btn-sm btn-primary"
                                                 onClick={() => handleVerDetalle(p)}
@@ -183,7 +185,7 @@ const ClientePedidos = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="text-center">
+                                    <td colSpan="7" className="text-center">
                                         No se encontraron pedidos.
                                     </td>
                                 </tr>
@@ -207,7 +209,8 @@ const ClientePedidos = () => {
 
                                 {/* === Información general del pedido === */}
                                 <div className="mb-3">
-                                    <p><strong>Fecha:</strong> {pedidoSeleccionado.fecha}</p>
+                                    <p><strong>Fecha / Hora del Pedido:</strong> {pedidoSeleccionado.fecha_creacion}</p>
+                                    <p><strong>Fecha / Hora de Entrega:</strong> {pedidoSeleccionado.fecha_entrega || "—"}</p>
                                     <p><strong>Estado:</strong>{" "}
                                         <span className={getEstadoClass(pedidoSeleccionado.estado)}>
                                             {capitalizarPrimeraLetra(pedidoSeleccionado.estado)}

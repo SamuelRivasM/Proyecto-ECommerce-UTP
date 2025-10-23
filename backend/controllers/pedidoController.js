@@ -4,39 +4,36 @@ const db = require("../models/db");
 
 // === Obtener pedidos de un cliente ===
 exports.obtenerPedidosPorCliente = async (req, res) => {
-    const { usuarioId } = req.params;
+  const { usuarioId } = req.params;
 
-    try {
-        const [pedidos] = await db.promise().query(
-            `
+  try {
+    const [pedidos] = await db.promise().query(`
       SELECT 
         id,
         metodo_pago,
         estado,
         total,
-        DATE_FORMAT(fecha, '%Y-%m-%d %H:%i:%s') AS fecha
+        DATE_FORMAT(fecha_creacion, '%Y-%m-%d %H:%i:%s') AS fecha_creacion,
+        DATE_FORMAT(fecha_entrega, '%Y-%m-%d %H:%i:%s') AS fecha_entrega
       FROM pedidos
       WHERE usuario_id = ?
-      ORDER BY fecha DESC
-      `,
-            [usuarioId]
-        );
+      ORDER BY fecha_creacion DESC
+    `, [usuarioId]);
 
-        // Asignar numeración dinámica inversa (más antiguo = 1)
-        const pedidosNumerados = pedidos
-            .slice()
-            .reverse()
-            .map((p, i) => ({
-                numero: i + 1,
-                ...p,
-            }))
-            .reverse(); // reordenamos a descendente nuevamente
+    const pedidosNumerados = pedidos
+      .slice()
+      .reverse()
+      .map((p, i) => ({
+        numero: i + 1,
+        ...p,
+      }))
+      .reverse();
 
-        res.json(pedidosNumerados);
-    } catch (error) {
-        console.error("Error al obtener pedidos del cliente:", error);
-        res.status(500).json({ message: "Error al obtener los pedidos del cliente" });
-    }
+    res.json(pedidosNumerados);
+  } catch (error) {
+    console.error("Error al obtener pedidos del cliente:", error);
+    res.status(500).json({ message: "Error al obtener los pedidos del cliente" });
+  }
 };
 
 // === Obtener detalle de un pedido ===
@@ -65,9 +62,9 @@ exports.obtenerDetallePedido = async (req, res) => {
 
 // === Crear nuevo pedido ===
 exports.crearPedido = async (req, res) => {
-    const { usuarioId, metodoPago, carrito, total } = req.body;
+    const { usuarioId, metodoPago, carrito, total, fechaEntrega } = req.body;
 
-    if (!usuarioId || !metodoPago || !carrito || carrito.length === 0) {
+    if (!usuarioId || !metodoPago || !carrito || carrito.length === 0 || !fechaEntrega) {
         return res.status(400).json({ message: "Datos incompletos para crear el pedido." });
     }
 
@@ -76,11 +73,11 @@ exports.crearPedido = async (req, res) => {
     try {
         await connection.beginTransaction();
 
-        // Insertar pedido principal
+        // Insertar pedido principal con fecha_entrega
         const [pedidoResult] = await connection.query(
-            `INSERT INTO pedidos (usuario_id, metodo_pago, total, estado)
-       VALUES (?, ?, ?, 'pendiente')`,
-            [usuarioId, metodoPago, total]
+            `INSERT INTO pedidos (usuario_id, metodo_pago, total, estado, fecha_entrega)
+             VALUES (?, ?, ?, 'pendiente', ?)`,
+            [usuarioId, metodoPago, total, fechaEntrega]
         );
 
         const pedidoId = pedidoResult.insertId;
@@ -89,11 +86,11 @@ exports.crearPedido = async (req, res) => {
         for (const item of carrito) {
             await connection.query(
                 `INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, subtotal)
-         VALUES (?, ?, ?, ?)`,
+                 VALUES (?, ?, ?, ?)`,
                 [pedidoId, item.id, item.cantidad, item.subtotal]
             );
 
-            // Reducir stock del producto
+            // Reducir stock
             await connection.query(
                 `UPDATE productos SET stock = GREATEST(stock - ?, 0) WHERE id = ?`,
                 [item.cantidad, item.id]
@@ -110,7 +107,6 @@ exports.crearPedido = async (req, res) => {
     } catch (error) {
         await connection.rollback();
         console.error("Error al crear pedido:", error);
-        console.error(error.stack);
         res.status(500).json({ message: "Error al registrar el pedido.", error: error.message });
     } finally {
         connection.release();
