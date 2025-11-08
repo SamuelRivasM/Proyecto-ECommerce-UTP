@@ -34,8 +34,8 @@ VALUES
 ('Chocolate Caliente', 'Bebida caliente de cacao', 6.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1761183798/cafeteria_utp/img_productos/gigai6z541mwyiyvegpq.avif', 20, 1),
 
 -- 2. Bebidas Frías
-('Jugo de Naranja', 'Jugo natural recién exprimido', 4.50, 'jugo_naranja.jpg', 35, 2),
-('Limonada Frappe', 'Refrescante limonada con hielo', 5.00, 'limonada.jpg', 40, 2),
+('Jugo de Naranja', 'Jugo natural recién exprimido', 4.50, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1761186719/cafeteria_utp/img_productos/xugjmwqjpvd6o5pqzc51.avif', 35, 2),
+('Limonada Frappe', 'Refrescante limonada con hielo', 5.00, 'https://res.cloudinary.com/dkxfrwzmg/image/upload/v1762572239/cafeteria_utp/img_productos/qfvz2xwuvt1geoi2oc7v.avif', 40, 2),
 ('Frappuccino', 'Bebida fría de café con crema', 8.00, 'frappuccino.jpg', 25, 2),
 ('Smoothie de Fresa', 'Batido de fresa natural', 7.50, 'smoothie_fresa.jpg', 30, 2),
 ('Agua Mineral', 'Botella de agua mineral', 2.00, 'agua.jpg', 100, 2),

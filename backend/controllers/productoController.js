@@ -103,3 +103,26 @@ exports.obtenerCategorias = async (req, res) => {
     res.status(500).json({ message: "Error al obtener categorías" });
   }
 };
+
+// === Editar producto ===
+exports.editarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, descripcion, precio, stock, categoria_id } = req.body;
+
+    if (!nombre || !precio) {
+      return res.status(400).json({ message: "Nombre y precio son obligatorios" });
+    }
+
+    await db.promise().query(`
+      UPDATE productos 
+      SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria_id = ?
+      WHERE id = ?
+    `, [nombre, descripcion, precio, stock, categoria_id || null, id]);
+
+    res.json({ message: "Producto actualizado correctamente" });
+  } catch (error) {
+    console.error("Error al editar producto:", error);
+    res.status(500).json({ message: "Error al editar producto" });
+  }
+};

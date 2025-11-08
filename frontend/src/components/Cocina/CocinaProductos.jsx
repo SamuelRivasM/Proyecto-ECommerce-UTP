@@ -16,6 +16,14 @@ const CocinaProductos = () => {
     const [filtro, setFiltro] = useState("");
     const [criterio, setCriterio] = useState("todos");
     const itemsPorPagina = 15;
+    const [productoEdit, setProductoEdit] = useState(null);
+    const [categorias, setCategorias] = useState([]);
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_URL}/productos/categorias`)
+            .then(res => setCategorias(res.data))
+            .catch(() => toast.error("Error al cargar categorías"));
+    }, []);
 
     useEffect(() => {
         const fetchProductos = async () => {
@@ -28,6 +36,40 @@ const CocinaProductos = () => {
         };
         fetchProductos();
     }, []);
+
+    // Función de Editar Producto
+    const handleEditar = (prod) => {
+        setProductoEdit({ ...prod });
+    };
+
+    // Función para Guardar luego de Editar
+    const handleGuardarCambios = async () => {
+        try {
+            await axios.put(
+                `${process.env.REACT_APP_API_URL}/productos/cocina/${productoEdit.id}`,
+                {
+                    nombre: productoEdit.nombre,
+                    descripcion: productoEdit.descripcion,
+                    precio: productoEdit.precio,
+                    stock: productoEdit.stock,
+                    categoria_id: categorias.find(c => c.nombre === productoEdit.categoria)?.id
+                }
+            );
+
+            // Refrescar en el frontend sin recargar
+            setProductos(prev =>
+                prev.map(p =>
+                    p.id === productoEdit.id ? productoEdit : p
+                )
+            );
+
+            toast.success("Producto actualizado correctamente");
+            setProductoEdit(null);
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al actualizar");
+        }
+    };
 
     // Subida de imagen con Cloudinary
     const handleCambiarImg = async (idProducto) => {
@@ -184,7 +226,12 @@ const CocinaProductos = () => {
                                         <td data-label="Categoría:">{prod.categoria}</td>
                                         <td data-label="Estado:">{prod.disponible ? "Activo" : "Inactivo"}</td>
                                         <td data-label="Acciones:" className="action-buttons">
-                                            <button className="btn btn-sm btn-primary">Editar</button>
+                                            <button
+                                                className="btn btn-sm btn-primary"
+                                                onClick={() => handleEditar(prod)}
+                                            >
+                                                Editar
+                                            </button>
                                             <button
                                                 className="btn btn-sm btn-secondary"
                                                 onClick={() => handleCambiarImg(prod.id)}
@@ -219,11 +266,58 @@ const CocinaProductos = () => {
                 </div>
             </div>
 
+            {productoEdit && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h5 className="mb-3">Editar Producto</h5>
+
+                        <label>Nombre</label>
+                        <input className="form-control mb-2"
+                            value={productoEdit.nombre}
+                            onChange={(e) => setProductoEdit(prev => ({ ...prev, nombre: e.target.value }))} />
+
+                        <label>Descripción</label>
+                        <textarea className="form-control mb-2"
+                            value={productoEdit.descripcion}
+                            onChange={(e) => setProductoEdit(prev => ({ ...prev, descripcion: e.target.value }))} />
+
+                        <label>Precio (S/)</label>
+                        <input type="number" className="form-control mb-2"
+                            value={productoEdit.precio}
+                            onChange={(e) => setProductoEdit(prev => ({ ...prev, precio: e.target.value }))} />
+
+                        <label>Stock</label>
+                        <input type="number" className="form-control mb-2"
+                            value={productoEdit.stock}
+                            onChange={(e) => setProductoEdit(prev => ({ ...prev, stock: e.target.value }))} />
+
+                        <label>Categoría</label>
+                        <select className="form-control mb-4"
+                            value={productoEdit.categoria}
+                            onChange={(e) => setProductoEdit(prev => ({ ...prev, categoria: e.target.value }))}>
+                            {categorias.map(c => (
+                                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+                            ))}
+                        </select>
+
+                        <div className="d-flex gap-3">
+                            <button className="btn btn-success" onClick={handleGuardarCambios}>
+                                Guardar
+                            </button>
+                            <button className="btn btn-danger" onClick={() => setProductoEdit(null)}>
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Footer */}
             <FooterGeneral />
 
             {/* Perfil modal */}
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
+
         </div>
     );
 };
