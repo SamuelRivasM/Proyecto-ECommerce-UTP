@@ -15,3 +15,4 @@ router.get("/cocina/pedidos-ordenados", pedidoController.obtenerPedidosParaCocin
 router.put("/:pedidoId/actualizar-estado", pedidoController.actualizarEstadoPedido);
 
 module.exports = router;
+    
