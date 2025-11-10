@@ -1,5 +1,6 @@
 // src/components/Cocina/CocinaPedidos.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
@@ -10,48 +11,58 @@ const CocinaPedidos = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [filtro, setFiltro] = useState("");
     const [criterio, setCriterio] = useState("todos");
+    const [pedidos, setPedidos] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Pedidos simulados
-    const pedidos = Array.from({ length: 35 }, (_, i) => ({
-        id: i + 1,
-        cliente: `Cliente ${i + 1}`,
-        metodo_pago: ["efectivo", "tarjeta", "billetera"][i % 3],
-        estado: ["pendiente", "en preparación", "listo", "entregado"][i % 4],
-        total: (Math.random() * 30 + 10).toFixed(2),
-        fecha: "2025-10-19 12:30:00",
-    }));
+    // === Obtener pedidos desde el backend ===
+    useEffect(() => {
+        const obtenerPedidos = async () => {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/pedidos/cocina/pedidos-ordenados`
+                );
+                setPedidos(response.data);
+            } catch (error) {
+                console.error("Error al obtener pedidos:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    // Filtrado
+        obtenerPedidos();
+    }, []);
+
+    // === Filtrado ===
     const pedidosFiltrados = pedidos.filter((p) => {
         if (criterio === "todos" || filtro.trim() === "") return true;
         const valor = filtro.toLowerCase();
         switch (criterio) {
             case "id":
-                return p.id.toString() === valor;
+                return p.id?.toString() === valor;
             case "cliente":
-                return p.cliente.toLowerCase().includes(valor);
+                return p.cliente_nombre?.toLowerCase().includes(valor);
             case "metodo_pago":
-                return p.metodo_pago.toLowerCase().includes(valor);
+                return p.metodo_pago?.toLowerCase().includes(valor);
             case "estado":
-                return p.estado.toLowerCase().includes(valor);
+                return p.estado?.toLowerCase().includes(valor);
             case "total":
-                return p.total.toString().includes(valor);
+                return p.total?.toString().includes(valor);
             case "fecha":
-                return p.fecha.toLowerCase().includes(valor);
+                return p.fecha_creacion?.toLowerCase().includes(valor);
             default:
                 return true;
         }
     });
 
-    // Paginación
-    const itemsPorPagina = 15;
+    // === Paginación ===
+    const itemsPorPagina = 12;
     const totalPaginas = Math.ceil(pedidosFiltrados.length / itemsPorPagina);
     const inicio = (currentPage - 1) * itemsPorPagina;
     const pedidosPagina = pedidosFiltrados.slice(inicio, inicio + itemsPorPagina);
 
     return (
         <div className="section-container">
-            {/* Navbar General */}
+            {/* Navbar */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
                 onLogout={() => window.location.replace("/")}
@@ -59,13 +70,20 @@ const CocinaPedidos = () => {
                 activePage="lista de pedidos"
             />
 
-            {/* === Contenido principal === */}
             <div className="container my-4">
                 <h2 className="fw-bold text-center mb-4">Lista de Pedidos</h2>
 
-                {/* === Filtro === */}
-                <div className="input-group mb-4 shadow-sm" style={{ maxWidth: "650px", height: "50px" }}>
-                    <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }}>🔍</span>
+                {/* === Barra de búsqueda === */}
+                <div
+                    className="input-group mb-4 shadow-sm"
+                    style={{ maxWidth: "650px", height: "50px" }}
+                >
+                    <span
+                        className="input-group-text bg-white border-end-0"
+                        style={{ fontSize: "1.2rem", height: "50px" }}
+                    >
+                        🔍
+                    </span>
                     <select
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
@@ -86,59 +104,98 @@ const CocinaPedidos = () => {
                     <input
                         type="text"
                         className="form-control border-start-0"
-                        placeholder={criterio === "todos" ? "Mostrar todos" : `Buscar por ${criterio}...`}
+                        placeholder={
+                            criterio === "todos"
+                                ? "Mostrar todos"
+                                : `Buscar por ${criterio}...`
+                        }
                         value={filtro}
                         onChange={(e) => setFiltro(e.target.value)}
                         disabled={criterio === "todos"}
                         style={{
                             height: "50px",
-                            backgroundColor: criterio === "todos" ? "#f5f5f5" : "white",
+                            backgroundColor:
+                                criterio === "todos" ? "#f5f5f5" : "white",
                         }}
                     />
                 </div>
 
-                {/* === Tabla === */}
-                <div className="table-container">
-                    <table className="table table-striped table-bordered align-middle">
-                        <thead className="table-header">
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Método de Pago</th>
-                                <th>Estado</th>
-                                <th>Total (S/)</th>
-                                <th>Fecha</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pedidosPagina.length > 0 ? (
-                                pedidosPagina.map((p) => (
-                                    <tr key={p.id}>
-                                        <td data-label="ID:">{p.id}</td>
-                                        <td data-label="Cliente:">{p.cliente}</td>
-                                        <td data-label="Método de Pago:">{p.metodo_pago}</td>
-                                        <td data-label="Estado:">{p.estado}</td>
-                                        <td data-label="Total (S/):">{p.total}</td>
-                                        <td data-label="Fecha:">{p.fecha}</td>
-                                        <td data-label="Acciones:" className="action-buttons">
-                                            <button className="btn btn-sm btn-primary">Ver Detalle</button>
-                                            <button className="btn btn-sm btn-success">Marcar Listo</button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="7" className="text-center">
-                                        No se encontraron resultados
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                {/* === Contenido principal === */}
+                {loading ? (
+                    <p className="text-center">Cargando pedidos...</p>
+                ) : pedidosPagina.length > 0 ? (
+                    <div className="row row-cols-1 row-cols-md-3 g-4">
+                        {pedidosPagina.map((p) => (
+                            <div className="col" key={p.id}>
+                                <div
+                                    className={`card shadow-sm border-${p.estado === "entregado"
+                                        ? "success"
+                                        : p.estado === "listo"
+                                            ? "primary"
+                                            : p.estado === "en_preparacion"
+                                                ? "warning"
+                                                : "secondary"
+                                        }`}
+                                >
+                                    <div className="card-body">
+                                        <h5 className="card-title fw-bold">
+                                            Pedido #{p.id}
+                                        </h5>
+                                        <p className="card-text mb-1">
+                                            <strong>Cliente:</strong>{" "}
+                                            {p.cliente_nombre}
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>Método de pago:</strong>{" "}
+                                            {p.metodo_pago}
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>Total:</strong> S/{" "}
+                                            {parseFloat(p.total).toFixed(2)}
+                                        </p>
+                                        <p className="card-text mb-1">
+                                            <strong>Fecha:</strong>{" "}
+                                            {p.fecha_creacion}
+                                        </p>
+                                        <p className="card-text">
+                                            <strong>Estado:</strong>{" "}
+                                            <span
+                                                className={`badge bg-${p.estado === "entregado"
+                                                    ? "success"
+                                                    : p.estado === "listo"
+                                                        ? "primary"
+                                                        : p.estado ===
+                                                            "en_preparacion"
+                                                            ? "warning text-dark"
+                                                            : "secondary"
+                                                    }`}
+                                            >
+                                                {p.estado}
+                                            </span>
+                                        </p>
+                                    </div>
 
-                    {/* Paginación */}
-                    <div className="pagination">
+                                    <div className="card-footer d-flex justify-content-between">
+                                        <button className="btn btn-sm btn-primary">
+                                            Ver Detalle
+                                        </button>
+                                        {p.estado !== "entregado" && (
+                                            <button className="btn btn-sm btn-success">
+                                                Marcar Listo
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center">No se encontraron pedidos</p>
+                )}
+
+                {/* Paginación */}
+                {!loading && totalPaginas > 1 && (
+                    <div className="pagination mt-4">
                         {Array.from({ length: totalPaginas }, (_, i) => (
                             <button
                                 key={i}
@@ -149,13 +206,11 @@ const CocinaPedidos = () => {
                             </button>
                         ))}
                     </div>
-                </div>
+                )}
             </div>
 
-            {/* Footer */}
             <FooterGeneral />
 
-            {/* Perfil modal */}
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
         </div>
     );
