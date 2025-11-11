@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "./clienteProductos.css";
 
@@ -207,6 +208,9 @@ const ClienteProductos = () => {
                     )}
                 </div>
             </section>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat /> 
 
             {/* Footer */}
             <FooterGeneral />

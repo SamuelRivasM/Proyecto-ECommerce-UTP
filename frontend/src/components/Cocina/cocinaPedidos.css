@@ -58,6 +58,12 @@
     min-width: 90px;
     margin: 0;
 }
+.modal-dialog {
+    max-width: 900px !important;
+}
+.modal-content {
+    border-radius: 12px;
+}
 
 /* ======== Responsivo ======== */
 @media (max-width: 992px) {

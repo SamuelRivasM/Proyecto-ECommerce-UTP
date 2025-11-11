@@ -7,8 +7,8 @@ VALUES
 ('Carlos Cliente', 'cliente@utp.edu.pe', '999111222', '$2b$10$om/yOfd..Jp0VMHevOrLwuVj8dEHyqvHWvAwIen1afZ9W9EkgdHSW', 'cliente', NULL),
 ('Ana Admin', 'admin@utp.edu.pe', '999333444', '$2b$10$63g.uv4a1JNsKPb.x3i9P.wGuDoPhZtBxgW2K/6NV.8NMYlM/sUTG', 'admin', NULL),
 ('Pedro Cocina', 'cocina@utp.edu.pe', '999555666', '$2b$10$zHDRgJ0xQ4m00jd4KF3PkOG4YQbXkh1gBzYRvnP/jLHuBz73Wi.Yi', 'cocina', NULL),
-('Sergio', 'U22201712@utp.edu.pe', '+51967548512', '$2b$10$zhM5pKhnXmfbPm//mXR91./r7diatigNwlKU4ywjo7UP6W2UPNOdW', 'cliente', '2025-10-01 20:46:21'),
-('Lucía Desactivada', 'lucia@utp.edu.pe', '999777888', '$2b$10$zhM5pKhnXmfbPm//mXR91./r7diatigNwlKU4ywjo7UP6W2UPNOdW', 'cliente', NULL);
+('Sergio', 'U22201712@utp.edu.pe', '+51967548512', '$2b$10$iDYTHyabBcw0AL6vU/Yawu/VYPdshxt5xiXp5N/L8t6G2nLbMfkvW', 'cliente', '2025-10-01 20:46:21'),
+('Lucía Desactivada', 'lucia@utp.edu.pe', '999777888', '$2b$10$7BliFC74xcIrpdi6HZFzWOCYcmD45ZeCLPbY/PT92euyRWAup4skS', 'cliente', NULL);
 
 -- ==========================================================
 -- CATEGORÍAS

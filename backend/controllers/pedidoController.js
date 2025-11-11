@@ -4,10 +4,10 @@ const db = require("../models/db");
 
 // === Obtener pedidos de un cliente ===
 exports.obtenerPedidosPorCliente = async (req, res) => {
-  const { usuarioId } = req.params;
+    const { usuarioId } = req.params;
 
-  try {
-    const [pedidos] = await db.promise().query(`
+    try {
+        const [pedidos] = await db.promise().query(`
       SELECT 
         id,
         metodo_pago,
@@ -20,20 +20,20 @@ exports.obtenerPedidosPorCliente = async (req, res) => {
       ORDER BY fecha_creacion DESC
     `, [usuarioId]);
 
-    const pedidosNumerados = pedidos
-      .slice()
-      .reverse()
-      .map((p, i) => ({
-        numero: i + 1,
-        ...p,
-      }))
-      .reverse();
+        const pedidosNumerados = pedidos
+            .slice()
+            .reverse()
+            .map((p, i) => ({
+                numero: i + 1,
+                ...p,
+            }))
+            .reverse();
 
-    res.json(pedidosNumerados);
-  } catch (error) {
-    console.error("Error al obtener pedidos del cliente:", error);
-    res.status(500).json({ message: "Error al obtener los pedidos del cliente" });
-  }
+        res.json(pedidosNumerados);
+    } catch (error) {
+        console.error("Error al obtener pedidos del cliente:", error);
+        res.status(500).json({ message: "Error al obtener los pedidos del cliente" });
+    }
 };
 
 // === Obtener detalle de un pedido ===
@@ -156,5 +156,69 @@ exports.verificarStock = async (req, res) => {
     } catch (error) {
         console.error("Error al verificar stock:", error);
         res.status(500).json({ message: "Error al verificar stock." });
+    }
+};
+
+// === Obtener pedidos para cocina con orden inteligente ===
+exports.obtenerPedidosParaCocina = async (req, res) => {
+    try {
+        const [pedidos] = await db.promise().query(`
+      SELECT p.id, p.usuario_id, u.nombre AS cliente_nombre, u.telefono AS cliente_telefono,
+             p.metodo_pago, p.estado, p.total,
+             DATE_FORMAT(p.fecha_creacion, '%Y-%m-%d %H:%i:%s') AS fecha_creacion,
+             DATE_FORMAT(p.fecha_entrega, '%Y-%m-%d %H:%i:%s') AS fecha_entrega
+      FROM pedidos p
+      INNER JOIN usuarios u ON p.usuario_id = u.id
+      ORDER BY 
+        CASE 
+          WHEN p.estado = 'en preparación' THEN 1
+          WHEN p.estado = 'pendiente' THEN 2
+          WHEN p.estado = 'listo' THEN 3
+          WHEN p.estado = 'entregado' THEN 4
+          ELSE 5
+        END,
+        p.fecha_entrega ASC,
+        p.id ASC;
+    `);
+
+        res.json(pedidos);
+    } catch (error) {
+        console.error("Error al obtener pedidos para cocina:", error);
+        res.status(500).json({ message: "Error al obtener pedidos para cocina" });
+    }
+};
+
+// === Actualizar estado del pedido y fecha_entrega si corresponde ===
+exports.actualizarEstadoPedido = async (req, res) => {
+    const { pedidoId } = req.params;
+    const { estado } = req.body;
+
+    const estadosValidos = ['pendiente', 'en preparación', 'listo', 'entregado'];
+
+    if (!estadosValidos.includes(estado)) {
+        return res.status(400).json({ message: "Estado no válido" });
+    }
+
+    try {
+        // Si el estado es 'listo' o 'entregado', se actualiza fecha_entrega también
+        const debeActualizarFecha = (estado === "listo" || estado === "entregado");
+
+        const query = debeActualizarFecha
+            ? "UPDATE pedidos SET estado = ?, fecha_entrega = NOW() WHERE id = ?"
+            : "UPDATE pedidos SET estado = ? WHERE id = ?";
+
+        const [result] = await db.promise().query(query, [estado, pedidoId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Pedido no encontrado" });
+        }
+
+        res.json({
+            message: `Pedido actualizado a: ${estado}`,
+            fecha_entrega_actualizada: debeActualizarFecha
+        });
+    } catch (error) {
+        console.error("Error al actualizar estado del pedido:", error);
+        res.status(500).json({ message: "Error al actualizar estado" });
     }
 };
