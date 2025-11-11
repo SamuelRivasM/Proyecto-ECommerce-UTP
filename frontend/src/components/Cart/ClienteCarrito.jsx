@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "./clienteCarrito.css";
 import { FaTrashAlt } from "react-icons/fa";
@@ -446,8 +447,10 @@ const ClienteCarrito = () => {
                         </button>
                     </div>
                 </div>
-
             </section>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat /> 
 
             {/* Footer */}
             <FooterGeneral />

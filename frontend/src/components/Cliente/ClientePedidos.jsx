@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
+import "../Layout/modals.css";
 import "./clientePedidos.css";
 
 const ClientePedidos = () => {
@@ -257,9 +259,11 @@ const ClientePedidos = () => {
                     </div>
                 </div>
             )}
-
             {/* Overlay del modal */}
             {showModal && <div className="modal-backdrop fade show"></div>}
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat /> 
 
             {/* Footer */}
             <FooterGeneral />

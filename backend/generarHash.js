@@ -5,7 +5,9 @@ const bcrypt = require('bcryptjs');
 const contraseñas = [
   { rol: 'cliente', pass: 'cliente123' },
   { rol: 'admin', pass: 'admin123' },
-  { rol: 'cocina', pass: 'cocina123' }
+  { rol: 'cocina', pass: 'cocina123' },
+  { rol: 'sergio', pass: 'sergio123' },
+  { rol: 'lucia', pass: 'lucia123' }
 ];
 
 const saltRounds = 10;

@@ -106,12 +106,12 @@ BEGIN
   -- Desactivar productos sin stock
   UPDATE productos
   SET disponible = 0
-  WHERE stock <= 0 AND disponible != 0;
+  WHERE stock <= 0;
 
   -- Activar productos con stock positivo
   UPDATE productos
   SET disponible = 1
-  WHERE stock > 0 AND disponible != 1;
+  WHERE stock > 0;
 END$$
 
 DELIMITER ;

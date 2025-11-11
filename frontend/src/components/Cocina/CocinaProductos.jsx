@@ -153,7 +153,7 @@ const CocinaProductos = () => {
                 <h2 className="fw-bold text-center mb-4">Lista de Productos</h2>
 
                 {/* === Filtro === */}
-                <div className="input-group mb-4 shadow-sm" style={{ maxWidth: "650px", height: "50px" }}>
+                <div className="input-group mb-4 shadow-sm" style={{ maxWidth: "650px", height: "50px", margin: "0 auto" }}>
                     <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }}>🔍</span>
                     <select
                         className="form-select border-start-0 border-end-0"
