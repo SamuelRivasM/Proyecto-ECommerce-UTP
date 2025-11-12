@@ -62,18 +62,18 @@ exports.obtenerDetallePedido = async (req, res) => {
 
 // === Crear nuevo pedido ===
 exports.crearPedido = async (req, res) => {
-    const { usuarioId, metodoPago, carrito, total, fechaEntrega } = req.body;
+    const { usuarioId, metodoPago, carrito, total, fechaEntrega, socketId } = req.body;
 
     if (!usuarioId || !metodoPago || !carrito || carrito.length === 0 || !fechaEntrega) {
         return res.status(400).json({ message: "Datos incompletos para crear el pedido." });
     }
 
     const connection = await db.promise().getConnection();
+    const io = req.app.get("io");
 
     try {
         await connection.beginTransaction();
 
-        // Insertar pedido principal con fecha_entrega
         const [pedidoResult] = await connection.query(
             `INSERT INTO pedidos (usuario_id, metodo_pago, total, estado, fecha_entrega)
              VALUES (?, ?, ?, 'pendiente', ?)`,
@@ -82,7 +82,14 @@ exports.crearPedido = async (req, res) => {
 
         const pedidoId = pedidoResult.insertId;
 
-        // Insertar cada producto en detalle_pedido
+        // Emitir inicio SOLO a ese cliente
+        if (io && socketId) {
+            io.to(socketId).emit("orderProgress", { pedidoId, percent: 10 });
+        }
+
+        const totalItems = carrito.length;
+        let processed = 0;
+
         for (const item of carrito) {
             await connection.query(
                 `INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, subtotal)
@@ -90,23 +97,40 @@ exports.crearPedido = async (req, res) => {
                 [pedidoId, item.id, item.cantidad, item.subtotal]
             );
 
-            // Reducir stock
             await connection.query(
                 `UPDATE productos SET stock = GREATEST(stock - ?, 0) WHERE id = ?`,
                 [item.cantidad, item.id]
             );
+
+            processed++;
+            const percent = 10 + Math.round((processed / totalItems) * 80);
+
+            if (io && socketId) {
+                io.to(socketId).emit("orderProgress", { pedidoId, percent });
+            }
         }
 
         await connection.commit();
 
+        if (io && socketId) {
+            io.to(socketId).emit("orderProgress", { pedidoId, percent: 100 });
+            io.to(socketId).emit("orderComplete", { pedidoId });
+        }
+
         res.status(201).json({
             message: "Pedido registrado correctamente.",
-            pedidoId: pedidoId,
+            pedidoId
         });
+
         console.log("Pedido creado correctamente, ID:", pedidoId);
     } catch (error) {
         await connection.rollback();
         console.error("Error al crear pedido:", error);
+
+        if (io && socketId) {
+            io.to(socketId).emit("orderError", { message: "Error al crear el pedido." });
+        }
+
         res.status(500).json({ message: "Error al registrar el pedido.", error: error.message });
     } finally {
         connection.release();

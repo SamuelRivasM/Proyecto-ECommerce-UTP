@@ -34,7 +34,15 @@ const CocinaProductos = () => {
                 toast.error("Error al obtener productos");
             }
         };
+
+        // Llamada inicial
         fetchProductos();
+
+        // Polling cada 3 segundos
+        const interval = setInterval(fetchProductos, 3000);
+
+        // Limpieza para evitar duplicados de intervalos
+        return () => clearInterval(interval);
     }, []);
 
     // Función de Editar Producto

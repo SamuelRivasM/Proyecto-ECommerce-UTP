@@ -54,6 +54,8 @@ const CocinaPedidos = () => {
                 return p.total?.toString().includes(valor);
             case "fecha_creacion":
                 return p.fecha_creacion?.toLowerCase().includes(valor);
+            case "fecha_entrega":
+                return p.fecha_entrega?.toLowerCase().includes(valor);
             default:
                 return true;
         }
@@ -163,7 +165,7 @@ const CocinaPedidos = () => {
                             setCriterio(e.target.value);
                             setFiltro("");
                         }}
-                        style={{ maxWidth: "150px", height: "50px" }}
+                        style={{ maxWidth: "200px", height: "50px" }}
                     >
                         <option value="todos">Todos</option>
                         <option value="id">ID</option>
@@ -171,7 +173,8 @@ const CocinaPedidos = () => {
                         <option value="metodo_pago">Método de Pago</option>
                         <option value="estado">Estado</option>
                         <option value="total">Total (S/)</option>
-                        <option value="fecha_creacion">Fecha</option>
+                        <option value="fecha_creacion">Fecha de Creación</option>
+                        <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
                     <input
                         type="text"
@@ -211,7 +214,8 @@ const CocinaPedidos = () => {
                                         <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
                                         <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
                                         <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>
-                                        <p><strong>Fecha entrega:</strong> {p.fecha_entrega || "—"}</p>
+                                        <p><strong>Fecha / Hora del Pedido:</strong> {p.fecha_creacion || "—"}</p>
+                                        <p><strong>Fecha / Hora de Entrega:</strong> {p.fecha_entrega || "—"}</p>
                                         <p><strong>Estado: </strong>
                                             {!p.editandoEstado ? (
                                                 <span className={getEstadoClass(p.estado)}>
