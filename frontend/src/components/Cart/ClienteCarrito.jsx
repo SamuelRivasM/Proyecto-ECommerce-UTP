@@ -306,287 +306,289 @@ const ClienteCarrito = () => {
                 activePage="carrito"
             />
 
-            {/* === Contenido principal === */}
-            <section className="container my-5 flex-grow">
-                <h2 className="fw-bold text-center mb-4">Carrito de Compras</h2>
+            <div className="carrito-container">
+                {/* === Contenido principal === */}
+                <section className="container my-5 flex-grow">
+                    <h2 className="fw-bold text-center text-dark mb-4">Carrito de Compras</h2>
 
-                {/* === Filtros === */}
-                <div className="row mb-4">
-                    <div className="col-md-5 mb-3 mb-md-0">
-                        <label className="form-label fw-semibold">Categoría</label>
-                        <select
-                            className="form-select"
-                            value={categoriaSeleccionada}
-                            onChange={(e) => setCategoriaSeleccionada(e.target.value)}
-                        >
-                            <option value="">Selecciona una categoría</option>
-                            {categorias.map((cat) => (
-                                <option key={cat.id} value={cat.nombre}>
-                                    {cat.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="col-md-5 mb-3 mb-md-0">
-                        <label className="form-label fw-semibold">Producto</label>
-                        <select
-                            className="form-select"
-                            value={productoSeleccionado}
-                            onChange={(e) => setProductoSeleccionado(e.target.value)}
-                            disabled={!categoriaSeleccionada}
-                        >
-                            <option value="">Selecciona un producto</option>
-                            {productosFiltrados.map((p) => (
-                                <option key={p.id} value={p.nombre}>
-                                    {p.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="col-md-2 d-flex align-items-end">
-                        <button
-                            className="btn btn-danger w-100"
-                            onClick={handleAgregarProducto}
-                        >
-                            Agregar Producto
-                        </button>
-                    </div>
-                </div>
-
-                {/* === Tabla del carrito === */}
-                <div className="table-responsive">
-                    <table className="table table-bordered align-middle">
-                        <thead className="table-light">
-                            <tr className="text-center">
-                                <th>N°</th>
-                                <th>Imagen</th>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Precio Unitario (S/)</th>
-                                <th>Cantidad</th>
-                                <th>Subtotal (S/)</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {carrito.length > 0 ? (
-                                carrito.map((item) => (
-                                    <tr key={item.id}>
-                                        <td className="text-center" data-label="N°">
-                                            {item.numero}
-                                        </td>
-
-                                        <td className="text-center" data-label="Imagen">
-                                            {item.imagen ? (
-                                                <img
-                                                    src={item.imagen}
-                                                    alt={item.nombre}
-                                                    style={{
-                                                        width: "55px",
-                                                        height: "55px",
-                                                        borderRadius: "8px",
-                                                        objectFit: "cover",
-                                                    }}
-                                                />
-                                            ) : (
-                                                <span className="text-muted">Sin imagen</span>
-                                            )}
-                                        </td>
-
-                                        <td className="text-center" data-label="Nombre:">{item.nombre}</td>
-                                        <td className="text-center" data-label="Descripción:">{item.descripcion}</td>
-
-                                        <td className="text-center" data-label="Precio Unitario (S/):">
-                                            {item.precio.toFixed(2)}
-                                        </td>
-
-                                        <td className="text-center" data-label="Cantidad:">
-                                            <button
-                                                className="btn btn-sm btn-outline-danger me-2"
-                                                onClick={() => actualizarCantidad(item.id, -1)}
-                                            >
-                                                -
-                                            </button>
-                                            {item.cantidad}
-                                            <button
-                                                className="btn btn-sm btn-outline-success ms-2"
-                                                onClick={() => actualizarCantidad(item.id, 1)}
-                                            >
-                                                +
-                                            </button>
-                                        </td>
-
-                                        <td
-                                            className="text-center fw-semibold"
-                                            data-label="Subtotal (S/):"
-                                        >
-                                            {item.subtotal.toFixed(2)}
-                                        </td>
-
-                                        <td className="text-center" data-label="Acciones:">
-                                            <div
-                                                className="d-flex justify-content-center align-items-center"
-                                                style={{ height: "100%" }}
-                                            >
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center"
-                                                    style={{
-                                                        width: "36px",
-                                                        height: "36px",
-                                                        borderRadius: "50%",
-                                                    }}
-                                                    onClick={() => eliminarProducto(item.id)}
-                                                >
-                                                    <FaTrashAlt />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="8" className="text-center text-muted">
-                                        No hay productos en el carrito.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* === Total y botón === */}
-                <div className="d-flex flex-column align-items-end mt-4 gap-3">
-                    <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Método de Pago:</h5>
-                        <select
-                            className="form-select w-auto"
-                            value={metodoPago}
-                            onChange={(e) => setMetodoPago(e.target.value)}
-                        >
-                            <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option>
-                            <option value="billetera">Billetera Digital</option>
-                        </select>
-                    </div>
-                    {/* Campo de fecha y hora de entrega */}
-                    <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Hora de entrega:</h5>
-
-                        {/* Selector de fecha (solo muestra el día actual y no editable) */}
-                        <div className="d-flex align-items-center gap-2">
-                            <select className="form-select w-auto" disabled>
-                                <option>
-                                    {new Date().toLocaleDateString("es-PE", {
-                                        weekday: "long",
-                                        day: "numeric",
-                                        month: "long",
-                                    })}
-                                </option>
-                            </select>
-
-                            {/* Selector de hora (solo horas futuras del día actual) */}
+                    {/* === Filtros === */}
+                    <div className="row mb-4">
+                        <div className="col-md-5 mb-3 mb-md-0">
+                            <label className="form-label fw-semibold">Categoría</label>
                             <select
-                                className="form-select w-auto"
-                                value={fechaEntrega}
-                                onChange={(e) => setFechaEntrega(e.target.value)}
-                                required
+                                className="form-select"
+                                value={categoriaSeleccionada}
+                                onChange={(e) => setCategoriaSeleccionada(e.target.value)}
                             >
-                                <option value="">Selecciona hora</option>
-                                {getSlotsForToday().map((hora) => (
-                                    <option key={hora} value={hora}>
-                                        {hora}
+                                <option value="">Selecciona una categoría</option>
+                                {categorias.map((cat) => (
+                                    <option key={cat.id} value={cat.nombre}>
+                                        {cat.nombre}
                                     </option>
                                 ))}
                             </select>
                         </div>
+                        <div className="col-md-5 mb-3 mb-md-0">
+                            <label className="form-label fw-semibold">Producto</label>
+                            <select
+                                className="form-select"
+                                value={productoSeleccionado}
+                                onChange={(e) => setProductoSeleccionado(e.target.value)}
+                                disabled={!categoriaSeleccionada}
+                            >
+                                <option value="">Selecciona un producto</option>
+                                {productosFiltrados.map((p) => (
+                                    <option key={p.id} value={p.nombre}>
+                                        {p.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="col-md-2 d-flex align-items-end">
+                            <button
+                                className="btn btn-danger w-100"
+                                onClick={handleAgregarProducto}
+                            >
+                                Agregar Producto
+                            </button>
+                        </div>
                     </div>
-                    <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
-                        <button className="btn btn-success" onClick={handleOpenConfirm}>
-                            Solicitar Pedido
-                        </button>
+
+                    {/* === Tabla del carrito === */}
+                    <div className="table-responsive">
+                        <table className="table table-bordered align-middle">
+                            <thead className="table-light">
+                                <tr className="text-center">
+                                    <th>N°</th>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Precio Unitario (S/)</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal (S/)</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {carrito.length > 0 ? (
+                                    carrito.map((item) => (
+                                        <tr key={item.id}>
+                                            <td className="text-center" data-label="N°">
+                                                {item.numero}
+                                            </td>
+
+                                            <td className="text-center" data-label="Imagen">
+                                                {item.imagen ? (
+                                                    <img
+                                                        src={item.imagen}
+                                                        alt={item.nombre}
+                                                        style={{
+                                                            width: "55px",
+                                                            height: "55px",
+                                                            borderRadius: "8px",
+                                                            objectFit: "cover",
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <span className="text-muted">Sin imagen</span>
+                                                )}
+                                            </td>
+
+                                            <td className="text-center" data-label="Nombre:">{item.nombre}</td>
+                                            <td className="text-center" data-label="Descripción:">{item.descripcion}</td>
+
+                                            <td className="text-center" data-label="Precio Unitario (S/):">
+                                                {item.precio.toFixed(2)}
+                                            </td>
+
+                                            <td className="text-center" data-label="Cantidad:">
+                                                <button
+                                                    className="btn btn-sm btn-outline-danger me-2"
+                                                    onClick={() => actualizarCantidad(item.id, -1)}
+                                                >
+                                                    -
+                                                </button>
+                                                {item.cantidad}
+                                                <button
+                                                    className="btn btn-sm btn-outline-success ms-2"
+                                                    onClick={() => actualizarCantidad(item.id, 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </td>
+
+                                            <td
+                                                className="text-center fw-semibold"
+                                                data-label="Subtotal (S/):"
+                                            >
+                                                {item.subtotal.toFixed(2)}
+                                            </td>
+
+                                            <td className="text-center" data-label="Acciones:">
+                                                <div
+                                                    className="d-flex justify-content-center align-items-center"
+                                                    style={{ height: "100%" }}
+                                                >
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center"
+                                                        style={{
+                                                            width: "36px",
+                                                            height: "36px",
+                                                            borderRadius: "50%",
+                                                        }}
+                                                        onClick={() => eliminarProducto(item.id)}
+                                                    >
+                                                        <FaTrashAlt />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="8" className="text-center text-muted">
+                                            No hay productos en el carrito.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-            </section>
 
-            {/* === Modal de Confirmación (advertencia) === */}
-            {showConfirmModal && (
-                <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Confirmación del Pedido</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)} />
-                            </div>
-                            <div className="modal-body">
-                                <p className="text-danger fw-semibold">
-                                    <strong>Advertencia:</strong> El pedido no podrá ser cancelado una vez enviado. La cocina
-                                    descontará ingredientes inmediatamente.
-                                </p>
-                                <p>¿Deseas continuar con el envío del pedido?</p>
+                    {/* === Total y botón === */}
+                    <div className="d-flex flex-column align-items-end mt-4 gap-3">
+                        <div className="d-flex align-items-center gap-3">
+                            <h5 className="fw-bold mb-0">Método de Pago:</h5>
+                            <select
+                                className="form-select w-auto"
+                                value={metodoPago}
+                                onChange={(e) => setMetodoPago(e.target.value)}
+                            >
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="billetera">Billetera Digital</option>
+                            </select>
+                        </div>
+                        {/* Campo de fecha y hora de entrega */}
+                        <div className="d-flex align-items-center gap-3">
+                            <h5 className="fw-bold mb-0">Hora de entrega:</h5>
 
-                                <div className="form-check form-switch mt-2">
-                                    <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        id="confirmSwitch"
-                                        checked={confirmSwitch}
-                                        onChange={(e) => setConfirmSwitch(e.target.checked)}
-                                    />
-                                    <label className="form-check-label" htmlFor="confirmSwitch">
-                                        Activar para habilitar "Solicitar Pedido"
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
-                                    Cancelar
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    disabled={!confirmSwitch}
-                                    onClick={handleConfirmarPedido}
+                            {/* Selector de fecha (solo muestra el día actual y no editable) */}
+                            <div className="d-flex align-items-center gap-2">
+                                <select className="form-select w-auto" disabled>
+                                    <option>
+                                        {new Date().toLocaleDateString("es-PE", {
+                                            weekday: "long",
+                                            day: "numeric",
+                                            month: "long",
+                                        })}
+                                    </option>
+                                </select>
+
+                                {/* Selector de hora (solo horas futuras del día actual) */}
+                                <select
+                                    className="form-select w-auto"
+                                    value={fechaEntrega}
+                                    onChange={(e) => setFechaEntrega(e.target.value)}
+                                    required
                                 >
-                                    Solicitar Pedido
-                                </button>
+                                    <option value="">Selecciona hora</option>
+                                    {getSlotsForToday().map((hora) => (
+                                        <option key={hora} value={hora}>
+                                            {hora}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="d-flex align-items-center gap-3">
+                            <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
+                            <button className="btn btn-success" onClick={handleOpenConfirm}>
+                                Solicitar Pedido
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                {/* === Modal de Confirmación (advertencia) === */}
+                {showConfirmModal && (
+                    <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Confirmación del Pedido</h5>
+                                    <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)} />
+                                </div>
+                                <div className="modal-body">
+                                    <p className="text-danger fw-semibold">
+                                        <strong>Advertencia:</strong> El pedido no podrá ser cancelado una vez enviado. La cocina
+                                        descontará ingredientes inmediatamente.
+                                    </p>
+                                    <p>¿Deseas continuar con el envío del pedido?</p>
+
+                                    <div className="form-check form-switch mt-2">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="confirmSwitch"
+                                            checked={confirmSwitch}
+                                            onChange={(e) => setConfirmSwitch(e.target.checked)}
+                                        />
+                                        <label className="form-check-label" htmlFor="confirmSwitch">
+                                            Activar para habilitar "Solicitar Pedido"
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        disabled={!confirmSwitch}
+                                        onClick={handleConfirmarPedido}
+                                    >
+                                        Solicitar Pedido
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {/* Overlay del modal */}
-            {showConfirmModal && <div className="modal-backdrop fade show"></div>}
+                )}
+                {/* Overlay del modal */}
+                {showConfirmModal && <div className="modal-backdrop fade show"></div>}
 
-            {/* === Modal de Progreso WebSocket === */}
-            {showProgressModal && (
-                <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-sm modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Enviando pedido...</h5>
-                            </div>
-                            <div className="modal-body">
-                                <p className="mb-2">Procesando pedido. Esto puede tardar unos segundos.</p>
-                                <div className="progress" style={{ height: "18px" }}>
-                                    <div
-                                        className="progress-bar progress-bar-striped progress-bar-animated"
-                                        role="progressbar"
-                                        style={{ width: `${progress}%` }}
-                                        aria-valuenow={progress}
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"
-                                    >
-                                        {progress}%
+                {/* === Modal de Progreso WebSocket === */}
+                {showProgressModal && (
+                    <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog modal-sm modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Enviando pedido...</h5>
+                                </div>
+                                <div className="modal-body">
+                                    <p className="mb-2">Procesando pedido. Esto puede tardar unos segundos.</p>
+                                    <div className="progress" style={{ height: "18px" }}>
+                                        <div
+                                            className="progress-bar progress-bar-striped progress-bar-animated"
+                                            role="progressbar"
+                                            style={{ width: `${progress}%` }}
+                                            aria-valuenow={progress}
+                                            aria-valuemin="0"
+                                            aria-valuemax="100"
+                                        >
+                                            {progress}%
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {/* Overlay del modal */}
-            {showProgressModal && <div className="modal-backdrop fade show"></div>}
+                )}
+                {/* Overlay del modal */}
+                {showProgressModal && <div className="modal-backdrop fade show"></div>}
+            </div>
 
             {/* Chatbot de Landbot */}
             <LandbotChat />

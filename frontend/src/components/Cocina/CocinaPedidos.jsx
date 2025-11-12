@@ -5,6 +5,7 @@ import axios from "axios";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import "../Layout/modals.css";
 import "./cocinaPedidos.css";
 
@@ -35,6 +36,11 @@ const CocinaPedidos = () => {
         };
 
         obtenerPedidos();
+    }, []);
+
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
     }, []);
 
     // === Filtrado ===
@@ -143,216 +149,221 @@ const CocinaPedidos = () => {
                 activePage="lista de pedidos"
             />
 
-            {/* === Contenido principal === */}
-            <div className="container my-4">
-                <h2 className="fw-bold text-center mb-4">Lista de Pedidos</h2>
+            <div className="pedidos-container">
+                {/* === Contenido principal === */}
+                <div className="container my-4">
+                    <h2 className="fw-bold text-center mb-4 text-light">Lista de Pedidos</h2>
 
-                {/* === Filtro === */}
-                <div
-                    className="input-group mb-4 shadow-sm"
-                    style={{ maxWidth: "650px", height: "50px", margin: "0 auto" }}
-                >
-                    <span
-                        className="input-group-text bg-white border-end-0"
-                        style={{ fontSize: "1.2rem", height: "50px" }}
+                    {/* === Filtro === */}
+                    <div
+                        className="input-group mb-4 shadow-sm"
+                        style={{ maxWidth: "650px", height: "50px", margin: "0 auto" }}
                     >
-                        🔍
-                    </span>
-                    <select
-                        className="form-select border-start-0 border-end-0"
-                        value={criterio}
-                        onChange={(e) => {
-                            setCriterio(e.target.value);
-                            setFiltro("");
-                        }}
-                        style={{ maxWidth: "200px", height: "50px" }}
-                    >
-                        <option value="todos">Todos</option>
-                        <option value="id">ID</option>
-                        <option value="cliente">Cliente</option>
-                        <option value="metodo_pago">Método de Pago</option>
-                        <option value="estado">Estado</option>
-                        <option value="total">Total (S/)</option>
-                        <option value="fecha_creacion">Fecha de Creación</option>
-                        <option value="fecha_entrega">Fecha de Entrega</option>
-                    </select>
-                    <input
-                        type="text"
-                        className="form-control border-start-0"
-                        placeholder={
-                            criterio === "todos"
-                                ? "Mostrar todos"
-                                : `Buscar por ${criterio}...`
-                        }
-                        value={filtro}
-                        onChange={(e) => setFiltro(e.target.value)}
-                        disabled={criterio === "todos"}
-                        style={{
-                            height: "50px",
-                            backgroundColor:
-                                criterio === "todos" ? "#f5f5f5" : "white",
-                        }}
-                    />
+                        <span
+                            className="input-group-text bg-white border-end-0"
+                            style={{ fontSize: "1.2rem", height: "50px" }}
+                        >
+                            🔍
+                        </span>
+                        <select
+                            className="form-select border-start-0 border-end-0"
+                            value={criterio}
+                            onChange={(e) => {
+                                setCriterio(e.target.value);
+                                setFiltro("");
+                            }}
+                            style={{ maxWidth: "200px", height: "50px" }}
+                        >
+                            <option value="todos">Todos</option>
+                            <option value="id">ID</option>
+                            <option value="cliente">Cliente</option>
+                            <option value="metodo_pago">Método de Pago</option>
+                            <option value="estado">Estado</option>
+                            <option value="total">Total (S/)</option>
+                            <option value="fecha_creacion">Fecha de Creación</option>
+                            <option value="fecha_entrega">Fecha de Entrega</option>
+                        </select>
+                        <input
+                            type="text"
+                            className="form-control border-start-0"
+                            placeholder={
+                                criterio === "todos"
+                                    ? "Mostrar todos"
+                                    : `Buscar por ${criterio}...`
+                            }
+                            value={filtro}
+                            onChange={(e) => setFiltro(e.target.value)}
+                            disabled={criterio === "todos"}
+                            style={{
+                                height: "50px",
+                                backgroundColor:
+                                    criterio === "todos" ? "#f5f5f5" : "white",
+                            }}
+                        />
+                    </div>
+
+                    {loading ? (
+                        <p className="text-center">Cargando pedidos...</p>
+                    ) : pedidosPagina.length > 0 ? (
+                        <div className="row row-cols-1 row-cols-md-3 g-4">
+                            {pedidosPagina.map((p) => (
+                                <div className="col" key={p.id}>
+                                    <div className={`card shadow-sm border-${p.estado === "entregado"
+                                        ? "success"
+                                        : p.estado === "listo"
+                                            ? "primary"
+                                            : p.estado === "en preparacion"
+                                                ? "warning"
+                                                : "secondary"
+                                        }`}>
+                                        <div className="card-body">
+                                            <h5 className="card-title fw-bold">Pedido #{p.id}</h5>
+                                            <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
+                                            <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
+                                            <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>
+                                            <p><strong>Fecha / Hora del Pedido:</strong> {p.fecha_creacion || "—"}</p>
+                                            <p><strong>Fecha / Hora de Entrega:</strong> {p.fecha_entrega || "—"}</p>
+                                            <p><strong>Estado: </strong>
+                                                {!p.editandoEstado ? (
+                                                    <span className={getEstadoClass(p.estado)}>
+                                                        {capitalizarPrimeraLetra(p.estado)}
+                                                    </span>
+                                                ) : (
+                                                    <select
+                                                        value={p.estado}
+                                                        onChange={(e) => {
+                                                            p.estado = e.target.value;
+                                                            setPedidos([...pedidos]);
+                                                        }}
+                                                        className="form-select form-select-sm mt-2"
+                                                    >
+                                                        <option value="pendiente">Pendiente</option>
+                                                        <option value="en preparación">En preparación</option>
+                                                        <option value="listo">Listo</option>
+                                                        <option value="entregado">Entregado</option>
+                                                    </select>
+                                                )}
+                                            </p>
+                                        </div>
+                                        <div className="card-footer d-flex justify-content-between">
+                                            <button
+                                                className="btn btn-sm btn-primary"
+                                                onClick={() => handleVerDetalle(p)}
+                                            >
+                                                Ver detalle
+                                            </button>
+
+                                            {!p.editandoEstado ? (
+                                                <button
+                                                    className="btn btn-sm btn-dark"
+                                                    onClick={() => toggleEdicion(p.id)}
+                                                >
+                                                    Actualizar estado
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="btn btn-sm btn-success"
+                                                    onClick={() => {
+                                                        handleActualizarEstado(p);
+                                                        toggleEdicion(p.id);
+                                                    }}
+                                                >
+                                                    Guardar
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center">No se encontraron pedidos</p>
+                    )}
+
+                    {/* Paginación */}
+                    {!loading && totalPaginas > 1 && (
+                        <div className="pagination mt-4" style={{ margin: "50px" }}>
+                            {Array.from({ length: totalPaginas }, (_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={currentPage === i + 1 ? "active" : ""}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {loading ? (
-                    <p className="text-center">Cargando pedidos...</p>
-                ) : pedidosPagina.length > 0 ? (
-                    <div className="row row-cols-1 row-cols-md-3 g-4">
-                        {pedidosPagina.map((p) => (
-                            <div className="col" key={p.id}>
-                                <div className={`card shadow-sm border-${p.estado === "entregado"
-                                    ? "success"
-                                    : p.estado === "listo"
-                                        ? "primary"
-                                        : p.estado === "en preparacion"
-                                            ? "warning"
-                                            : "secondary"
-                                    }`}>
-                                    <div className="card-body">
-                                        <h5 className="card-title fw-bold">Pedido #{p.id}</h5>
-                                        <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
-                                        <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
-                                        <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>
-                                        <p><strong>Fecha / Hora del Pedido:</strong> {p.fecha_creacion || "—"}</p>
-                                        <p><strong>Fecha / Hora de Entrega:</strong> {p.fecha_entrega || "—"}</p>
-                                        <p><strong>Estado: </strong>
-                                            {!p.editandoEstado ? (
-                                                <span className={getEstadoClass(p.estado)}>
-                                                    {capitalizarPrimeraLetra(p.estado)}
-                                                </span>
-                                            ) : (
-                                                <select
-                                                    value={p.estado}
-                                                    onChange={(e) => {
-                                                        p.estado = e.target.value;
-                                                        setPedidos([...pedidos]);
-                                                    }}
-                                                    className="form-select form-select-sm mt-2"
-                                                >
-                                                    <option value="pendiente">Pendiente</option>
-                                                    <option value="en preparación">En preparación</option>
-                                                    <option value="listo">Listo</option>
-                                                    <option value="entregado">Entregado</option>
-                                                </select>
-                                            )}
+                {/* === Modal Detalle === */}
+                {showModal && pedidoSeleccionado && (
+                    <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+                        <div className="modal-dialog modal-lg modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header bg-dark text-white">
+                                    <h5 className="modal-title">
+                                        Detalle del Pedido N° {pedidoSeleccionado.id}
+                                    </h5>
+                                </div>
+                                <div className="modal-body">
+
+                                    {/* === Información general del pedido === */}
+                                    <div className="mb-3">
+                                        <p><strong>Fecha / Hora del Pedido:</strong> {pedidoSeleccionado.fecha_creacion}</p>
+                                        <p><strong>Fecha / Hora de Entrega:</strong> {pedidoSeleccionado.fecha_entrega || "—"}</p>
+                                        <p><strong>Estado:</strong>{" "}
+                                            <span className={getEstadoClass(pedidoSeleccionado.estado)}>
+                                                {capitalizarPrimeraLetra(pedidoSeleccionado.estado)}
+                                            </span>
                                         </p>
+                                        <p><strong>Método de Pago:</strong> {capitalizarPrimeraLetra(pedidoSeleccionado.metodo_pago)}</p>
+                                        <p><strong>Total:</strong> S/ {pedidoSeleccionado.total}</p>
                                     </div>
-                                    <div className="card-footer d-flex justify-content-between">
-                                        <button
-                                            className="btn btn-sm btn-primary"
-                                            onClick={() => handleVerDetalle(p)}
-                                        >
-                                            Ver detalle
-                                        </button>
 
-                                        {!p.editandoEstado ? (
-                                            <button
-                                                className="btn btn-sm btn-dark"
-                                                onClick={() => toggleEdicion(p.id)}
-                                            >
-                                                Actualizar estado
-                                            </button>
-                                        ) : (
-                                            <button
-                                                className="btn btn-sm btn-success"
-                                                onClick={() => {
-                                                    handleActualizarEstado(p);
-                                                    toggleEdicion(p.id);
-                                                }}
-                                            >
-                                                Guardar
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center">No se encontraron pedidos</p>
-                )}
-
-                {/* Paginación */}
-                {!loading && totalPaginas > 1 && (
-                    <div className="pagination mt-4" style={{ margin: "50px" }}>
-                        {Array.from({ length: totalPaginas }, (_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setCurrentPage(i + 1)}
-                                className={currentPage === i + 1 ? "active" : ""}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* === Modal Detalle === */}
-            {showModal && pedidoSeleccionado && (
-                <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header bg-dark text-white">
-                                <h5 className="modal-title">
-                                    Detalle del Pedido N° {pedidoSeleccionado.id}
-                                </h5>
-                            </div>
-                            <div className="modal-body">
-
-                                {/* === Información general del pedido === */}
-                                <div className="mb-3">
-                                    <p><strong>Fecha / Hora del Pedido:</strong> {pedidoSeleccionado.fecha_creacion}</p>
-                                    <p><strong>Fecha / Hora de Entrega:</strong> {pedidoSeleccionado.fecha_entrega || "—"}</p>
-                                    <p><strong>Estado:</strong>{" "}
-                                        <span className={getEstadoClass(pedidoSeleccionado.estado)}>
-                                            {capitalizarPrimeraLetra(pedidoSeleccionado.estado)}
-                                        </span>
-                                    </p>
-                                    <p><strong>Método de Pago:</strong> {capitalizarPrimeraLetra(pedidoSeleccionado.metodo_pago)}</p>
-                                    <p><strong>Total:</strong> S/ {pedidoSeleccionado.total}</p>
-                                </div>
-
-                                {/* === Tabla de productos === */}
-                                <div className="table-container">
-                                    <table className="table table-striped table-bordered align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th>Producto(s)</th>
-                                                <th>Cantidad</th>
-                                                <th>Precio Unitario (S/)</th>
-                                                <th>Subtotal (S/)</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {detallePedido.length > 0 ? (
-                                                detallePedido.map((item) => (
-                                                    <tr key={item.id}>
-                                                        <td data-label="Producto(s):">{item.producto}</td>
-                                                        <td data-label="Cantidad:">{item.cantidad}</td>
-                                                        <td data-label="Precio Unitario (S/):">{item.precio}</td>
-                                                        <td data-label="Subtotal (S/):">{item.subtotal}</td>
-                                                    </tr>
-                                                ))
-                                            ) : (
+                                    {/* === Tabla de productos === */}
+                                    <div className="table-container">
+                                        <table className="table table-striped table-bordered align-middle">
+                                            <thead>
                                                 <tr>
-                                                    <td colSpan="4" className="text-center">No hay detalles disponibles.</td>
+                                                    <th>Producto(s)</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Precio Unitario (S/)</th>
+                                                    <th>Subtotal (S/)</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {detallePedido.length > 0 ? (
+                                                    detallePedido.map((item) => (
+                                                        <tr key={item.id}>
+                                                            <td data-label="Producto(s):">{item.producto}</td>
+                                                            <td data-label="Cantidad:">{item.cantidad}</td>
+                                                            <td data-label="Precio Unitario (S/):">{item.precio}</td>
+                                                            <td data-label="Subtotal (S/):">{item.subtotal}</td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="4" className="text-center">No hay detalles disponibles.</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={handleCerrarModal}>Cerrar</button>
+                                <div className="modal-footer">
+                                    <button className="btn btn-secondary" onClick={handleCerrarModal}>Cerrar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-            {/* Overlay del modal */}
-            {showModal && <div className="modal-backdrop fade show"></div>}
+                )}
+                {/* Overlay del modal */}
+                {showModal && <div className="modal-backdrop fade show"></div>}
+            </div>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

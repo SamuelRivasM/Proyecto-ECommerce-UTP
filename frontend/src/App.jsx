@@ -1,6 +1,6 @@
 
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
@@ -34,11 +34,27 @@ import CocinaPedidos from "./components/Cocina/CocinaPedidos";
 
 // Rutas Globales
 import ContactoSection from "./components/Layout/ContactoSection";
+import LandbotChat from "./components/Layout/LandbotChat";
+
+// Subcomponente para controlar cuándo se muestra el chatbot
+const ConditionalLandbot = () => {
+  const location = useLocation();
+
+  // Rutas donde NO queremos que se muestre el chatbot
+  const hiddenRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
+
+  const shouldHide = hiddenRoutes.some((path) => location.pathname.startsWith(path));
+
+  return shouldHide ? null : <LandbotChat />;
+};
 
 function App() {
   return (
     <CartProvider>
       <Router>
+        {/* Render condicional del chatbot */}
+        <ConditionalLandbot />
+
         <Routes>
           {/* Vista de Autenticación */}
           <Route path="/" element={<Login />} />

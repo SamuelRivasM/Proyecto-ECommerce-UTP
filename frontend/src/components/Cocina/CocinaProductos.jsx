@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import "./cocinaProductos.css";
 
 const CocinaProductos = () => {
@@ -319,6 +320,9 @@ const CocinaProductos = () => {
                     </div>
                 </div>
             )}
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

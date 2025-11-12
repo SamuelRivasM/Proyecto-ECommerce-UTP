@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "./NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "./Perfil";
 
 const ContactoSection = () => {
@@ -78,6 +79,9 @@ const ContactoSection = () => {
                     Volver al Inicio
                 </button>
             </section>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />
