@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -63,7 +63,6 @@ const Login = () => {
         backgroundImage: `linear-gradient(rgba(52,52,52,0.5), rgba(52,52,52,0.5)), url(${bgCafe})`,
       }}
     >
-      <ToastContainer position="top-center" autoClose={3000} />
       <div className="auth-card login-card">
         <div className="auth-left">
           <img src={cafeImg} alt="Cafetería UTP" className="auth-image" />
