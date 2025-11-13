@@ -1,56 +1,9 @@
 
-/* src/components/Cart/clienteCarrito.css */
-
-/* ======== Fondo General ======== */
-.carrito-container {
-  position: relative;
-  background-image: url("../../assets/img/cliente-carrito.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  min-height: 100vh;
-  padding: 40px;
-  overflow: hidden;
-}
-
-/* Overlay claro */
-.carrito-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.45);
-  z-index: 0;
-}
-
-/* Contenido encima del overlay */
-.carrito-container>* {
-  position: relative;
-  z-index: 1;
-}
-
-/* ======== Tabla ======== */
-.table-container {
-  overflow-x: auto;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
-}
-
+/* src/Cart/clienteCarrito.css */
 .table th,
 .table td {
-  vertical-align: middle !important;
-  text-align: center;
-  white-space: nowrap;
+  vertical-align: middle;
 }
-
-.table thead.table-header tr th {
-  background-color: #a4001d !important;
-  color: white !important;
-}
-
-/* Botones */
 .btn-outline-danger,
 .btn-outline-success {
   width: 32px;
@@ -59,12 +12,10 @@
   border-radius: 50%;
 }
 
-/* ======== Responsivo ======== */
 @media (max-width: 992px) {
   .table thead {
     display: none;
   }
-
   .table,
   .table tbody,
   .table tr,
@@ -72,26 +23,22 @@
     display: block;
     width: 100%;
   }
-
   .table tr {
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
     border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
   }
-
   .table td {
     text-align: left;
-    padding: 6px 10px;
     position: relative;
-    white-space: normal;
+    padding: 8px 10px;
   }
-
   .table td::before {
     content: attr(data-label);
     font-weight: bold;
-    color: #a4001d;
+    color: #A4001D;
     display: block;
     margin-bottom: 4px;
   }

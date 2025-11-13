@@ -32,11 +32,6 @@ const ClientePedidos = () => {
         }
     }, [user?.id]);
 
-    useEffect(() => {
-        document.body.classList.add("bootstrap-modal");
-        return () => document.body.classList.remove("bootstrap-modal");
-    }, []);
-
     // === Función para capitalizar primera letra ===
     const capitalizarPrimeraLetra = (texto) => {
         if (!texto || texto.trim() === "") return "Desconocido";
@@ -268,7 +263,7 @@ const ClientePedidos = () => {
             {showModal && <div className="modal-backdrop fade show"></div>}
 
             {/* Chatbot de Landbot */}
-            <LandbotChat />
+            <LandbotChat /> 
 
             {/* Footer */}
             <FooterGeneral />

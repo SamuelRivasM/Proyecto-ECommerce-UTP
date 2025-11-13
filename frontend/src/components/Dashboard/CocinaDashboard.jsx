@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
-import LandbotChat from "../Layout/LandbotChat";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -124,9 +123,6 @@ const CocinaDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Chatbot de Landbot */}
-      <LandbotChat />
 
       {/* Footer */}
       <FooterGeneral />

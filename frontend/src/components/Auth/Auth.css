@@ -261,30 +261,3 @@ select.auth-select:focus {
     transform: translateY(-50%);
     pointer-events: none;
 }
-
-/* ======== Corrección de fondo Login ======== */
-.auth-container {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-}
-
-html,
-body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    /* evita scroll vacío en pantallas exactas */
-}
-
-@supports (-webkit-touch-callout: none) {
-    .auth-container {
-        min-height: -webkit-fill-available;
-    }
-}

@@ -1,71 +1,11 @@
 
-/* src/components/Cocina/cocinaPedidos.css */
-
-/* ======== Fondo General ======== */
-.pedidos-container {
-    position: relative;
-    background-image: url("../../assets/img/cocina-pedidos.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-    padding: 40px;
-    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-}
-
-/* Overlay oscuro encima del fondo */
-.pedidos-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.45);
-    z-index: 0;
-}
-
-/* Asegura que el contenido quede por encima del overlay */
-.pedidos-container>* {
-    position: relative;
-    z-index: 1;
-}
-
-/* ======== Tarjetas de pedido ======== */
-.card {
-    background-color: #fff1b8;
-    /* Amarillo crema tipo papel pedido */
-    border: none !important;
-    border-radius: 16px !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 8px 18px rgba(255, 255, 255, 0.15),
-        0 3px 8px rgba(0, 0, 0, 0.25);
-}
-
-.card:hover {
-    transform: scale(1.07);
-    z-index: 10;
-    box-shadow: 0 15px 25px rgba(255, 255, 255, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.4);
-}
-
-/* Encabezado de cada tarjeta */
-.card-title {
-    color: #dc3545;
-}
-
-/* Texto interior */
-.card-body p {
-    color: #333;
-    font-weight: 500;
-}
-
-/* ======== Tabla Detalle Pedido ======== */
+/* src/Cocina/cocinaPedidos.css */
 .table-container {
     overflow-x: auto;
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* ======== Tabla ======== */
@@ -76,6 +16,7 @@
     white-space: nowrap;
 }
 
+/* Forzar color del encabezado aunque haya Bootstrap */
 .table thead.table-header tr th {
     background-color: #a4001d !important;
     color: white !important;
@@ -89,7 +30,6 @@
     flex-wrap: wrap;
     gap: 6px;
 }
-
 .pagination button {
     border: none;
     background: #f1f1f1;
@@ -98,12 +38,10 @@
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 .pagination button.active {
     background: #a4001d;
     color: white;
 }
-
 .pagination button:hover {
     background: #ddd;
 }
@@ -115,17 +53,14 @@
     flex-wrap: wrap;
     gap: 6px;
 }
-
 .action-buttons button {
     flex: 1 1 auto;
     min-width: 90px;
     margin: 0;
 }
-
 .modal-dialog {
     max-width: 900px !important;
 }
-
 .modal-content {
     border-radius: 12px;
 }
@@ -135,7 +70,6 @@
     .table thead {
         display: none;
     }
-
     .table,
     .table tbody,
     .table tr,
@@ -143,7 +77,6 @@
         display: block;
         width: 100%;
     }
-
     .table tr {
         margin-bottom: 16px;
         border: 1px solid #ddd;
@@ -151,14 +84,12 @@
         padding: 10px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
-
     .table td {
         text-align: left;
         padding: 6px 10px;
         position: relative;
         white-space: normal;
     }
-
     .table td::before {
         content: attr(data-label);
         font-weight: bold;
@@ -166,11 +97,9 @@
         display: block;
         margin-bottom: 4px;
     }
-
     .action-buttons {
         justify-content: flex-start;
     }
-
     .action-buttons button {
         flex: unset;
         min-width: auto;
@@ -183,21 +112,17 @@
     .table-container {
         padding: 10px;
     }
-
     .table tr {
         padding: 8px;
     }
-
     .table td {
         font-size: 13px;
     }
-
     .action-buttons {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
     }
-
     .action-buttons button {
         width: 100%;
         font-size: 12px;
