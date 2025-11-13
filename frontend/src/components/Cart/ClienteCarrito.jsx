@@ -275,7 +275,7 @@ const ClienteCarrito = () => {
                 carrito,
                 total: parseFloat(total),
                 fechaEntrega,
-                socketId: socketRef.current.id, // usar mismo socket
+                socketId: socketRef.current.id, // ✅ usar mismo socket
             });
 
         } catch (error) {
