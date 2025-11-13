@@ -32,6 +32,11 @@ const ClientePedidos = () => {
         }
     }, [user?.id]);
 
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
+    }, []);
+
     // === Función para capitalizar primera letra ===
     const capitalizarPrimeraLetra = (texto) => {
         if (!texto || texto.trim() === "") return "Desconocido";

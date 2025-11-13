@@ -1,68 +1,68 @@
 
 /* src/Layout/modals.css */
 /* Global modal fixes: hace que los modales se vean centrados y con ancho sensato */
-.modal.fade.show {
+.bootstrap-modal .modal.fade.show {
   display: block; /* bootstrap ya lo hace, pero por seguridad */
 }
 
 /* ancho por defecto para modal-lg y modal-xl */
-.modal-dialog {
+.bootstrap-modal .modal-dialog {
   margin: 1.75rem auto;
   max-width: 920px !important;
   width: 100%;
   padding: 0 12px;
 }
 
-.modal-dialog.modal-lg {
+.bootstrap-modal .modal-dialog.modal-lg {
   max-width: 920px !important;
 }
 
-.modal-dialog.modal-xl {
+.bootstrap-modal .modal-dialog.modal-xl {
   max-width: 1140px !important;
 }
 
 /* cuerpo del modal con scroll si es muy alto */
-.modal-body {
+.bootstrap-modal .modal-body {
   max-height: 72vh;
   overflow-y: auto;
 }
 
 /* aseguro que .table-responsive dentro del modal ocupe todo */
-.modal .table-responsive {
+.bootstrap-modal .modal .table-responsive {
   margin-top: 8px;
 }
 
 /* sombra / borde en el contenido para verse uniforme */
-.modal-content {
+.bootstrap-modal .modal-content {
   border-radius: 10px;
   overflow: hidden;
 }
 
 /* backdrop z-index por encima del layout */
-.modal-backdrop.show {
+.bootstrap-modal .modal-backdrop.show {
   z-index: 1040;
 }
-.modal.show {
+.bootstrap-modal .modal.show {
   z-index: 1050;
 }
 
 /* Forzar que el modal ignore los límites del container */
-.modal {
+.bootstrap-modal .modal {
   position: fixed !important;
   inset: 0 !important;
 }
 
-.modal-dialog {
+.bootstrap-modal .modal-dialog {
   max-width: 950px !important;
   width: auto !important;
   margin: auto !important;
 }
 
-.modal-content {
+.bootstrap-modal .modal-content {
   width: 100% !important;
 }
 
-.modal-body .table-container {
+.bootstrap-modal .modal-body .table-container {
   max-width: 100%;
   overflow-x: auto;
 }

@@ -224,6 +224,11 @@ const ClienteCarrito = () => {
         }
     };
 
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
+    }, []);
+
     // Iniciar WebSocket UNA SOLA VEZ
     useEffect(() => {
         socketRef.current = io(SOCKET_URL, { transports: ["websocket"] });
@@ -269,15 +274,33 @@ const ClienteCarrito = () => {
                 return;
             }
 
+            // Convertir la hora seleccionada a datetime completo (hoy)
+            const ahora = new Date();
+            const [hora, minuto] = fechaEntrega.split(":");
+            const fechaCompleta = new Date(
+                ahora.getFullYear(),
+                ahora.getMonth(),
+                ahora.getDate(),
+                hora,
+                minuto,
+                0
+            );
+
+            const pad = (n) => String(n).padStart(2, "0");
+            const fechaEntregaFormatoMySQL = `${fechaCompleta.getFullYear()}-${pad(
+                fechaCompleta.getMonth() + 1
+            )}-${pad(fechaCompleta.getDate())} ${pad(
+                fechaCompleta.getHours()
+            )}:${pad(fechaCompleta.getMinutes())}:00`;
+
             await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
                 usuarioId: user.id,
                 metodoPago,
                 carrito,
                 total: parseFloat(total),
-                fechaEntrega,
-                socketId: socketRef.current.id, // ✅ usar mismo socket
+                fechaEntrega: fechaEntregaFormatoMySQL,
+                socketId: socketRef.current.id,
             });
-
         } catch (error) {
             toast.error("Error procesando pedido.");
             setShowProgressModal(false);
