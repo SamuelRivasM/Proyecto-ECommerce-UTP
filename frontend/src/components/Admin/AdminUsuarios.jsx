@@ -3,6 +3,7 @@
 import { useState } from "react";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 
 const AdminUsuarios = () => {
@@ -195,6 +196,9 @@ const AdminUsuarios = () => {
                     </table>
                 </div>
             </main>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

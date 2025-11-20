@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "./NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "./Perfil";
 
 const ContactoSection = () => {
@@ -74,10 +75,13 @@ const ContactoSection = () => {
                 <p className="text-muted mb-0">Teléfono: (01) 230-5010</p>
                 <p className="text-muted">Correo: informes@utp.edu.pe</p>
 
-                <button className="btn btn-outline-danger mt-3" onClick={handleVolverInicio}>
+                <button className="btn btn-danger mt-3 fw-bold" onClick={handleVolverInicio}>
                     Volver al Inicio
                 </button>
             </section>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

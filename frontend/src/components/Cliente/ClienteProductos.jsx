@@ -204,7 +204,7 @@ const ClienteProductos = () => {
                                         <p className="text-muted mb-3">{prod.descripcion}</p>
                                         <p className="fw-semibold mb-3">S/ {parseFloat(prod.precio).toFixed(2)}</p>
                                         <button
-                                            className="btn btn-danger btn-sm"
+                                            className="btn btn-danger btn-sm fw-bold"
                                             onClick={() => handleAgregarAlCarrito(prod)}
                                         >
                                             Agregar al carrito

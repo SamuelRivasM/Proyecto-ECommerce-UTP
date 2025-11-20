@@ -368,7 +368,7 @@ const ClienteCarrito = () => {
                     </div>
                     <div className="col-md-2 d-flex align-items-end">
                         <button
-                            className="btn btn-danger w-100"
+                            className="btn btn-danger w-100 fw-bold"
                             onClick={handleAgregarProducto}
                         >
                             Agregar Producto
@@ -525,7 +525,7 @@ const ClienteCarrito = () => {
                     </div>
                     <div className="d-flex align-items-center gap-3">
                         <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
-                        <button className="btn btn-success" onClick={handleOpenConfirm}>
+                        <button className="btn btn-success fw-bold" onClick={handleOpenConfirm}>
                             Solicitar Pedido
                         </button>
                     </div>

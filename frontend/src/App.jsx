@@ -54,7 +54,7 @@ function App() {
       <Router>
         {/* Render condicional del chatbot */}
         <ConditionalLandbot />
-        
+
         <Routes>
           {/* Vista de Autenticación */}
           <Route path="/" element={<Login />} />

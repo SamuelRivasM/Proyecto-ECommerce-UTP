@@ -63,8 +63,10 @@ const ClienteDashboard = () => {
               docentes y personal administrativo con pedidos en línea y pagos rápidos.
             </p>
             <div className="mb-4">
-              <button className="btn btn-danger me-3">Reservar</button>
-              <button className="btn btn-danger" onClick={() => navigate("/cliente-productos")}>
+              <button className="btn btn-danger me-3 fw-bold" onClick={() => navigate("/cliente-carrito")}>
+                Hacer un Pedido
+                </button>
+              <button className="btn btn-danger fw-bold" onClick={() => navigate("/cliente-productos")}>
                 Ver menú
               </button>
             </div>

@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import "./cocinaProductos.css";
 
 const CocinaProductos = () => {
@@ -235,13 +236,13 @@ const CocinaProductos = () => {
                                         <td data-label="Estado:">{prod.disponible ? "Activo" : "Inactivo"}</td>
                                         <td data-label="Acciones:" className="action-buttons">
                                             <button
-                                                className="btn btn-sm btn-primary"
+                                                className="btn btn-sm btn-primary fw-bold"
                                                 onClick={() => handleEditar(prod)}
                                             >
                                                 Editar
                                             </button>
                                             <button
-                                                className="btn btn-sm btn-secondary"
+                                                className="btn btn-sm btn-secondary fw-bold"
                                                 onClick={() => handleCambiarImg(prod.id)}
                                             >
                                                 Cambiar IMG
@@ -277,7 +278,7 @@ const CocinaProductos = () => {
             {productoEdit && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h5 className="mb-3">Editar Producto</h5>
+                        <h5 className="mb-3 fw-bold">Editar Producto</h5>
 
                         <label>Nombre</label>
                         <input className="form-control mb-2"
@@ -309,16 +310,19 @@ const CocinaProductos = () => {
                         </select>
 
                         <div className="d-flex gap-3">
-                            <button className="btn btn-success" onClick={handleGuardarCambios}>
+                            <button className="btn btn-success fw-bold" onClick={handleGuardarCambios}>
                                 Guardar
                             </button>
-                            <button className="btn btn-danger" onClick={() => setProductoEdit(null)}>
+                            <button className="btn btn-danger fw-bold" onClick={() => setProductoEdit(null)}>
                                 Cancelar
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

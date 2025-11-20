@@ -5,6 +5,7 @@ import axios from "axios";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import "../Layout/modals.css";
 import "./cocinaPedidos.css";
 
@@ -35,6 +36,11 @@ const CocinaPedidos = () => {
         };
 
         obtenerPedidos();
+    }, []);
+
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
     }, []);
 
     // === Filtrado ===
@@ -95,15 +101,15 @@ const CocinaPedidos = () => {
     const getEstadoClass = (estado) => {
         switch (estado?.toLowerCase()) {
             case "pendiente":
-                return "badge bg-warning text-dark";
+                return "badge bg-danger text-light";
             case "en preparación":
-                return "badge bg-info text-dark";
+                return "badge bg-warning text-dark";
             case "listo":
-                return "badge bg-primary";
+                return "badge bg-primary text-light";
             case "entregado":
-                return "badge bg-success";
+                return "badge bg-success text-light";
             default:
-                return "badge bg-secondary";
+                return "badge bg-secondary text-light";
         }
     };
 
@@ -205,9 +211,9 @@ const CocinaPedidos = () => {
                                     ? "success"
                                     : p.estado === "listo"
                                         ? "primary"
-                                        : p.estado === "en preparacion"
+                                        : p.estado === "en preparación"
                                             ? "warning"
-                                            : "secondary"
+                                            : "danger"
                                     }`}>
                                     <div className="card-body">
                                         <h5 className="card-title fw-bold">Pedido #{p.id}</h5>
@@ -240,7 +246,7 @@ const CocinaPedidos = () => {
                                     </div>
                                     <div className="card-footer d-flex justify-content-between">
                                         <button
-                                            className="btn btn-sm btn-primary"
+                                            className="btn btn-sm btn-primary fw-bold"
                                             onClick={() => handleVerDetalle(p)}
                                         >
                                             Ver detalle
@@ -248,7 +254,7 @@ const CocinaPedidos = () => {
 
                                         {!p.editandoEstado ? (
                                             <button
-                                                className="btn btn-sm btn-dark"
+                                                className="btn btn-sm btn-dark fw-bold"
                                                 onClick={() => toggleEdicion(p.id)}
                                             >
                                                 Actualizar estado
@@ -353,6 +359,9 @@ const CocinaPedidos = () => {
             )}
             {/* Overlay del modal */}
             {showModal && <div className="modal-backdrop fade show"></div>}
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />
