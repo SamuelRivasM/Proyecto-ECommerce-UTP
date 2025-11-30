@@ -189,7 +189,7 @@ exports.obtenerPedidosParaCocina = async (req, res) => {
     try {
         const [pedidos] = await db.promise().query(`
       SELECT p.id, p.usuario_id, u.nombre AS cliente_nombre, u.telefono AS cliente_telefono,
-             p.metodo_pago, p.estado, p.total,
+             p.metodo_pago, p.estado, p.estado_pago, p.total,
              DATE_FORMAT(p.fecha_creacion, '%Y-%m-%d %H:%i:%s') AS fecha_creacion,
              DATE_FORMAT(p.fecha_entrega, '%Y-%m-%d %H:%i:%s') AS fecha_entrega
       FROM pedidos p

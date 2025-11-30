@@ -58,6 +58,27 @@ const CocinaPedidos = () => {
                 return p.estado?.toLowerCase().includes(valor);
             case "total":
                 return p.total?.toString().includes(valor);
+            case "estado_pago":
+                const estadoTexto = p.estado_pago === 1 ? "pagado" : "no pagado";
+
+                // Convertimos todo a minúsculas para igualdad
+                const estadoLower = estadoTexto.toLowerCase();
+                const valorLower = valor.toLowerCase();
+
+                if (valorLower.startsWith("pa")) {
+                    return p.estado_pago === 1; // Solo pagados
+                }
+                if (valorLower.startsWith("no")) {
+                    return p.estado_pago === 0; // Solo no pagados
+                }
+                if (valorLower === "1") {
+                    return p.estado_pago === 1;
+                }
+                if (valorLower === "0") {
+                    return p.estado_pago === 0;
+                }
+                // Comparación exacta SOLO si coincide completamente
+                return estadoLower === valorLower;
             case "fecha_creacion":
                 return p.fecha_creacion?.toLowerCase().includes(valor);
             case "fecha_entrega":
@@ -177,8 +198,9 @@ const CocinaPedidos = () => {
                         <option value="id">ID</option>
                         <option value="cliente">Cliente</option>
                         <option value="metodo_pago">Método de Pago</option>
-                        <option value="estado">Estado</option>
+                        <option value="estado">Estado del Pedido</option>
                         <option value="total">Total (S/)</option>
+                        <option value="estado_pago">Estado de Pago</option>
                         <option value="fecha_creacion">Fecha de Creación</option>
                         <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
@@ -220,9 +242,17 @@ const CocinaPedidos = () => {
                                         <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
                                         <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
                                         <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>
+                                        <p>
+                                            <strong>Estado de Pago: </strong>
+                                            {p.estado_pago === 1 ? (
+                                                <span className="badge bg-success">Pagado</span>
+                                            ) : (
+                                                <span className="badge bg-danger">No pagado</span>
+                                            )}
+                                        </p>
                                         <p><strong>Fecha / Hora del Pedido:</strong> {p.fecha_creacion || "—"}</p>
                                         <p><strong>Fecha / Hora de Entrega:</strong> {p.fecha_entrega || "—"}</p>
-                                        <p><strong>Estado: </strong>
+                                        <p><strong>Estado del Pedido: </strong>
                                             {!p.editandoEstado ? (
                                                 <span className={getEstadoClass(p.estado)}>
                                                     {capitalizarPrimeraLetra(p.estado)}
@@ -318,6 +348,14 @@ const CocinaPedidos = () => {
                                     </p>
                                     <p><strong>Método de Pago:</strong> {capitalizarPrimeraLetra(pedidoSeleccionado.metodo_pago)}</p>
                                     <p><strong>Total:</strong> S/ {pedidoSeleccionado.total}</p>
+                                    <p>
+                                        <strong>Estado de Pago:</strong>{" "}
+                                        {pedidoSeleccionado.estado_pago === 1 ? (
+                                            <span className="badge bg-success">Pagado</span>
+                                        ) : (
+                                            <span className="badge bg-danger">No pagado</span>
+                                        )}
+                                    </p>
                                 </div>
 
                                 {/* === Tabla de productos === */}

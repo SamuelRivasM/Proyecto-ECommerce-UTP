@@ -1,5 +1,5 @@
 // src/components/Cart/ClienteCarrito.jsx
-import { useEffect, useState, useRef, Component } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarGeneral from "../Layout/NavbarGeneral";
@@ -32,7 +32,6 @@ const ClienteCarrito = () => {
     const [progress, setProgress] = useState(0);
     const [pagoBilletera, setPagoBilletera] = useState(false); // Bandera para pago confirmado en billetera
     const socketRef = useRef(null);
-    const [pedidoActualId, setPedidoActualId] = useState(null); // Guardar ID del pedido para actualizar estado_pago
 
     // === ESTADO NUEVO PARA EL MODAL QR ===
     const [showQrModal, setShowQrModal] = useState(false);
@@ -249,6 +248,7 @@ const ClienteCarrito = () => {
     const handleCloseQrModal = async () => {
         setShowQrModal(false);
         setConfirmSwitch(false);
+        setPagoBilletera(false);
         setShowConfirmModal(true);
     }
 
@@ -354,13 +354,13 @@ const ClienteCarrito = () => {
                     console.log("Intentando actualizar estado_pago para pedido:", response.data.pedidoId);
 
                     // Para billetera: solo si se confirmó en el modal QR
-                    // Para efectivo y tarjeta: siempre se confirma aquí
+                    // Para efectivo y tarjeta: no se confirma el pago
                     let debeActualizar = false;
 
                     if (metodoPago === "billetera" && pagoBilletera) {
                         debeActualizar = true;
                     } else if (metodoPago === "efectivo" || metodoPago === "tarjeta") {
-                        debeActualizar = true;
+                        debeActualizar = false;
                     }
 
                     if (debeActualizar) {
@@ -369,6 +369,11 @@ const ClienteCarrito = () => {
                         });
                         console.log("Estado de pago actualizado exitosamente:", updateResponse.data);
                         toast.success("¡Pago registrado exitosamente!");
+                        // Disparar evento para refrescar la tabla de pedidos
+                        window.dispatchEvent(new Event("pedidoCreado"));
+                    } else {
+                        console.log("No se requiere actualizar estado_pago para este método de pago.");
+                        toast.info("Recuerda completar el pago al recibir tu pedido.");
                         // Disparar evento para refrescar la tabla de pedidos
                         window.dispatchEvent(new Event("pedidoCreado"));
                     }
@@ -646,6 +651,12 @@ const ClienteCarrito = () => {
                                         />
                                     </div>
 
+                                    <p className="mt-3 text-danger small fw-semibold">
+                                        ⚠️ Advertencia: Mentir, falsear pagos o intentar engañar al sistema puede generar
+                                        repercusiones estrictas, incluyendo la anulación del pedido y restricciones en el
+                                        servicio.
+                                    </p>
+
                                     <p className="mt-3 text-muted small">
                                         Una vez realizado el pago, puedes cerrar esta ventana.
                                     </p>
@@ -697,7 +708,15 @@ const ClienteCarrito = () => {
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => {
+                                        setPagoBilletera(false);
+                                        setShowConfirmModal(false);
+                                        toast.info("Pedido cancelado. Si habías iniciado un pago, fue cancelado también.");
+                                    }}
+                                >
                                     Cancelar
                                 </button>
                                 <button
@@ -723,16 +742,28 @@ const ClienteCarrito = () => {
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Enviando pedido...</h5>
-                                <button type="button" className="btn-close" onClick={() => setShowProgressModal(false)} />
                             </div>
                             <div className="modal-body">
-                                {/* Lógica del progreso */}
-
+                                <p className="mb-2">Procesando pedido. Esto puede tardar unos segundos.</p>
+                                <div className="progress" style={{ height: "18px" }}>
+                                    <div
+                                        className="progress-bar progress-bar-striped progress-bar-animated"
+                                        role="progressbar"
+                                        style={{ width: `${progress}%` }}
+                                        aria-valuenow={progress}
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                    >
+                                        {progress}%
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+            {/* Overlay del modal */}
+            {showProgressModal && <div className="modal-backdrop fade show"></div>}
 
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
             <LandbotChat />

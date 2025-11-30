@@ -74,10 +74,10 @@ const Perfil = ({ onClose }) => {
 
             setEditable(false);
             setFormData({ ...formData, password: "" }); // limpiar password
-            toast.success("Perfil actualizado correctamente ✅");
+            toast.success("Perfil actualizado correctamente");
         } catch (err) {
             console.error("Error actualizando perfil", err);
-            toast.error("Error al actualizar perfil ❌");
+            toast.error("Error al actualizar perfil");
         }
     };
 

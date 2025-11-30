@@ -55,6 +55,7 @@ CREATE TABLE pedidos (
   usuario_id INT NOT NULL,
   metodo_pago ENUM('efectivo','tarjeta','billetera') NOT NULL,
   estado ENUM('pendiente','en preparación','listo','entregado') DEFAULT 'pendiente',
+  estado_pago TINYINT(1) DEFAULT 0 COMMENT '1 = pagado, 0 = no pagado',
   total DECIMAL(10,2) NOT NULL,
   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   fecha_entrega TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -97,6 +98,7 @@ CREATE TABLE tokens_recuperacion (
 
 SET GLOBAL event_scheduler = ON;
 
+-- Actualizar Stock Automáticamente
 DELIMITER $$
 
 CREATE EVENT IF NOT EXISTS actualizar_estado_productos_event
@@ -107,3 +109,19 @@ DO
 
 $$
 DELIMITER ;
+
+-- Actualizar Estado de Pago Automáticamente
+DELIMITER $$
+
+CREATE EVENT IF NOT EXISTS actualizar_estado_pago_pedidos_event
+ON SCHEDULE EVERY 3 SECOND
+DO
+    UPDATE pedidos
+    SET estado_pago = 1
+    WHERE estado = 'entregado'
+      AND estado_pago = 0;
+
+$$
+DELIMITER ;
+
+DELIMITER $$

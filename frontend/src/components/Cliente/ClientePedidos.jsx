@@ -75,14 +75,41 @@ const ClientePedidos = () => {
         if (criterio === "todos" || filtro.trim() === "") return true;
         const valor = filtro.toLowerCase();
         switch (criterio) {
+            case "numero":
+                return p.numero?.toString().includes(valor);
+            case "cliente":
+                return p.cliente_nombre?.toLowerCase().includes(valor);
             case "metodo_pago":
-                return (p.metodo_pago || "desconocido").toLowerCase().includes(valor);
+                return p.metodo_pago?.toLowerCase().includes(valor);
             case "estado":
-                return (p.estado || "desconocido").toLowerCase().includes(valor);
+                return p.estado?.toLowerCase().includes(valor);
             case "total":
-                return p.total.toString().includes(valor);
-            case "fecha":
-                return p.fecha.toLowerCase().includes(valor);
+                return p.total?.toString().includes(valor);
+            case "estado_pago":
+                const estadoTexto = p.estado_pago === 1 ? "pagado" : "no pagado";
+
+                // Convertimos todo a minúsculas para igualdad
+                const estadoLower = estadoTexto.toLowerCase();
+                const valorLower = valor.toLowerCase();
+
+                if (valorLower.startsWith("pa")) {
+                    return p.estado_pago === 1; // Solo pagados
+                }
+                if (valorLower.startsWith("no")) {
+                    return p.estado_pago === 0; // Solo no pagados
+                }
+                if (valorLower === "1") {
+                    return p.estado_pago === 1;
+                }
+                if (valorLower === "0") {
+                    return p.estado_pago === 0;
+                }
+                // Comparación exacta SOLO si coincide completamente
+                return estadoLower === valorLower;
+            case "fecha_creacion":
+                return p.fecha_creacion?.toLowerCase().includes(valor);
+            case "fecha_entrega":
+                return p.fecha_entrega?.toLowerCase().includes(valor);
             default:
                 return true;
         }
@@ -140,9 +167,12 @@ const ClientePedidos = () => {
                 {/* === Filtro === */}
                 <div
                     className="input-group mb-4 shadow-sm"
-                    style={{ maxWidth: "700px", height: "50px", margin: "0 auto" }}
+                    style={{ maxWidth: "650px", height: "50px", margin: "0 auto" }}
                 >
-                    <span className="input-group-text bg-white border-end-0" style={{ height: "50px" }}>
+                    <span
+                        className="input-group-text bg-white border-end-0"
+                        style={{ fontSize: "1.2rem", height: "50px" }}
+                    >
                         🔍
                     </span>
                     <select
@@ -155,10 +185,14 @@ const ClientePedidos = () => {
                         style={{ maxWidth: "200px", height: "50px" }}
                     >
                         <option value="todos">Todos</option>
+                        <option value="numero">ID</option>
+                        <option value="cliente">Cliente</option>
                         <option value="metodo_pago">Método de Pago</option>
-                        <option value="estado">Estado</option>
+                        <option value="estado">Estado del Pedido</option>
                         <option value="total">Total (S/)</option>
-                        <option value="fecha">Fecha</option>
+                        <option value="estado_pago">Estado de Pago</option>
+                        <option value="fecha_creacion">Fecha de Creación</option>
+                        <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
                     <input
                         type="text"
@@ -172,7 +206,9 @@ const ClientePedidos = () => {
                         onChange={(e) => setFiltro(e.target.value)}
                         disabled={criterio === "todos"}
                         style={{
-                            backgroundColor: criterio === "todos" ? "#f5f5f5" : "white", height: "50px"
+                            height: "50px",
+                            backgroundColor:
+                                criterio === "todos" ? "#f5f5f5" : "white",
                         }}
                     />
                 </div>
@@ -184,7 +220,7 @@ const ClientePedidos = () => {
                             <tr>
                                 <th>N°</th>
                                 <th>Método de Pago</th>
-                                <th>Estado</th>
+                                <th>Estado de Pedido</th>
                                 <th>Estado de Pago</th>
                                 <th>Total (S/)</th>
                                 <th>Fecha / Hora del Pedido</th>
@@ -200,7 +236,7 @@ const ClientePedidos = () => {
                                         <td data-label="Método de Pago:">
                                             {capitalizarPrimeraLetra(p.metodo_pago)}
                                         </td>
-                                        <td data-label="Estado:">
+                                        <td data-label="Estado de Pedido:">
                                             <span className={getEstadoClass(p.estado)}>
                                                 {capitalizarPrimeraLetra(p.estado)}
                                             </span>
