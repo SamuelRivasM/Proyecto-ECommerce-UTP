@@ -100,18 +100,10 @@ SET GLOBAL event_scheduler = ON;
 DELIMITER $$
 
 CREATE EVENT IF NOT EXISTS actualizar_estado_productos_event
-ON SCHEDULE EVERY 10 SECOND
+ON SCHEDULE EVERY 3 SECOND
 DO
-BEGIN
-  -- Desactivar productos sin stock
-  UPDATE productos
-  SET disponible = 0
-  WHERE stock <= 0;
+    UPDATE productos
+    SET disponible = (stock > 0); -- TRUE=1 , FALSE=0
 
-  -- Activar productos con stock positivo
-  UPDATE productos
-  SET disponible = 1
-  WHERE stock > 0;
-END$$
-
+$$
 DELIMITER ;

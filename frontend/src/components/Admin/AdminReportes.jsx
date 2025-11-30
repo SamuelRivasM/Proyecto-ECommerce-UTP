@@ -3,6 +3,7 @@
 import { useState } from "react";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 
 const AdminReportes = () => {
@@ -34,7 +35,7 @@ const AdminReportes = () => {
                             <div className="card-body text-center">
                                 <h5 className="card-title">📈 Reporte de Ventas</h5>
                                 <p className="text-muted">Resumen mensual de ingresos y ventas totales.</p>
-                                <button className="btn btn-outline-primary">Generar PDF</button>
+                                <button className="btn btn-primary fw-bold">Generar PDF</button>
                             </div>
                         </div>
                     </div>
@@ -44,7 +45,7 @@ const AdminReportes = () => {
                             <div className="card-body text-center">
                                 <h5 className="card-title">👥 Reporte de Usuarios</h5>
                                 <p className="text-muted">Usuarios activos, roles y fechas de registro.</p>
-                                <button className="btn btn-outline-success">Generar PDF</button>
+                                <button className="btn btn-success fw-bold">Generar PDF</button>
                             </div>
                         </div>
                     </div>
@@ -54,7 +55,7 @@ const AdminReportes = () => {
                             <div className="card-body text-center">
                                 <h5 className="card-title">🛍️ Reporte de Pedidos</h5>
                                 <p className="text-muted">Pedidos por estado, método de pago y cliente.</p>
-                                <button className="btn btn-outline-danger">Generar PDF</button>
+                                <button className="btn btn-danger fw-bold">Generar PDF</button>
                             </div>
                         </div>
                     </div>
@@ -79,7 +80,7 @@ const AdminReportes = () => {
                                 <td>2025-10-18</td>
                                 <td>Sergio Chiquinta</td>
                                 <td>
-                                    <button className="btn btn-sm btn-outline-secondary">Ver PDF</button>
+                                    <button className="btn btn-sm btn-outline-secondary fw-bold">Ver PDF</button>
                                 </td>
                             </tr>
                             <tr>
@@ -88,13 +89,16 @@ const AdminReportes = () => {
                                 <td>2025-10-15</td>
                                 <td>Oscar Chocce</td>
                                 <td>
-                                    <button className="btn btn-sm btn-outline-secondary">Ver PDF</button>
+                                    <button className="btn btn-sm btn-outline-secondary fw-bold">Ver PDF</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </main>
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

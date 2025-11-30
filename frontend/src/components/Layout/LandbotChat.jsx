@@ -10,7 +10,7 @@ const LandbotChat = () => {
             if (!myLandbot) {
                 const script = document.createElement("script");
                 script.type = "module";
-                script.async = true;
+                script.async = true;    
 
                 script.addEventListener("load", () => {
                     /* global Landbot */

@@ -5,6 +5,7 @@ import axios from "axios";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 import "../Layout/modals.css";
 import "./cocinaPedidos.css";
 
@@ -37,6 +38,11 @@ const CocinaPedidos = () => {
         obtenerPedidos();
     }, []);
 
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
+    }, []);
+
     // === Filtrado ===
     const pedidosFiltrados = pedidos.filter((p) => {
         if (criterio === "todos" || filtro.trim() === "") return true;
@@ -54,6 +60,8 @@ const CocinaPedidos = () => {
                 return p.total?.toString().includes(valor);
             case "fecha_creacion":
                 return p.fecha_creacion?.toLowerCase().includes(valor);
+            case "fecha_entrega":
+                return p.fecha_entrega?.toLowerCase().includes(valor);
             default:
                 return true;
         }
@@ -93,15 +101,15 @@ const CocinaPedidos = () => {
     const getEstadoClass = (estado) => {
         switch (estado?.toLowerCase()) {
             case "pendiente":
-                return "badge bg-warning text-dark";
+                return "badge bg-danger text-light";
             case "en preparación":
-                return "badge bg-info text-dark";
+                return "badge bg-warning text-dark";
             case "listo":
-                return "badge bg-primary";
+                return "badge bg-primary text-light";
             case "entregado":
-                return "badge bg-success";
+                return "badge bg-success text-light";
             default:
-                return "badge bg-secondary";
+                return "badge bg-secondary text-light";
         }
     };
 
@@ -163,7 +171,7 @@ const CocinaPedidos = () => {
                             setCriterio(e.target.value);
                             setFiltro("");
                         }}
-                        style={{ maxWidth: "150px", height: "50px" }}
+                        style={{ maxWidth: "200px", height: "50px" }}
                     >
                         <option value="todos">Todos</option>
                         <option value="id">ID</option>
@@ -171,7 +179,8 @@ const CocinaPedidos = () => {
                         <option value="metodo_pago">Método de Pago</option>
                         <option value="estado">Estado</option>
                         <option value="total">Total (S/)</option>
-                        <option value="fecha_creacion">Fecha</option>
+                        <option value="fecha_creacion">Fecha de Creación</option>
+                        <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
                     <input
                         type="text"
@@ -202,16 +211,17 @@ const CocinaPedidos = () => {
                                     ? "success"
                                     : p.estado === "listo"
                                         ? "primary"
-                                        : p.estado === "en preparacion"
+                                        : p.estado === "en preparación"
                                             ? "warning"
-                                            : "secondary"
+                                            : "danger"
                                     }`}>
                                     <div className="card-body">
                                         <h5 className="card-title fw-bold">Pedido #{p.id}</h5>
                                         <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
                                         <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
                                         <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>
-                                        <p><strong>Fecha entrega:</strong> {p.fecha_entrega || "—"}</p>
+                                        <p><strong>Fecha / Hora del Pedido:</strong> {p.fecha_creacion || "—"}</p>
+                                        <p><strong>Fecha / Hora de Entrega:</strong> {p.fecha_entrega || "—"}</p>
                                         <p><strong>Estado: </strong>
                                             {!p.editandoEstado ? (
                                                 <span className={getEstadoClass(p.estado)}>
@@ -236,7 +246,7 @@ const CocinaPedidos = () => {
                                     </div>
                                     <div className="card-footer d-flex justify-content-between">
                                         <button
-                                            className="btn btn-sm btn-primary"
+                                            className="btn btn-sm btn-primary fw-bold"
                                             onClick={() => handleVerDetalle(p)}
                                         >
                                             Ver detalle
@@ -244,7 +254,7 @@ const CocinaPedidos = () => {
 
                                         {!p.editandoEstado ? (
                                             <button
-                                                className="btn btn-sm btn-dark"
+                                                className="btn btn-sm btn-dark fw-bold"
                                                 onClick={() => toggleEdicion(p.id)}
                                             >
                                                 Actualizar estado
@@ -349,6 +359,9 @@ const CocinaPedidos = () => {
             )}
             {/* Overlay del modal */}
             {showModal && <div className="modal-backdrop fade show"></div>}
+
+            {/* Chatbot de Landbot */}
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

@@ -32,9 +32,11 @@ const ClienteProductos = () => {
     };
 
     useEffect(() => {
+        let mounted = true;
         const fetchProductos = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/productos/cliente`);
+                if (!mounted) return;
                 setProductos(response.data);
             } catch (error) {
                 toast.error("Error al obtener productos");
@@ -42,6 +44,14 @@ const ClienteProductos = () => {
             }
         };
         fetchProductos();
+
+        // Polling cada 10s
+        const intervalo = setInterval(fetchProductos, 10000);
+
+        return () => {
+            mounted = false;
+            clearInterval(intervalo);
+        };
     }, []);
 
     useEffect(() => {
@@ -194,7 +204,7 @@ const ClienteProductos = () => {
                                         <p className="text-muted mb-3">{prod.descripcion}</p>
                                         <p className="fw-semibold mb-3">S/ {parseFloat(prod.precio).toFixed(2)}</p>
                                         <button
-                                            className="btn btn-danger btn-sm"
+                                            className="btn btn-danger btn-sm fw-bold"
                                             onClick={() => handleAgregarAlCarrito(prod)}
                                         >
                                             Agregar al carrito
@@ -210,7 +220,7 @@ const ClienteProductos = () => {
             </section>
 
             {/* Chatbot de Landbot */}
-            <LandbotChat /> 
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />

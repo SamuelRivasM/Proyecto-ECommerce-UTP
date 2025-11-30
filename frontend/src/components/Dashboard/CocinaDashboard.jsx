@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
+import LandbotChat from "../Layout/LandbotChat";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -108,13 +109,13 @@ const CocinaDashboard = () => {
             </p>
             <div className="mb-4">
               <button
-                className="btn btn-danger me-3"
+                className="btn btn-danger me-3 fw-bold"
                 onClick={() => navigate("/cocina-pedidos")}
               >
                 Ver Pedidos
               </button>
               <button
-                className="btn btn-danger"
+                className="btn btn-danger fw-bold"
                 onClick={() => navigate("/cocina-productos")}
               >
                 Gestionar Productos
@@ -123,6 +124,9 @@ const CocinaDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Chatbot de Landbot */}
+      <LandbotChat />
 
       {/* Footer */}
       <FooterGeneral />

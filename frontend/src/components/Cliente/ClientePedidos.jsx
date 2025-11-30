@@ -32,6 +32,11 @@ const ClientePedidos = () => {
         }
     }, [user?.id]);
 
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
+    }, []);
+
     // === Función para capitalizar primera letra ===
     const capitalizarPrimeraLetra = (texto) => {
         if (!texto || texto.trim() === "") return "Desconocido";
@@ -177,7 +182,7 @@ const ClientePedidos = () => {
                                         <td data-label="Fecha / Hora de Entrega:">{p.fecha_entrega || "—"}</td>
                                         <td data-label="Acciones:" className="action-buttons">
                                             <button
-                                                className="btn btn-sm btn-primary"
+                                                className="btn btn-sm btn-primary fw-bold"
                                                 onClick={() => handleVerDetalle(p)}
                                             >
                                                 Ver Detalle
@@ -203,7 +208,7 @@ const ClientePedidos = () => {
                     <div className="modal-dialog modal-lg modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header bg-dark text-white">
-                                <h5 className="modal-title">
+                                <h5 className="modal-title fw-bold">
                                     Detalle del Pedido N° {pedidoSeleccionado.numero}
                                 </h5>
                             </div>

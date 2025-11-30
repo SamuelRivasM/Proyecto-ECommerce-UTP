@@ -1,6 +1,5 @@
-
 // src/components/Cart/ClienteCarrito.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, Component } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarGeneral from "../Layout/NavbarGeneral";
@@ -8,7 +7,16 @@ import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "./clienteCarrito.css";
+import "../Layout/modals.css";
+import "./ModalPagoQR.css";
 import { FaTrashAlt } from "react-icons/fa";
+import qrImage from '../../assets/img/QR.jpg';
+import io from "socket.io-client";
+
+const SOCKET_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:3000";
+// URL PREDETERMINADA DEL CÓDIGO QR
+// *** IMPORTANTE: Reemplaza esta URL con la ruta real de tu imagen QR. ***
+const PREDETERMINED_QR_URL = "/img/qr_predeterminado.png";
 
 const ClienteCarrito = () => {
     const [showPerfil, setShowPerfil] = useState(false);
@@ -21,7 +29,20 @@ const ClienteCarrito = () => {
     const [metodoPago, setMetodoPago] = useState("efectivo");
     const [fechaEntrega, setFechaEntrega] = useState("");
 
-    // === Obtener categorías y productos ===
+    // Confirm modal + websocket state
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmSwitch, setConfirmSwitch] = useState(false);
+    const [showProgressModal, setShowProgressModal] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const socketRef = useRef(null);
+    
+    // === ESTADO NUEVO PARA EL MODAL QR ===
+    const [showQrModal, setShowQrModal] = useState(false);
+
+    // === Calcular total ===
+    const total = carrito.reduce((acc, item) => acc + parseFloat(item.subtotal || 0), 0).toFixed(2);
+
+    // === Obtener categorías y productos === (y mantener polling)
     useEffect(() => {
         // Cargar el Carrito al entrar
         const carritoGuardado = JSON.parse(localStorage.getItem("carrito")) || [];
@@ -34,7 +55,7 @@ const ClienteCarrito = () => {
         setCarrito(carritoConvertido);
         setNumero(carritoConvertido.length + 1);
 
-        const fetchData = async () => {
+        const fetchAll = async () => {
             try {
                 const [resCat, resProd] = await Promise.all([
                     axios.get(`${process.env.REACT_APP_API_URL}/productos/categorias`),
@@ -47,7 +68,34 @@ const ClienteCarrito = () => {
                 console.error(err);
             }
         };
-        fetchData();
+        fetchAll();
+
+        // Polling cada 10s para refrescar productos
+        const intervalo = setInterval(async () => {
+            try {
+                const resProd = await axios.get(`${process.env.REACT_APP_API_URL}/productos/cliente`);
+                // Compara si hay cambios en la lista (por simplicidad actualizamos siempre)
+                const nuevos = resProd.data;
+                // Si hay productos en carrito que ya no están disponibles -> quitar y avisar
+                const disponiblesIds = nuevos.map((p) => p.id);
+                const carritoActual = JSON.parse(localStorage.getItem("carrito")) || [];
+                const faltantes = carritoActual.filter((it) => !disponiblesIds.includes(it.id));
+                if (faltantes.length > 0) {
+                    // Remover del carrito
+                    const nuevoCarrito = carritoActual.filter((it) => disponiblesIds.includes(it.id));
+                    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+                    setCarrito(nuevoCarrito);
+                    setNumero(nuevoCarrito.length > 0 ? nuevoCarrito.length + 1 : 1);
+                    faltantes.forEach((f) => toast.warning(`"${f.nombre}" ya no está disponible y fue removido del carrito.`));
+                    window.dispatchEvent(new Event("cartUpdated"));
+                }
+                setProductos(nuevos);
+            } catch (err) {
+                console.error("Error en polling productos:", err);
+            }
+        }, 10000);
+
+        return () => clearInterval(intervalo);
     }, []);
 
     // === Productos filtrados por categoría ===
@@ -115,42 +163,68 @@ const ClienteCarrito = () => {
 
     // === Aumentar o disminuir cantidad ===
     const actualizarCantidad = (id, delta) => {
-        setCarrito((prev) =>
-            prev.map((item) =>
+        setCarrito((prev) => {
+            const nuevoCarrito = prev.map((item) =>
                 item.id === id
                     ? {
-                        ...item,
-                        cantidad: Math.max(1, item.cantidad + delta),
-                        subtotal: Math.max(1, item.cantidad + delta) * item.precio,
-                    }
+                          ...item,
+                          cantidad: Math.max(1, item.cantidad + delta),
+                          subtotal: Math.max(1, item.cantidad + delta) * item.precio,
+                      }
                     : item
-            )
-        );
+            );
+            localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+            return nuevoCarrito;
+        });
     };
 
-    // === Calcular total ===
-    const total = carrito.reduce((acc, item) => acc + parseFloat(item.subtotal || 0), 0).toFixed(2);
+    // === Manejador del cambio de Método de Pago ===
 
-    // === Método para Solicitar un Pedido ===
-    const handleSolicitarPedido = async () => {
+    const handleMetodoPagoChange = (e) => {
+        const newMetodo = e.target.value;
+        setMetodoPago(newMetodo);
+        setShowQrModal(false); // Asegurar que se cierra si cambia de 'tarjeta'/'billetera' a 'efectivo'
+
+    };
+
+    // Obtener primer slot de 15min estrictamente posterior al "ahora" para la fecha de entrega
+    const getSlotsForToday = () => {
+        const ahora = new Date();
+        const slots = [];
+        // Calcular próximo intervalo de 15 minutos *estrictamente mayor* que ahora
+        const minutes = ahora.getMinutes();
+        const seconds = ahora.getSeconds();
+        const ms = ahora.getMilliseconds();
+        let remainder = minutes % 15;
+        let addMin = remainder === 0 && seconds === 0 && ms === 0 ? 15 : (15 - remainder);
+        if (remainder === 0 && (seconds > 0 || ms > 0)) addMin = 15; // si está exacto pero ya pasaron segundos
+        const primer = new Date(ahora.getTime() + addMin * 60_000 - (seconds * 1000 + ms));
+        // Generar hasta 23:45
+        const fin = new Date(ahora);
+        fin.setHours(23, 45, 0, 0);
+        for (let cur = new Date(primer); cur <= fin; cur = new Date(cur.getTime() + 15 * 60_000)) {
+            const hh = cur.getHours().toString().padStart(2, "0");
+            const mm = cur.getMinutes().toString().padStart(2, "0");
+            slots.push(`${hh}:${mm}`);
+        }
+        return slots;
+    };
+
+    const handleOpenConfirm = async () => {
         if (carrito.length === 0) return toast.warning("El carrito está vacío.");
-
         if (!fechaEntrega) return toast.warning("Debe seleccionar la hora de entrega.");
 
-        const ahora = new Date();
-        const [horaSel, minSel] = fechaEntrega.split(":").map(Number);
-        const fechaSeleccionada = new Date();
-        fechaSeleccionada.setHours(horaSel, minSel, 0, 0);
-
-        if (fechaSeleccionada <= ahora) {
-            return toast.warning("Seleccione una hora posterior a la actual.");
+        if ((metodoPago === "tarjeta" || metodoPago === "billetera")) {
+            if (parseFloat(total) > 0) {
+                setShowQrModal(true);
+                return; 
+            } else {
+                return toast.warning("No se puede pagar con Billetera Digital/Tarjeta si el total es S/ 0.00. Añade productos o cambia el método de pago.");
+            }
         }
 
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user || !user.id) return toast.error("Usuario no identificado.");
-
         try {
-            // Verificar stock antes de crear pedido
+            // Verificar stock
             const verificarRes = await axios.post(
                 `${process.env.REACT_APP_API_URL}/pedidos/cliente/verificar-stock`,
                 { carrito }
@@ -160,58 +234,103 @@ const ClienteCarrito = () => {
                 toast.error("Error al verificar stock.");
                 return;
             }
-
-            // Crear pedido
-            const totalPedido = parseFloat(total);
-
-            // Combinar fecha actual + hora seleccionada
-            const hoy = new Date();
-            const [horaSel, minSel] = fechaEntrega.split(":").map(Number);
-            const fechaEntregaCompleta = new Date(
-                hoy.getFullYear(),
-                hoy.getMonth(),
-                hoy.getDate(),
-                horaSel,
-                minSel,
-                0
-            );
-            // Formatear manualmente a "YYYY-MM-DD HH:mm:ss" en hora local (Perú)
-            const pad = (n) => (n < 10 ? "0" + n : n);
-            const fechaEntregaFormateada = `${fechaEntregaCompleta.getFullYear()}-${pad(
-                fechaEntregaCompleta.getMonth() + 1
-            )}-${pad(fechaEntregaCompleta.getDate())} ${pad(
-                fechaEntregaCompleta.getHours()
-            )}:${pad(fechaEntregaCompleta.getMinutes())}:00`;
-
-            // Enviar al backend la fecha completa
-            await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
-                usuarioId: user.id,
-                metodoPago,
-                carrito,
-                total: totalPedido,
-                fechaEntrega: fechaEntregaFormateada,
-            });
-
-            toast.success("Pedido enviado correctamente.");
-
-            // Limpiar carrito
-            setCarrito([]);
-            localStorage.removeItem("carrito");
-            window.dispatchEvent(new Event("cartUpdated"));
-            setNumero(1);
-            setFechaEntrega("");
-
+            setConfirmSwitch(false);
+            setShowConfirmModal(true);
         } catch (error) {
             if (error.response && error.response.data && error.response.data.insuficientes) {
                 error.response.data.insuficientes.forEach((prod) => {
                     toast.warning(`"${prod.nombre}" sin stock suficiente (${prod.motivo}).`);
                 });
             } else {
-                console.error("Error al solicitar pedido:", error);
-                toast.error("Error del servidor al registrar el pedido.");
+                console.error("Error al verificar stock:", error);
+                toast.error("Error del servidor al verificar stock.");
             }
         }
     };
+
+    useEffect(() => {
+        document.body.classList.add("bootstrap-modal");
+        return () => document.body.classList.remove("bootstrap-modal");
+    }, []);
+
+    // Iniciar WebSocket UNA SOLA VEZ
+    useEffect(() => {
+        socketRef.current = io(SOCKET_URL, { transports: ["websocket"] });
+
+        // Eventos globales (solo se registran una vez)
+        socketRef.current.on("orderProgress", (data) => {
+            if (data && typeof data.percent === "number") {
+                setProgress(Math.min(100, Math.round(data.percent)));
+                setShowProgressModal(true);
+            }
+        });
+
+        socketRef.current.on("orderComplete", () => {
+            setProgress(100);
+            toast.success("Pedido enviado correctamente");
+
+            setCarrito([]);
+            localStorage.removeItem("carrito");
+            window.dispatchEvent(new Event("cartUpdated"));
+            setNumero(1);
+            setFechaEntrega("");
+
+            setTimeout(() => {
+                setShowProgressModal(false);
+            }, 800);
+        });
+
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, []);
+
+    // === Realizar pedido (se llama desde modal cuando el usuario confirma) ===
+    const handleConfirmarPedido = async () => {
+        setShowConfirmModal(false);
+        setProgress(0);
+        setShowProgressModal(true);
+
+        try {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user.id) {
+                toast.error("Usuario no identificado.");
+                return;
+            }
+
+            // Convertir la hora seleccionada a datetime completo (hoy)
+            const ahora = new Date();
+            const [hora, minuto] = fechaEntrega.split(":");
+            const fechaCompleta = new Date(
+                ahora.getFullYear(),
+                ahora.getMonth(),
+                ahora.getDate(),
+                hora,
+                minuto,
+                0
+            );
+
+            const pad = (n) => String(n).padStart(2, "0");
+            const fechaEntregaFormatoMySQL = `${fechaCompleta.getFullYear()}-${pad(
+                fechaCompleta.getMonth() + 1
+            )}-${pad(fechaCompleta.getDate())} ${pad(
+                fechaCompleta.getHours()
+            )}:${pad(fechaCompleta.getMinutes())}:00`;
+
+            await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
+                usuarioId: user.id,
+                metodoPago,
+                carrito,
+                total: parseFloat(total),
+                fechaEntrega: fechaEntregaFormatoMySQL,
+                socketId: socketRef.current.id,
+            });
+        } catch (error) {
+            toast.error("Error procesando pedido.");
+            setShowProgressModal(false);
+        }
+    };
+    // === Cuando polling detecta producto no disponible en catálogo y en combobox ya no aparece (handled) ===
 
     return (
         <div
@@ -273,7 +392,7 @@ const ClienteCarrito = () => {
                     </div>
                     <div className="col-md-2 d-flex align-items-end">
                         <button
-                            className="btn btn-danger w-100"
+                            className="btn btn-danger w-100 fw-bold"
                             onClick={handleAgregarProducto}
                         >
                             Agregar Producto
@@ -389,7 +508,7 @@ const ClienteCarrito = () => {
                         <select
                             className="form-select w-auto"
                             value={metodoPago}
-                            onChange={(e) => setMetodoPago(e.target.value)}
+                            onChange={handleMetodoPagoChange}
                         >
                             <option value="efectivo">Efectivo</option>
                             <option value="tarjeta">Tarjeta</option>
@@ -420,43 +539,150 @@ const ClienteCarrito = () => {
                                 required
                             >
                                 <option value="">Selecciona hora</option>
-                                {(() => {
-                                    const ahora = new Date();
-                                    const horas = [];
-                                    const inicio = ahora.getHours() + (ahora.getMinutes() > 50 ? 1 : 0);
-                                    for (let h = inicio; h <= 23; h++) {
-                                        const hora = h.toString().padStart(2, "0");
-                                        horas.push(`${hora}:00`);
-                                        horas.push(`${hora}:15`);
-                                        horas.push(`${hora}:30`);
-                                        horas.push(`${hora}:45`);
-                                    }
-                                    return horas.map((hora) => (
-                                        <option key={hora} value={hora}>
-                                            {hora}
-                                        </option>
-                                    ));
-                                })()}
+                                {getSlotsForToday().map((hora) => (
+                                    <option key={hora} value={hora}>
+                                        {hora}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
                     <div className="d-flex align-items-center gap-3">
                         <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
-                        <button className="btn btn-success" onClick={handleSolicitarPedido}>
+                        <button className="btn btn-success fw-bold" onClick={handleOpenConfirm}>
                             Solicitar Pedido
                         </button>
                     </div>
                 </div>
             </section>
 
-            {/* Chatbot de Landbot */}
-            <LandbotChat /> 
+            {showQrModal && (
+                <>
+                    <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered modal-sm">
+                            <div className="modal-content text-center">
+                                <div className="modal-header bg-danger text-white border-0 p-3">
+                                    <h5 className="modal-title fs-5 fw-bold w-100">
+                                        Pago con {metodoPago === 'tarjeta' ? 'Tarjeta / App' : 'Billetera Digital'}
+                                    </h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close btn-close-white"
+                                        onClick={() => setShowQrModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body p-4">
+                                    <p className="fw-semibold mb-3">
+                                        Escanea el código QR para completar tu pago de <span className="text-danger fw-bold">S/ {total}</span>:
+                                    </p>
 
-            {/* Footer */}
-            <FooterGeneral />
+                                    {/* Contenedor del QR con estilos inyectados o de ModalPagoQR.css */}
+                                    <div style={{ maxWidth: '200px', margin: '0 auto', padding: '10px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                                        <img
+                                            src={qrImage}
+                                            alt="Código QR de Pago"
+                                            className="img-fluid"
+                                            style={{
+                                                width: '100%',
+                                                height: 'auto',
+                                                aspectRatio: '1 / 1',
+                                                display: 'block'
+                                            }}
+                                        />
+                                    </div>
 
-            {/* Perfil modal */}
+                                    <p className="mt-3 text-muted small">
+                                        Una vez realizado el pago, puedes cerrar esta ventana.
+                                    </p>
+                                </div>
+                                <div className="modal-footer justify-content-center p-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-success w-100 fw-bold"
+                                        onClick={() => setShowQrModal(false)}
+                                    >
+                                        Pago realizado
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Overlay */}
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
+
+            {/* === Modal de Confirmación (advertencia) === */}
+            {showConfirmModal && (
+                <div className="modal show d-block" tabIndex="-1">
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Confirmación del Pedido</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)} />
+                            </div>
+                            <div className="modal-body">
+                                <p className="text-danger fw-semibold">
+                                    <strong>Advertencia:</strong> El pedido no podrá ser cancelado una vez enviado. La cocina
+                                    descontará ingredientes inmediatamente.
+                                </p>
+                                <p>¿Deseas continuar con el envío del pedido?</p>
+
+                                <div className="form-check form-switch mt-2">
+                                    <input
+                                        className="form-check-input"
+                                        type="checkbox"
+                                        id="confirmSwitch"
+                                        checked={confirmSwitch}
+                                        onChange={(e) => setConfirmSwitch(e.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="confirmSwitch">
+                                        Activar para habilitar "Solicitar Pedido"
+                                    </label>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    disabled={!confirmSwitch}
+                                    onClick={handleConfirmarPedido}
+                                >
+                                    Solicitar Pedido
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Overlay del modal */}
+            {showConfirmModal && <div className="modal-backdrop fade show"></div>}
+
+            {/* === Modal de Progreso WebSocket === */}
+            {showProgressModal && (
+                <div className="modal show d-block" tabIndex="-1">
+                    <div className="modal-dialog modal-sm modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Enviando pedido...</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowProgressModal(false)} />
+                            </div>
+                            <div className="modal-body">
+                                {/* Lógica del progreso */}
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Componentes de Layout */}
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
+            <LandbotChat />
+            <FooterGeneral />
         </div>
     );
 };
