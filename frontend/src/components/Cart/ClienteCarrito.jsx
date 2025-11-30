@@ -10,14 +10,10 @@ import "./clienteCarrito.css";
 import "../Layout/modals.css";
 import "./ModalPagoQR.css";
 import { FaTrashAlt } from "react-icons/fa";
-import qrImage from '../../assets/img/QR.jpg';
+import qrImage from '../../assets/img/QR.jpg'; 
 import io from "socket.io-client";
 
 const SOCKET_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:3000";
-// URL PREDETERMINADA DEL CÓDIGO QR
-// *** IMPORTANTE: Reemplaza esta URL con la ruta real de tu imagen QR. ***
-const PREDETERMINED_QR_URL = "/img/qr_predeterminado.png";
-
 const ClienteCarrito = () => {
     const [showPerfil, setShowPerfil] = useState(false);
     const [categorias, setCategorias] = useState([]);
@@ -183,8 +179,8 @@ const ClienteCarrito = () => {
     const handleMetodoPagoChange = (e) => {
         const newMetodo = e.target.value;
         setMetodoPago(newMetodo);
-        setShowQrModal(false); // Asegurar que se cierra si cambia de 'tarjeta'/'billetera' a 'efectivo'
-
+        // Cerramos el modal QR por si estaba abierto
+        setShowQrModal(false); 
     };
 
     // Obtener primer slot de 15min estrictamente posterior al "ahora" para la fecha de entrega
@@ -209,20 +205,19 @@ const ClienteCarrito = () => {
         }
         return slots;
     };
-
     const handleOpenConfirm = async () => {
         if (carrito.length === 0) return toast.warning("El carrito está vacío.");
         if (!fechaEntrega) return toast.warning("Debe seleccionar la hora de entrega.");
 
-        if ((metodoPago === "tarjeta" || metodoPago === "billetera")) {
+        if (metodoPago === "billetera") {
             if (parseFloat(total) > 0) {
+                // Si es Billetera Digital y el total es > 0, abrir el modal QR
                 setShowQrModal(true);
                 return; 
             } else {
-                return toast.warning("No se puede pagar con Billetera Digital/Tarjeta si el total es S/ 0.00. Añade productos o cambia el método de pago.");
+                return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
             }
         }
-
         try {
             // Verificar stock
             const verificarRes = await axios.post(
@@ -235,6 +230,7 @@ const ClienteCarrito = () => {
                 return;
             }
             setConfirmSwitch(false);
+            // Abrir el modal de Confirmación para Efectivo/Tarjeta
             setShowConfirmModal(true);
         } catch (error) {
             if (error.response && error.response.data && error.response.data.insuficientes) {
@@ -247,6 +243,13 @@ const ClienteCarrito = () => {
             }
         }
     };
+
+    const handleCloseQrModal = () => {
+        setShowQrModal(false);
+        setConfirmSwitch(false);
+        setShowConfirmModal(true);
+    }
+
 
     useEffect(() => {
         document.body.classList.add("bootstrap-modal");
@@ -511,7 +514,7 @@ const ClienteCarrito = () => {
                             onChange={handleMetodoPagoChange}
                         >
                             <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option>
+                            <option value="tarjeta">Tarjeta</option> 
                             <option value="billetera">Billetera Digital</option>
                         </select>
                     </div>
@@ -556,6 +559,7 @@ const ClienteCarrito = () => {
                 </div>
             </section>
 
+            {/* **=== Modal de Pago QR (Abre solo con Billetera Digital) ===** */}
             {showQrModal && (
                 <>
                     <div className="modal show d-block" tabIndex="-1">
@@ -563,12 +567,12 @@ const ClienteCarrito = () => {
                             <div className="modal-content text-center">
                                 <div className="modal-header bg-danger text-white border-0 p-3">
                                     <h5 className="modal-title fs-5 fw-bold w-100">
-                                        Pago con {metodoPago === 'tarjeta' ? 'Tarjeta / App' : 'Billetera Digital'}
+                                        Pago con Billetera Digital
                                     </h5>
                                     <button
                                         type="button"
                                         className="btn-close btn-close-white"
-                                        onClick={() => setShowQrModal(false)}
+                                        onClick={handleCloseQrModal} 
                                     />
                                 </div>
                                 <div className="modal-body p-4">
@@ -599,7 +603,7 @@ const ClienteCarrito = () => {
                                     <button
                                         type="button"
                                         className="btn btn-success w-100 fw-bold"
-                                        onClick={() => setShowQrModal(false)}
+                                        onClick={handleCloseQrModal} // Usa la nueva función
                                     >
                                         Pago realizado
                                     </button>
@@ -679,7 +683,6 @@ const ClienteCarrito = () => {
                 </div>
             )}
             
-            {/* Componentes de Layout */}
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
             <LandbotChat />
             <FooterGeneral />
