@@ -12,6 +12,7 @@ exports.obtenerPedidosPorCliente = async (req, res) => {
         id,
         metodo_pago,
         estado,
+        estado_pago,
         total,
         DATE_FORMAT(fecha_creacion, '%Y-%m-%d %H:%i:%s') AS fecha_creacion,
         DATE_FORMAT(fecha_entrega, '%Y-%m-%d %H:%i:%s') AS fecha_entrega
@@ -244,5 +245,34 @@ exports.actualizarEstadoPedido = async (req, res) => {
     } catch (error) {
         console.error("Error al actualizar estado del pedido:", error);
         res.status(500).json({ message: "Error al actualizar estado" });
+    }
+};
+
+// === Actualizar estado de pago (0 = no pagado, 1 = pagado) ===
+exports.actualizarEstadoPago = async (req, res) => {
+    const { pedidoId } = req.params;
+    const { estado_pago } = req.body;
+
+    if (typeof estado_pago !== 'number' || ![0, 1].includes(estado_pago)) {
+        return res.status(400).json({ message: "Estado de pago inválido. Debe ser 0 o 1." });
+    }
+
+    try {
+        const [result] = await db.promise().query(
+            "UPDATE pedidos SET estado_pago = ? WHERE id = ?",
+            [estado_pago, pedidoId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Pedido no encontrado" });
+        }
+
+        res.json({
+            message: `Estado de pago actualizado a: ${estado_pago === 1 ? 'Pagado' : 'No pagado'}`,
+            estado_pago
+        });
+    } catch (error) {
+        console.error("Error al actualizar estado de pago:", error);
+        res.status(500).json({ message: "Error al actualizar estado de pago" });
     }
 };

@@ -10,7 +10,7 @@ import "./clienteCarrito.css";
 import "../Layout/modals.css";
 import "./ModalPagoQR.css";
 import { FaTrashAlt } from "react-icons/fa";
-import qrImage from '../../assets/img/QR.jpg'; 
+import qrImage from '../../assets/img/QR.jpg';
 import io from "socket.io-client";
 
 const SOCKET_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:3000";
@@ -30,8 +30,10 @@ const ClienteCarrito = () => {
     const [confirmSwitch, setConfirmSwitch] = useState(false);
     const [showProgressModal, setShowProgressModal] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [pagoBilletera, setPagoBilletera] = useState(false); // Bandera para pago confirmado en billetera
     const socketRef = useRef(null);
-    
+    const [pedidoActualId, setPedidoActualId] = useState(null); // Guardar ID del pedido para actualizar estado_pago
+
     // === ESTADO NUEVO PARA EL MODAL QR ===
     const [showQrModal, setShowQrModal] = useState(false);
 
@@ -163,10 +165,10 @@ const ClienteCarrito = () => {
             const nuevoCarrito = prev.map((item) =>
                 item.id === id
                     ? {
-                          ...item,
-                          cantidad: Math.max(1, item.cantidad + delta),
-                          subtotal: Math.max(1, item.cantidad + delta) * item.precio,
-                      }
+                        ...item,
+                        cantidad: Math.max(1, item.cantidad + delta),
+                        subtotal: Math.max(1, item.cantidad + delta) * item.precio,
+                    }
                     : item
             );
             localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
@@ -180,7 +182,7 @@ const ClienteCarrito = () => {
         const newMetodo = e.target.value;
         setMetodoPago(newMetodo);
         // Cerramos el modal QR por si estaba abierto
-        setShowQrModal(false); 
+        setShowQrModal(false);
     };
 
     // Obtener primer slot de 15min estrictamente posterior al "ahora" para la fecha de entrega
@@ -213,7 +215,7 @@ const ClienteCarrito = () => {
             if (parseFloat(total) > 0) {
                 // Si es Billetera Digital y el total es > 0, abrir el modal QR
                 setShowQrModal(true);
-                return; 
+                return;
             } else {
                 return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
             }
@@ -244,10 +246,27 @@ const ClienteCarrito = () => {
         }
     };
 
-    const handleCloseQrModal = () => {
+    const handleCloseQrModal = async () => {
         setShowQrModal(false);
         setConfirmSwitch(false);
         setShowConfirmModal(true);
+    }
+
+    // === Manejar confirmación de pago en modal QR (Billetera Digital) ===
+    const handlePagoRealizadoQR = async () => {
+        try {
+            // Guardar bandera de que el pago fue confirmado en billetera digital
+            setPagoBilletera(true);
+            toast.success("Pago confirmado. Completa tu pedido.");
+
+            // Cerrar el modal QR y pasar al modal de confirmación
+            setShowQrModal(false);
+            setConfirmSwitch(false);
+            setShowConfirmModal(true);
+        } catch (error) {
+            console.error("Error al procesar pago:", error);
+            toast.error("Error al procesar el pago.");
+        }
     }
 
 
@@ -320,7 +339,7 @@ const ClienteCarrito = () => {
                 fechaCompleta.getHours()
             )}:${pad(fechaCompleta.getMinutes())}:00`;
 
-            await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/pedidos/cliente/nuevo`, {
                 usuarioId: user.id,
                 metodoPago,
                 carrito,
@@ -328,6 +347,38 @@ const ClienteCarrito = () => {
                 fechaEntrega: fechaEntregaFormatoMySQL,
                 socketId: socketRef.current.id,
             });
+
+            // Actualizar estado_pago a 1 (pagado) según el método de pago
+            if (response.data.pedidoId) {
+                try {
+                    console.log("Intentando actualizar estado_pago para pedido:", response.data.pedidoId);
+
+                    // Para billetera: solo si se confirmó en el modal QR
+                    // Para efectivo y tarjeta: siempre se confirma aquí
+                    let debeActualizar = false;
+
+                    if (metodoPago === "billetera" && pagoBilletera) {
+                        debeActualizar = true;
+                    } else if (metodoPago === "efectivo" || metodoPago === "tarjeta") {
+                        debeActualizar = true;
+                    }
+
+                    if (debeActualizar) {
+                        const updateResponse = await axios.put(`${process.env.REACT_APP_API_URL}/pedidos/estado-pago/${response.data.pedidoId}`, {
+                            estado_pago: 1
+                        });
+                        console.log("Estado de pago actualizado exitosamente:", updateResponse.data);
+                        toast.success("¡Pago registrado exitosamente!");
+                        // Disparar evento para refrescar la tabla de pedidos
+                        window.dispatchEvent(new Event("pedidoCreado"));
+                    }
+                } catch (error) {
+                    console.error("Error completo al actualizar estado de pago:", error.response?.data || error.message);
+                    toast.error("Error al registrar el pago: " + (error.response?.data?.message || error.message));
+                } finally {
+                    setPagoBilletera(false);
+                }
+            }
         } catch (error) {
             toast.error("Error procesando pedido.");
             setShowProgressModal(false);
@@ -514,7 +565,7 @@ const ClienteCarrito = () => {
                             onChange={handleMetodoPagoChange}
                         >
                             <option value="efectivo">Efectivo</option>
-                            <option value="tarjeta">Tarjeta</option> 
+                            <option value="tarjeta">Tarjeta</option>
                             <option value="billetera">Billetera Digital</option>
                         </select>
                     </div>
@@ -572,7 +623,7 @@ const ClienteCarrito = () => {
                                     <button
                                         type="button"
                                         className="btn-close btn-close-white"
-                                        onClick={handleCloseQrModal} 
+                                        onClick={handleCloseQrModal}
                                     />
                                 </div>
                                 <div className="modal-body p-4">
@@ -603,7 +654,7 @@ const ClienteCarrito = () => {
                                     <button
                                         type="button"
                                         className="btn btn-success w-100 fw-bold"
-                                        onClick={handleCloseQrModal} // Usa la nueva función
+                                        onClick={handlePagoRealizadoQR}
                                     >
                                         Pago realizado
                                     </button>
@@ -676,13 +727,13 @@ const ClienteCarrito = () => {
                             </div>
                             <div className="modal-body">
                                 {/* Lógica del progreso */}
-                                
+
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-            
+
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
             <LandbotChat />
             <FooterGeneral />

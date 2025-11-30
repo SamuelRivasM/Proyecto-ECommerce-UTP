@@ -24,12 +24,21 @@ const ClientePedidos = () => {
 
     // === Obtener pedidos del backend ===
     useEffect(() => {
-        if (user?.id) {
-            axios
-                .get(`${process.env.REACT_APP_API_URL}/pedidos/cliente/${user.id}`)
-                .then((res) => setPedidos(res.data))
-                .catch((err) => console.error("Error cargando pedidos:", err));
-        }
+        const cargarPedidos = () => {
+            if (user?.id) {
+                axios
+                    .get(`${process.env.REACT_APP_API_URL}/pedidos/cliente/${user.id}`)
+                    .then((res) => setPedidos(res.data))
+                    .catch((err) => console.error("Error cargando pedidos:", err));
+            }
+        };
+
+        cargarPedidos();
+
+        // Escuchar evento de pedido creado para refrescar la tabla
+        window.addEventListener("pedidoCreado", cargarPedidos);
+
+        return () => window.removeEventListener("pedidoCreado", cargarPedidos);
     }, [user?.id]);
 
     useEffect(() => {
@@ -41,6 +50,24 @@ const ClientePedidos = () => {
     const capitalizarPrimeraLetra = (texto) => {
         if (!texto || texto.trim() === "") return "Desconocido";
         return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+    };
+
+    // === Función para transformar estado de pago ===
+    const getEstadoPagoText = (estado_pago, metodo_pago) => {
+        // Solo mostrar estado de pago para billetera digital
+        if (metodo_pago?.toLowerCase() === "billetera") {
+            return estado_pago === 1 ? "Pagado" : "No pagado";
+        }
+        // Para otros métodos, mostrar vacío o N/A
+        return "No pagado";
+    };
+
+    // === Etiqueta de color para estado de pago ===
+    const getEstadoPagoClass = (estado_pago, metodo_pago) => {
+        if (metodo_pago?.toLowerCase() !== "billetera") {
+            return "badge bg-secondary";
+        }
+        return estado_pago === 1 ? "badge bg-success" : "badge bg-danger";
     };
 
     // === Filtrado ===
@@ -158,6 +185,7 @@ const ClientePedidos = () => {
                                 <th>N°</th>
                                 <th>Método de Pago</th>
                                 <th>Estado</th>
+                                <th>Estado de Pago</th>
                                 <th>Total (S/)</th>
                                 <th>Fecha / Hora del Pedido</th>
                                 <th>Fecha / Hora de Entrega</th>
@@ -177,6 +205,11 @@ const ClientePedidos = () => {
                                                 {capitalizarPrimeraLetra(p.estado)}
                                             </span>
                                         </td>
+                                        <td data-label="Estado de Pago:">
+                                            <span className={getEstadoPagoClass(p.estado_pago, p.metodo_pago)}>
+                                                {getEstadoPagoText(p.estado_pago, p.metodo_pago)}
+                                            </span>
+                                        </td>
                                         <td data-label="Total (S/):">{p.total}</td>
                                         <td data-label="Fecha / Hora del Pedido:">{p.fecha_creacion}</td>
                                         <td data-label="Fecha / Hora de Entrega:">{p.fecha_entrega || "—"}</td>
@@ -192,7 +225,7 @@ const ClientePedidos = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="text-center">
+                                    <td colSpan="8" className="text-center">
                                         No se encontraron pedidos.
                                     </td>
                                 </tr>
@@ -214,7 +247,6 @@ const ClientePedidos = () => {
                             </div>
                             <div className="modal-body">
 
-                                {/* === Información general del pedido === */}
                                 <div className="mb-3">
                                     <p><strong>Fecha / Hora del Pedido:</strong> {pedidoSeleccionado.fecha_creacion}</p>
                                     <p><strong>Fecha / Hora de Entrega:</strong> {pedidoSeleccionado.fecha_entrega || "—"}</p>
@@ -224,6 +256,11 @@ const ClientePedidos = () => {
                                         </span>
                                     </p>
                                     <p><strong>Método de Pago:</strong> {capitalizarPrimeraLetra(pedidoSeleccionado.metodo_pago)}</p>
+                                    <p><strong>Estado de Pago:</strong>{" "}
+                                        <span className={getEstadoPagoClass(pedidoSeleccionado.estado_pago, pedidoSeleccionado.metodo_pago)}>
+                                            {getEstadoPagoText(pedidoSeleccionado.estado_pago, pedidoSeleccionado.metodo_pago)}
+                                        </span>
+                                    </p>
                                     <p><strong>Total:</strong> S/ {pedidoSeleccionado.total}</p>
                                 </div>
 
@@ -268,7 +305,7 @@ const ClientePedidos = () => {
             {showModal && <div className="modal-backdrop fade show"></div>}
 
             {/* Chatbot de Landbot */}
-            <LandbotChat /> 
+            <LandbotChat />
 
             {/* Footer */}
             <FooterGeneral />
