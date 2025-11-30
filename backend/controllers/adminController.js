@@ -1,6 +1,7 @@
 
 // backend/controllers/adminController.js
 const db = require("../models/db");
+const bcrypt = require("bcryptjs");
 
 function getCondicionFecha(periodo) {
   const campo = "fecha_creacion"; // o "fecha_entrega" si eliminaste la anterior
@@ -110,5 +111,121 @@ exports.getUsuariosRecientes = async (req, res) => {
   } catch (error) {
     console.error("Error en getUsuariosRecientes:", error);
     res.status(500).json({ message: "Error al obtener usuarios recientes" });
+  }
+};
+
+// === Lista usuarios ===
+exports.getUsuarios = async (req, res) => {
+  try {
+    const [usuarios] = await db.promise().query(`
+      SELECT id, nombre, email, telefono, rol, fecha_registro, ultimo_login, estado
+      FROM usuarios
+      ORDER BY id ASC
+    `);
+
+    res.json(usuarios);
+  } catch (error) {
+    console.error("Error en getUsuarios:", error);
+    res.status(500).json({ message: "Error al obtener lista de usuarios" });
+  }
+};
+
+// === Crear usuario ===
+exports.crearUsuario = async (req, res) => {
+  const { nombre, email, telefono, rol, password } = req.body;
+
+  if (!nombre || !email || !rol || !password) {
+    return res.status(400).json({ message: "Complete todos los campos obligatorios" });
+  }
+
+  try {
+    const [existe] = await db.promise().query(
+      "SELECT id FROM usuarios WHERE email = ?",
+      [email]
+    );
+
+    if (existe.length > 0) {
+      return res.status(400).json({ message: "El correo ya está registrado" });
+    }
+
+    const [telExiste] = await db.promise().query(
+      "SELECT id FROM usuarios WHERE telefono = ?",
+      [telefono]
+    );
+
+    if (telExiste.length > 0) {
+      return res.status(400).json({ message: "El teléfono ya está registrado" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const [resultado] = await db.promise().query(
+      `INSERT INTO usuarios 
+       (nombre, email, telefono, rol, password, estado, fecha_registro) 
+       VALUES (?, ?, ?, ?, ?, 1, NOW())`,
+      [nombre, email, telefono || "", rol, hashedPassword]
+    );
+
+    res.status(201).json({
+      id: resultado.insertId,
+      nombre,
+      email,
+      telefono,
+      rol,
+      estado: 1
+    });
+
+  } catch (error) {
+    console.error("Error crearUsuario:", error);
+    res.status(500).json({ message: "Error al crear usuario" });
+  }
+};
+
+// === Editar usuario ===
+exports.editarUsuario = async (req, res) => {
+  const { id } = req.params;
+  let { nombre, email, telefono, rol, password } = req.body;
+
+  try {
+    // Si hay nueva contraseña, encriptarla
+    if (password && password.trim() !== "") {
+      const saltRounds = 10;
+      const hash = await bcrypt.hash(password, saltRounds);
+
+      await db.promise().query(
+        "UPDATE usuarios SET nombre=?, email=?, telefono=?, rol=?, password=? WHERE id=?",
+        [nombre, email, telefono || "", rol, hash, id]
+      );
+    } else {
+      // Sin cambio de contraseña
+      await db.promise().query(
+        "UPDATE usuarios SET nombre=?, email=?, telefono=?, rol=? WHERE id=?",
+        [nombre, email, telefono || "", rol, id]
+      );
+    }
+
+    res.json({ message: "Usuario actualizado correctamente" });
+  } catch (error) {
+    console.error("Error editarUsuario:", error);
+    res.status(500).json({ message: "Error al actualizar usuario" });
+  }
+};
+
+
+// === Activar / Desactivar usuario ===
+exports.cambiarEstadoUsuario = async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+
+  try {
+    await db.promise().query(
+      "UPDATE usuarios SET estado=? WHERE id=?",
+      [estado, id]
+    );
+
+    res.json({ message: "Estado actualizado" });
+  } catch (error) {
+    console.error("Error cambiarEstadoUsuario:", error);
+    res.status(500).json({ message: "Error al actualizar estado" });
   }
 };

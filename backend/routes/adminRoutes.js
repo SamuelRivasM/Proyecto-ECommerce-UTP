@@ -10,5 +10,9 @@ router.get("/stats/pedidos", adminController.getPedidosStats);
 router.get("/stats/ventas", adminController.getVentasStats);
 router.get("/stats/productos", adminController.getProductosTop);
 router.get("/stats/usuarios-recientes", adminController.getUsuariosRecientes);
+router.get("/cargar-usuarios", adminController.getUsuarios);
+router.post("/crear-usuario", adminController.crearUsuario);
+router.put("/editar-usuario/:id", adminController.editarUsuario);
+router.patch("/estado-usuario/:id", adminController.cambiarEstadoUsuario);
 
 module.exports = router;
