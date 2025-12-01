@@ -19,19 +19,19 @@ const NavbarGeneral = ({
     // Opciones visibles según el rol (todos aplicados :D)
     const menuPorRol = {
         admin: [
-            { nombre: "Inicio", accion: onInicioClick },
+            { nombre: "Inicio", accion: () => navigate("/admin-dashboard") },
             { nombre: "Usuarios", accion: () => navigate("/admin-usuarios") },
             { nombre: "Reportes", accion: () => navigate("/admin-reportes") },
             { nombre: "Contacto", accion: () => navigate("/contacto") },
         ],
         cocina: [
-            { nombre: "Inicio", accion: onInicioClick },
+            { nombre: "Inicio", accion: () => navigate("/cocina-dashboard") },
             { nombre: "Lista de Pedidos", accion: () => navigate("/cocina-pedidos") },
             { nombre: "Lista de Productos", accion: () => navigate("/cocina-productos") },
             { nombre: "Contacto", accion: () => navigate("/contacto") },
         ],
         cliente: [
-            { nombre: "Inicio", accion: onInicioClick },
+            { nombre: "Inicio", accion: () => navigate("/cliente-dashboard") },
             { nombre: "Productos", accion: () => navigate("/cliente-productos") },
             { nombre: "Mis Pedidos", accion: () => navigate("/cliente-pedidos") },
             { nombre: "Carrito", accion: () => navigate("/cliente-carrito"), esCarrito: true },
