@@ -125,7 +125,7 @@ exports.register = async (req, res) => {
 };
 
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const twilio = require("twilio");
 
 // === FORGOT PASSWORD ===
@@ -133,7 +133,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { method, value } = req.body;
 
-    // Buscar usuario por email o telefono
+    // Buscar usuario
     const query = `SELECT id, nombre, email, telefono FROM usuarios WHERE ${method} = ?`;
     const [users] = await db.promise().query(query, [value]);
 
@@ -143,38 +143,30 @@ exports.forgotPassword = async (req, res) => {
 
     const user = users[0];
 
-    // Generar token único
+    // Generar token
     const token = crypto.randomBytes(32).toString("hex");
 
-    // Guardar en tokens_recuperacion
-    await db
-      .promise()
-      .query(
-        "INSERT INTO tokens_recuperacion (usuario_id, token) VALUES (?, ?)",
-        [user.id, token]
-      );
+    await db.promise().query(
+      "INSERT INTO tokens_recuperacion (usuario_id, token) VALUES (?, ?)",
+      [user.id, token]
+    );
 
-    // Enviar correo o SMS
+    const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
+
+    // Envío de Correo Resend
     if (method === "email") {
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true, // IMPORTANTE
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
-      const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
-
-      await transporter.sendMail({
-        from: `"Cafetería UTP" <${process.env.EMAIL_USER}>`,
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM,
         to: user.email,
         subject: "Recuperación de contraseña",
-        html: `<p>Hola ${user.nombre},</p>
-               <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-               <a href="${resetUrl}">${resetUrl}</a>`,
+        html: `
+          <p>Hola ${user.nombre},</p>
+          <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+          <p><a href="${resetUrl}">${resetUrl}</a></p>
+          <p>Si no solicitaste este cambio, ignora este mensaje.</p>
+        `,
       });
 
     } if (method === "telefono") {
