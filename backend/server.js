@@ -14,7 +14,7 @@ const pedidoRoutes = require("./routes/pedidoRoutes");
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3000', 'https://proyecto-ecommerce-utp.onrender.com'],
+  origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3000', 'https://proyecto-ecommerce-utp-frontend.onrender.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cache-Control', 'Range'],
@@ -35,7 +35,7 @@ const server = http.createServer(app);
 // Socket.IO init
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3000', 'https://proyecto-ecommerce-utp.onrender.com'],
+    origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3000', 'https://proyecto-ecommerce-utp-frontend.onrender.com'],
     methods: ["GET", "POST"],
   },
 });
