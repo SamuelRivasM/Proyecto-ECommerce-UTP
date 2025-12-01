@@ -85,7 +85,7 @@ BEGIN
         SET total = cantidad * (SELECT precio FROM productos WHERE id = producto);
         SET fecha_pedido = DATE_ADD('2025-01-01', INTERVAL FLOOR(RAND() * 288) DAY);
         SET fecha_entrega = DATE_ADD(fecha_pedido, INTERVAL FLOOR(RAND() * 3) DAY);
-        SET metodo = ELT(FLOOR(1 + RAND()*3), 'tarjeta', 'efectivo', 'billetera digital');
+        SET metodo = ELT(FLOOR(1 + RAND()*3), 'tarjeta', 'efectivo', 'billetera');
         SET estado = ELT(FLOOR(1 + RAND()*3), 'entregado', 'en preparación', 'listo');
 
         INSERT INTO pedidos (usuario_id, metodo_pago, estado, total, fecha_creacion, fecha_entrega)
