@@ -16,7 +16,7 @@ const app = express();
 app.use(cors({
   origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3000', 'https://proyecto-ecommerce-utp-frontend.onrender.com'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Cache-Control', 'Range'],
   exposedHeaders: ['Content-Disposition', 'Content-Length', 'Content-Range']
 }));
