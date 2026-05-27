@@ -6,6 +6,7 @@ import NavbarGeneral from "./NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "./Perfil";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const ContactoSection = () => {
     const [showPerfil, setShowPerfil] = useState(false);
@@ -14,12 +15,6 @@ const ContactoSection = () => {
     // Obtenemos el rol del usuario
     const user = JSON.parse(localStorage.getItem("user")) || {};
     const rol = user?.rol || "cliente";
-
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/");
-    };
 
     const handleVolverInicio = () => {
         switch (rol) {
@@ -33,6 +28,8 @@ const ContactoSection = () => {
                 navigate("/cliente-dashboard");
         }
     };
+
+    const handleLogout = useGlobalLogout();
 
     return (
         <div

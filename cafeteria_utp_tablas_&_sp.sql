@@ -19,7 +19,8 @@ CREATE TABLE usuarios (
   rol ENUM('cliente','admin','cocina') DEFAULT 'cliente',
   fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   ultimo_login TIMESTAMP NULL,
-  estado TINYINT(1) DEFAULT 1 COMMENT '1 = activo, 0 = desactivado'
+  estado TINYINT(1) DEFAULT 1 COMMENT '1 = activo, 0 = desactivado',
+  session_version INT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------

@@ -1,5 +1,6 @@
 // src/components/Cart/ClienteCarrito.jsx
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarGeneral from "../Layout/NavbarGeneral";
@@ -12,9 +13,11 @@ import "./ModalPagoQR.css";
 import { FaTrashAlt } from "react-icons/fa";
 import qrImage from '../../assets/img/QR.jpg';
 import io from "socket.io-client";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const SOCKET_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:3000";
 const ClienteCarrito = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
     const [categorias, setCategorias] = useState([]);
     const [productos, setProductos] = useState([]);
@@ -269,7 +272,6 @@ const ClienteCarrito = () => {
         }
     }
 
-
     useEffect(() => {
         document.body.classList.add("bootstrap-modal");
         return () => document.body.classList.remove("bootstrap-modal");
@@ -391,6 +393,8 @@ const ClienteCarrito = () => {
     };
     // === Cuando polling detecta producto no disponible en catálogo y en combobox ya no aparece (handled) ===
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div
             style={{
@@ -403,12 +407,8 @@ const ClienteCarrito = () => {
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    window.location.href = "/";
-                }}
-                onInicioClick={() => (window.location.href = "/cliente-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cliente-dashboard")}
                 activePage="carrito"
             />
 

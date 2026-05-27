@@ -1,6 +1,7 @@
 
 // src/components/Cliente/ClientePedidos.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
@@ -8,8 +9,10 @@ import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "../Layout/modals.css";
 import "./clientePedidos.css";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const ClientePedidos = () => {
+    const navigate = useNavigate();
     const [pedidos, setPedidos] = useState([]);
     const [filtro, setFiltro] = useState("");
     const [criterio, setCriterio] = useState("todos");
@@ -150,13 +153,15 @@ const ClientePedidos = () => {
         setDetallePedido([]);
     };
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div className="section-container">
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => window.location.replace("/")}
-                onInicioClick={() => window.location.replace("/cliente-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cliente-dashboard")}
                 activePage="mis pedidos"
             />
 

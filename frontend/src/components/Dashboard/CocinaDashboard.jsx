@@ -1,11 +1,12 @@
 
 // src/components/Dashboard/CocinaDashboard.jsx
 import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
-import LandbotChat from "../Layout/LandbotChat";
+import { toast } from "react-toastify";
 
 // Imágenes
 import cafeteriaEntrada from "../../assets/img/cafeteria-entrada.jpeg";
@@ -29,10 +30,36 @@ const CocinaDashboard = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/"); // redirige al login
+  // Cerrar sesión
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const socketId = sessionStorage.getItem("socketId");
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/auth/logout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Socket-Id": socketId || "",
+          },
+        }
+      );
+
+      toast.success(response.data?.message || "Sesión cerrada correctamente.");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      toast.error("No se pudo notificar el cierre global. Se cerrará la sesión local.");
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("socketId");
+
+      window.dispatchEvent(new Event("auth-logout-local"));
+
+      navigate("/", { replace: true });
+    }
   };
 
   return (
@@ -124,9 +151,6 @@ const CocinaDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Chatbot de Landbot */}
-      <LandbotChat />
 
       {/* Footer */}
       <FooterGeneral />

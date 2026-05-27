@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const query = `
-      SELECT id, nombre, email, password, rol, estado 
+      SELECT id, nombre, email, password, rol, estado, session_version
       FROM usuarios
       WHERE email = ?
     `;
@@ -46,9 +46,10 @@ exports.login = async (req, res) => {
         rol: user.rol,
         nombre: user.nombre,
         email: user.email,
+        sessionVersion: user.session_version,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '8h' }
+      { expiresIn: '1h' }
     );
 
     res.json({
@@ -234,4 +235,49 @@ exports.resetPassword = async (req, res) => {
     console.error("Error en resetPassword:", error);
     res.status(500).json({ message: "Error del servidor" });
   }
+};
+
+// === LOGOUT GLOBAL ===
+exports.logout = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sourceSocketId = req.header("X-Socket-Id");
+
+    await db.promise().query(
+      "UPDATE usuarios SET session_version = session_version + 1 WHERE id = ?",
+      [userId]
+    );
+
+    const io = req.app.get("io");
+
+    if (io) {
+      const room = `user:${userId}`;
+
+      console.log(`Emitiendo force-logout a la sala ${room}`);
+      console.log(`Socket origen del logout: ${sourceSocketId || "No enviado"}`);
+
+      if (sourceSocketId) {
+        io.to(room).except(sourceSocketId).emit("force-logout", {
+          message: "Sesión cerrada desde otro navegador.",
+        });
+      } else {
+        io.to(room).emit("force-logout", {
+          message: "Sesión cerrada desde otro navegador.",
+        });
+      }
+    }
+
+    res.json({ message: "Sesión cerrada correctamente." });
+  } catch (error) {
+    console.error("Error en logout:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+// === VALIDAR SESIÓN ACTUAL ===
+exports.me = async (req, res) => {
+  res.json({
+    message: "Sesión válida",
+    user: req.user,
+  });
 };
