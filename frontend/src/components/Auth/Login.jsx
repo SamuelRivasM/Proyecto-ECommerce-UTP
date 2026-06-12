@@ -33,6 +33,9 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
+      // Avisar a AuthSessionSync que ya existe una sesión
+      window.dispatchEvent(new Event("auth-login"));
+
       toast.success(`Bienvenido ${user.nombre}`);
 
       switch (user.rol) {

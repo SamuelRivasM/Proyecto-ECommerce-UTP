@@ -1,6 +1,7 @@
 
 // src/components/Cocina/CocinaPedidos.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
@@ -8,8 +9,10 @@ import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import "../Layout/modals.css";
 import "./cocinaPedidos.css";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const CocinaPedidos = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [filtro, setFiltro] = useState("");
@@ -20,22 +23,49 @@ const CocinaPedidos = () => {
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
     const [detallePedido, setDetallePedido] = useState([]);
 
-    // === Obtener pedidos desde el backend ===
+    // === Obtener y actualizar pedidos cada 4 segundos ===
     useEffect(() => {
+        let componenteActivo = true;
+
         const obtenerPedidos = async () => {
             try {
                 const response = await axios.get(
                     `${process.env.REACT_APP_API_URL}/pedidos/cocina/pedidos-ordenados`
                 );
+
+                if (!componenteActivo) return;
+
                 setPedidos(response.data);
+
+                // Actualizar también la información mostrada en el modal
+                setPedidoSeleccionado((pedidoActual) => {
+                    if (!pedidoActual) return null;
+
+                    return (
+                        response.data.find(
+                            (pedido) => pedido.id === pedidoActual.id
+                        ) || pedidoActual
+                    );
+                });
             } catch (error) {
                 console.error("Error al obtener pedidos:", error);
             } finally {
-                setLoading(false);
+                if (componenteActivo) {
+                    setLoading(false);
+                }
             }
         };
 
+        // Primera carga inmediata
         obtenerPedidos();
+
+        // Volver a consultar cada 4 segundos
+        const intervalo = setInterval(obtenerPedidos, 4000);
+
+        return () => {
+            componenteActivo = false;
+            clearInterval(intervalo);
+        };
     }, []);
 
     useEffect(() => {
@@ -160,13 +190,15 @@ const CocinaPedidos = () => {
     const inicio = (currentPage - 1) * itemsPorPagina;
     const pedidosPagina = pedidosFiltrados.slice(inicio, inicio + itemsPorPagina);
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div className="section-container">
             {/* Navbar */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => window.location.replace("/")}
-                onInicioClick={() => window.location.replace("/cocina-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cocina-dashboard")}
                 activePage="lista de pedidos"
             />
 

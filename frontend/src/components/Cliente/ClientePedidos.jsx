@@ -1,6 +1,7 @@
 
 // src/components/Cliente/ClientePedidos.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
@@ -8,8 +9,10 @@ import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "../Layout/modals.css";
 import "./clientePedidos.css";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const ClientePedidos = () => {
+    const navigate = useNavigate();
     const [pedidos, setPedidos] = useState([]);
     const [filtro, setFiltro] = useState("");
     const [criterio, setCriterio] = useState("todos");
@@ -22,23 +25,43 @@ const ClientePedidos = () => {
 
     const user = JSON.parse(localStorage.getItem("user")) || {};
 
-    // === Obtener pedidos del backend ===
+    // === Obtener y actualizar pedidos del backend ===
     useEffect(() => {
-        const cargarPedidos = () => {
-            if (user?.id) {
-                axios
-                    .get(`${process.env.REACT_APP_API_URL}/pedidos/cliente/${user.id}`)
-                    .then((res) => setPedidos(res.data))
-                    .catch((err) => console.error("Error cargando pedidos:", err));
+        const cargarPedidos = async () => {
+            if (!user?.id) return;
+
+            try {
+                const res = await axios.get(
+                    `${process.env.REACT_APP_API_URL}/pedidos/cliente/${user.id}`
+                );
+
+                setPedidos(res.data);
+
+                // También actualiza el pedido mostrado en el modal
+                setPedidoSeleccionado((pedidoActual) => {
+                    if (!pedidoActual) return null;
+
+                    return (
+                        res.data.find((pedido) => pedido.id === pedidoActual.id) ||
+                        pedidoActual
+                    );
+                });
+            } catch (error) {
+                console.error("Error cargando pedidos:", error);
             }
         };
 
         cargarPedidos();
 
-        // Escuchar evento de pedido creado para refrescar la tabla
+        // Se consulta cada 4 segundos para detectar cambios hechos por el evento MySQL
+        const intervalo = setInterval(cargarPedidos, 4000);
+
         window.addEventListener("pedidoCreado", cargarPedidos);
 
-        return () => window.removeEventListener("pedidoCreado", cargarPedidos);
+        return () => {
+            clearInterval(intervalo);
+            window.removeEventListener("pedidoCreado", cargarPedidos);
+        };
     }, [user?.id]);
 
     useEffect(() => {
@@ -53,21 +76,15 @@ const ClientePedidos = () => {
     };
 
     // === Función para transformar estado de pago ===
-    const getEstadoPagoText = (estado_pago, metodo_pago) => {
-        // Solo mostrar estado de pago para billetera digital
-        if (metodo_pago?.toLowerCase() === "billetera") {
-            return estado_pago === 1 ? "Pagado" : "No pagado";
-        }
-        // Para otros métodos, mostrar vacío o N/A
-        return "No pagado";
+    const getEstadoPagoText = (estado_pago) => {
+        return Number(estado_pago) === 1 ? "Pagado" : "No pagado";
     };
 
     // === Etiqueta de color para estado de pago ===
-    const getEstadoPagoClass = (estado_pago, metodo_pago) => {
-        if (metodo_pago?.toLowerCase() !== "billetera") {
-            return "badge bg-secondary";
-        }
-        return estado_pago === 1 ? "badge bg-success" : "badge bg-danger";
+    const getEstadoPagoClass = (estado_pago) => {
+        return Number(estado_pago) === 1
+            ? "badge bg-success"
+            : "badge bg-danger";
     };
 
     // === Filtrado ===
@@ -150,13 +167,15 @@ const ClientePedidos = () => {
         setDetallePedido([]);
     };
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div className="section-container">
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => window.location.replace("/")}
-                onInicioClick={() => window.location.replace("/cliente-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cliente-dashboard")}
                 activePage="mis pedidos"
             />
 
@@ -242,8 +261,8 @@ const ClientePedidos = () => {
                                             </span>
                                         </td>
                                         <td data-label="Estado de Pago:">
-                                            <span className={getEstadoPagoClass(p.estado_pago, p.metodo_pago)}>
-                                                {getEstadoPagoText(p.estado_pago, p.metodo_pago)}
+                                            <span className={getEstadoPagoClass(p.estado_pago)}>
+                                                {getEstadoPagoText(p.estado_pago)}
                                             </span>
                                         </td>
                                         <td data-label="Total (S/):">{p.total}</td>
@@ -292,9 +311,10 @@ const ClientePedidos = () => {
                                         </span>
                                     </p>
                                     <p><strong>Método de Pago:</strong> {capitalizarPrimeraLetra(pedidoSeleccionado.metodo_pago)}</p>
-                                    <p><strong>Estado de Pago:</strong>{" "}
-                                        <span className={getEstadoPagoClass(pedidoSeleccionado.estado_pago, pedidoSeleccionado.metodo_pago)}>
-                                            {getEstadoPagoText(pedidoSeleccionado.estado_pago, pedidoSeleccionado.metodo_pago)}
+                                    <p>
+                                        <strong>Estado de Pago:</strong>{" "}
+                                        <span className={getEstadoPagoClass(pedidoSeleccionado.estado_pago)}>
+                                            {getEstadoPagoText(pedidoSeleccionado.estado_pago)}
                                         </span>
                                     </p>
                                     <p><strong>Total:</strong> S/ {pedidoSeleccionado.total}</p>

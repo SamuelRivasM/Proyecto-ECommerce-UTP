@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import "./Auth.css";
 import bgCafe from "../../assets/img/bg-cafe.jpg";
@@ -17,7 +18,54 @@ const Register = () => {
     const [email, setEmail] = useState("");
     const [telefono, setTelefono] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [loading, setLoading] = useState(false);
+
+    const getPasswordStrength = (value) => {
+        let score = 0;
+
+        if (value.length >= 8) score++;
+        if (/[A-Z]/.test(value)) score++;
+        if (/[a-z]/.test(value)) score++;
+        if (/[0-9]/.test(value)) score++;
+        if (/[^A-Za-z0-9]/.test(value)) score++;
+
+        if (!value) {
+            return {
+                label: "",
+                className: "",
+                level: 0,
+            };
+        }
+
+        if (score <= 2) {
+            return {
+                label: "Débil",
+                className: "weak",
+                level: 1,
+            };
+        }
+
+        if (score <= 4) {
+            return {
+                label: "Moderada",
+                className: "moderate",
+                level: 2,
+            };
+        }
+
+        return {
+            label: "Fuerte",
+            className: "strong",
+            level: 3,
+        };
+    };
+
+    const passwordStrength = getPasswordStrength(password);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -35,6 +83,20 @@ const Register = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@utp\.edu\.pe$/;
         if (!emailRegex.test(email)) {
             toast.error("El correo debe ser institucional (@utp.edu.pe)");
+            setLoading(false);
+            return;
+        }
+
+        // Validación de confirmación de contraseña solo en frontend
+        if (password !== confirmPassword) {
+            toast.error("Las contraseñas no coinciden");
+            setLoading(false);
+            return;
+        }
+
+        // Validación de contraseña débil solo en frontend
+        if (passwordStrength.level === 1) {
+            toast.error("La contraseña es débil. Usa mínimo 8 caracteres, mayúsculas, números o símbolos.");
             setLoading(false);
             return;
         }
@@ -110,13 +172,65 @@ const Register = () => {
                         />
 
                         <label>Contraseña:</label>
-                        <input
-                            type="password"
-                            placeholder="********"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="********"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+
+                        {password && (
+                            <div className="password-strength">
+                                <div className="password-strength-header">
+                                    <span>Seguridad:</span>
+                                    <span className={`password-strength-text ${passwordStrength.className}`}>
+                                        {passwordStrength.label}
+                                    </span>
+                                </div>
+
+                                <div className="password-strength-bar">
+                                    <div className={`password-strength-fill ${passwordStrength.className}`}></div>
+                                </div>
+
+                                <small className="password-requirements">
+                                    Usa mínimo 8 caracteres, mayúsculas, minúsculas, números y símbolos.
+                                </small>
+                            </div>
+                        )}
+
+                        <label>Confirmar contraseña:</label>
+                        <div className="password-input-wrapper">
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="********"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+
+                        {confirmPassword && password !== confirmPassword && (
+                            <small className="confirm-password-error">
+                                Las contraseñas no coinciden.
+                            </small>
+                        )}
 
                         <button type="submit" className="auth-btn" disabled={loading}>
                             {loading ? "Procesando..." : "Registrarse"}

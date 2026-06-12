@@ -1,5 +1,6 @@
 // src/components/Cart/ClienteCarrito.jsx
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import NavbarGeneral from "../Layout/NavbarGeneral";
@@ -12,9 +13,11 @@ import "./ModalPagoQR.css";
 import { FaTrashAlt } from "react-icons/fa";
 import qrImage from '../../assets/img/QR.jpg';
 import io from "socket.io-client";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const SOCKET_URL = process.env.REACT_APP_API_URL?.replace("/api", "") || "http://localhost:3000";
 const ClienteCarrito = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
     const [categorias, setCategorias] = useState([]);
     const [productos, setProductos] = useState([]);
@@ -25,13 +28,17 @@ const ClienteCarrito = () => {
     const [metodoPago, setMetodoPago] = useState("efectivo");
     const [fechaEntrega, setFechaEntrega] = useState("");
 
-    // Confirm modal + websocket state
+    // === Estados para el modal de confirmación de pedido (WebSockets) ===
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmSwitch, setConfirmSwitch] = useState(false);
     const [showProgressModal, setShowProgressModal] = useState(false);
     const [progress, setProgress] = useState(0);
     const [pagoBilletera, setPagoBilletera] = useState(false); // Bandera para pago confirmado en billetera
     const socketRef = useRef(null);
+
+    // === Estados para el modal de confirmación de borrar producto ===
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [productoAEliminar, setProductoAEliminar] = useState(null);
 
     // === ESTADO NUEVO PARA EL MODAL QR ===
     const [showQrModal, setShowQrModal] = useState(false);
@@ -139,10 +146,45 @@ const ClienteCarrito = () => {
         toast.success("Producto agregado al carrito correctamente.");
     };
 
+    // === Solicitar confirmación antes de eliminar ===
+    const solicitarEliminarProducto = (producto) => {
+        setProductoAEliminar(producto);
+        setShowDeleteModal(true);
+    };
+
+    // === Cancelar eliminación ===
+    const cancelarEliminacion = () => {
+        setProductoAEliminar(null);
+        setShowDeleteModal(false);
+        toast.info("Eliminación cancelada. El producto permanece en el carrito.");
+    };
+
+    // === Confirmar eliminación ===
+    const confirmarEliminacion = () => {
+        if (!productoAEliminar) {
+            toast.error("No se seleccionó ningún producto para eliminar.");
+            return;
+        }
+
+        eliminarProducto(productoAEliminar.id);
+        setProductoAEliminar(null);
+        setShowDeleteModal(false);
+    };
+
     // === Eliminar producto del carrito ===
     const eliminarProducto = (id) => {
+        const productoExiste = carrito.some(
+            (item) => Number(item.id) === Number(id)
+        );
+
+        // CP-04: controlar un ID que no existe en el carrito
+        if (!productoExiste) {
+            toast.error("El producto indicado no existe en el carrito.");
+            return false;
+        }
+
         const nuevoCarrito = carrito
-            .filter((item) => item.id !== id)
+            .filter((item) => Number(item.id) !== Number(id))
             .map((item, index) => ({
                 ...item,
                 numero: index + 1,
@@ -150,12 +192,12 @@ const ClienteCarrito = () => {
 
         setCarrito(nuevoCarrito);
         localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-        window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
+        window.dispatchEvent(new Event("cartUpdated"));
 
-        // Si ya no queda ningún producto, reiniciamos el contador a 1
         setNumero(nuevoCarrito.length > 0 ? nuevoCarrito.length + 1 : 1);
 
         toast.info("Producto eliminado del carrito.");
+        return true;
     };
 
     // === Aumentar o disminuir cantidad ===
@@ -269,7 +311,6 @@ const ClienteCarrito = () => {
         }
     }
 
-
     useEffect(() => {
         document.body.classList.add("bootstrap-modal");
         return () => document.body.classList.remove("bootstrap-modal");
@@ -277,17 +318,42 @@ const ClienteCarrito = () => {
 
     // Iniciar WebSocket UNA SOLA VEZ
     useEffect(() => {
-        socketRef.current = io(SOCKET_URL, { transports: ["websocket"] });
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-        // Eventos globales (solo se registran una vez)
-        socketRef.current.on("orderProgress", (data) => {
+        // Ajusta estas claves según cómo guardes el token en tu Login
+        const token =
+            localStorage.getItem("token") ||
+            localStorage.getItem("authToken") ||
+            user.token;
+
+        if (!token) {
+            console.warn("No hay token JWT para conectar Socket.IO.");
+            return;
+        }
+
+        const socket = io(SOCKET_URL, {
+            transports: ["websocket"],
+            auth: { token },
+        });
+
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+            console.log("Socket conectado:", socket.id);
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("Error Socket.IO:", err.message);
+        });
+
+        socket.on("orderProgress", (data) => {
             if (data && typeof data.percent === "number") {
                 setProgress(Math.min(100, Math.round(data.percent)));
                 setShowProgressModal(true);
             }
         });
 
-        socketRef.current.on("orderComplete", () => {
+        socket.on("orderComplete", () => {
             setProgress(100);
             toast.success("Pedido enviado correctamente");
 
@@ -302,8 +368,14 @@ const ClienteCarrito = () => {
             }, 800);
         });
 
+        socket.on("orderError", (data) => {
+            toast.error(data?.message || "Error al crear el pedido.");
+            setShowProgressModal(false);
+        });
+
         return () => {
-            socketRef.current.disconnect();
+            socket.disconnect();
+            socketRef.current = null;
         };
     }, []);
 
@@ -345,7 +417,7 @@ const ClienteCarrito = () => {
                 carrito,
                 total: parseFloat(total),
                 fechaEntrega: fechaEntregaFormatoMySQL,
-                socketId: socketRef.current.id,
+                socketId: socketRef.current?.connected ? socketRef.current.id : null,
             });
 
             // Actualizar estado_pago a 1 (pagado) según el método de pago
@@ -391,6 +463,8 @@ const ClienteCarrito = () => {
     };
     // === Cuando polling detecta producto no disponible en catálogo y en combobox ya no aparece (handled) ===
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div
             style={{
@@ -403,12 +477,8 @@ const ClienteCarrito = () => {
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    window.location.href = "/";
-                }}
-                onInicioClick={() => (window.location.href = "/cliente-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cliente-dashboard")}
                 activePage="carrito"
             />
 
@@ -541,7 +611,8 @@ const ClienteCarrito = () => {
                                                         height: "36px",
                                                         borderRadius: "50%",
                                                     }}
-                                                    onClick={() => eliminarProducto(item.id)}
+                                                    onClick={() => solicitarEliminarProducto(item)}
+                                                    aria-label={`Eliminar ${item.nombre}`}
                                                 >
                                                     <FaTrashAlt />
                                                 </button>
@@ -614,6 +685,53 @@ const ClienteCarrito = () => {
                     </div>
                 </div>
             </section>
+
+            {/* === Modal de confirmación para eliminar producto === */}
+            {showDeleteModal && productoAEliminar && (
+                <>
+                    <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header bg-danger text-white">
+                                    <h5 className="modal-title">
+                                        Confirmar eliminación
+                                    </h5>
+                                </div>
+
+                                <div className="modal-body">
+                                    <p className="mb-2">
+                                        ¿Estás seguro de eliminar este producto del carrito?
+                                    </p>
+
+                                    <p className="fw-bold mb-0">
+                                        {productoAEliminar.nombre}
+                                    </p>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={cancelarEliminacion}
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={confirmarEliminacion}
+                                    >
+                                        Sí, eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
 
             {/* **=== Modal de Pago QR (Abre solo con Billetera Digital) ===** */}
             {showQrModal && (

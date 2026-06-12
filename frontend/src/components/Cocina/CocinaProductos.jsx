@@ -1,6 +1,7 @@
 
 // src/components/Cocina/CocinaProductos.jsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,8 +10,10 @@ import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import "./cocinaProductos.css";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const CocinaProductos = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
     const [productos, setProductos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -147,13 +150,15 @@ const CocinaProductos = () => {
     const inicio = (currentPage - 1) * itemsPorPagina;
     const productosPagina = productosFiltrados.slice(inicio, inicio + itemsPorPagina);
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div className="section-container">
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onLogout={() => window.location.replace("/")}
-                onInicioClick={() => window.location.replace("/cocina-dashboard")}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/cocina-dashboard")}
                 activePage="lista de productos"
             />
 

@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const query = `
-      SELECT id, nombre, email, password, rol, estado 
+      SELECT id, nombre, email, password, rol, estado, session_version
       FROM usuarios
       WHERE email = ?
     `;
@@ -46,9 +46,10 @@ exports.login = async (req, res) => {
         rol: user.rol,
         nombre: user.nombre,
         email: user.email,
+        sessionVersion: user.session_version,
       },
       process.env.JWT_SECRET,
-      { expiresIn: '8h' }
+      { expiresIn: '1h' }
     );
 
     res.json({
@@ -133,7 +134,10 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { method, value } = req.body;
 
-    // Buscar usuario
+    if (!["email", "telefono"].includes(method)) {
+      return res.status(400).json({ message: "Método de recuperación inválido" });
+    }
+
     const query = `SELECT id, nombre, email, telefono FROM usuarios WHERE ${method} = ?`;
     const [users] = await db.promise().query(query, [value]);
 
@@ -143,7 +147,6 @@ exports.forgotPassword = async (req, res) => {
 
     const user = users[0];
 
-    // Generar token
     const token = crypto.randomBytes(32).toString("hex");
 
     await db.promise().query(
@@ -153,13 +156,13 @@ exports.forgotPassword = async (req, res) => {
 
     const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
 
-    // Envío de Correo Resend
     if (method === "email") {
       const resend = new Resend(process.env.RESEND_API_KEY);
 
-      await resend.emails.send({
+      try {
+        await resend.emails.send({
         from: process.env.EMAIL_FROM,
-        to: user.email,
+        to: user.email.trim().toLowerCase(),
         subject: "Recuperación de contraseña",
         html: `
           <p>Hola ${user.nombre},</p>
@@ -168,19 +171,32 @@ exports.forgotPassword = async (req, res) => {
           <p>Si no solicitaste este cambio, ignora este mensaje.</p>
         `,
       });
+      } catch (resendError) {
+        console.error("Error de Resend:", resendError);
 
-    } if (method === "telefono") {
-      const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-      // Validación de que esté habilitado el teléfono de Twilio
-      if (!process.env.TWILIO_PHONE) {
-        return res.status(503).json({ message: "La opción por teléfono aún no está habilitada" });
+        return res.status(502).json({
+          message:
+            "No se pudo enviar el correo. Verifica el dominio remitente configurado en Resend.",
+        });
       }
+    }
+
+    if (method === "telefono") {
+      if (!process.env.TWILIO_PHONE) {
+        return res.status(503).json({
+          message: "La opción por teléfono aún no está habilitada",
+        });
+      }
+
+      const client = twilio(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN
+      );
 
       await client.messages.create({
         body: `Tu código de recuperación es: ${token}`,
         from: process.env.TWILIO_PHONE,
-        to: user.telefono, // asegúrate que el número está en formato internacional (+51 para Perú)
+        to: user.telefono,
       });
     }
 
@@ -234,4 +250,49 @@ exports.resetPassword = async (req, res) => {
     console.error("Error en resetPassword:", error);
     res.status(500).json({ message: "Error del servidor" });
   }
+};
+
+// === LOGOUT GLOBAL ===
+exports.logout = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const sourceSocketId = req.header("X-Socket-Id");
+
+    await db.promise().query(
+      "UPDATE usuarios SET session_version = session_version + 1 WHERE id = ?",
+      [userId]
+    );
+
+    const io = req.app.get("io");
+
+    if (io) {
+      const room = `user:${userId}`;
+
+      console.log(`Emitiendo force-logout a la sala ${room}`);
+      console.log(`Socket origen del logout: ${sourceSocketId || "No enviado"}`);
+
+      if (sourceSocketId) {
+        io.to(room).except(sourceSocketId).emit("force-logout", {
+          message: "Sesión cerrada desde otro navegador.",
+        });
+      } else {
+        io.to(room).emit("force-logout", {
+          message: "Sesión cerrada desde otro navegador.",
+        });
+      }
+    }
+
+    res.json({ message: "Sesión cerrada correctamente." });
+  } catch (error) {
+    console.error("Error en logout:", error);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+// === VALIDAR SESIÓN ACTUAL ===
+exports.me = async (req, res) => {
+  res.json({
+    message: "Sesión válida",
+    user: req.user,
+  });
 };

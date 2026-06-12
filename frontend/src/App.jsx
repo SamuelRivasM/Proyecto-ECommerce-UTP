@@ -13,6 +13,8 @@ import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
+import AuthSessionSync from "./components/Auth/AuthSessionSync";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
 // Rutas Dashboard
 import AdminDashboard from "./components/Dashboard/AdminDashboard";
@@ -40,18 +42,29 @@ import LandbotChat from "./components/Layout/LandbotChat";
 const ConditionalLandbot = () => {
   const location = useLocation();
 
-  // Rutas donde NO queremos que se muestre el chatbot
-  const hiddenRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
 
-  const shouldHide = hiddenRoutes.some((path) => location.pathname.startsWith(path));
+  const publicRoutes = ["/", "/register", "/forgot-password"];
 
-  return shouldHide ? null : <LandbotChat />;
+  const isPublicRoute =
+    publicRoutes.includes(location.pathname) ||
+    location.pathname.startsWith("/reset-password");
+
+  if (!token || !user || isPublicRoute) {
+    return null;
+  }
+
+  return <LandbotChat />;
 };
 
 function App() {
   return (
     <CartProvider>
       <Router>
+        {/* Sincronización de sesión autenticada */}
+        <AuthSessionSync />
+
         {/* Render condicional del chatbot */}
         <ConditionalLandbot />
 
@@ -63,22 +76,92 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Vista de Dashboards por Rol */}
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/cliente-dashboard" element={<ClienteDashboard />} />
-          <Route path="/cocina-dashboard" element={<CocinaDashboard />} />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cliente-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["cliente"]}>
+                <ClienteDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cocina-dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["cocina"]}>
+                <CocinaDashboard />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Vista de Rol Admin */}
-          <Route path="/admin-usuarios" element={<AdminUsuarios />} />
-          <Route path="/admin-reportes" element={<AdminReportes />} />
+          <Route
+            path="/admin-usuarios"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminUsuarios />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-reportes"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminReportes />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Vista de Rol Clientes */}
-          <Route path="/cliente-productos" element={<ClienteProductos />} />
-          <Route path="/cliente-pedidos" element={<ClientePedidos />} />
-          <Route path="/cliente-carrito" element={<ClienteCarrito />} />
+          <Route
+            path="/cliente-productos"
+            element={
+              <ProtectedRoute allowedRoles={["cliente"]}>
+                <ClienteProductos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cliente-pedidos"
+            element={
+              <ProtectedRoute allowedRoles={["cliente"]}>
+                <ClientePedidos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cliente-carrito"
+            element={
+              <ProtectedRoute allowedRoles={["cliente"]}>
+                <ClienteCarrito />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Vistas del Rol Cocina */}
-          <Route path="/cocina-productos" element={<CocinaProductos />} />
-          <Route path="/cocina-pedidos" element={<CocinaPedidos />} />
+          <Route
+            path="/cocina-productos"
+            element={
+              <ProtectedRoute allowedRoles={["cocina"]}>
+                <CocinaProductos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cocina-pedidos"
+            element={
+              <ProtectedRoute allowedRoles={["cocina"]}>
+                <CocinaPedidos />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Contacto global */}
           <Route path="/contacto" element={<ContactoSection />} />

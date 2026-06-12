@@ -4,7 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "jest --runInBand",
+    "test:verbose": "jest --runInBand --verbose",
+    "test:auth": "jest tests/tdd/auth-test.js --runInBand",
+    "test:catalogo": "jest tests/tdd/catalogo-test.js --runInBand",
+    "test:carrito": "jest tests/tdd/carrito-test.js --runInBand",
+    "test:pedidos": "jest tests/tdd/pedidos-test.js --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +33,8 @@
     "twilio": "^5.10.6"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.2.2"
   }
 }

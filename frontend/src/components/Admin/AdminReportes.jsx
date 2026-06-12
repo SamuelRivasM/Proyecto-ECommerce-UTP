@@ -1,24 +1,26 @@
 
 // src/components/Admin/AdminReportes.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 const AdminReportes = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
+
+    const handleLogout = useGlobalLogout();
 
     return (
         <div style={{ backgroundColor: "#FAF7F5", minHeight: "100vh" }}>
             {/* Navbar General */}
             <NavbarGeneral
                 onPerfilClick={() => setShowPerfil(true)}
-                onInicioClick={() => (window.location.href = "/admin-dashboard")}
-                onLogout={() => {
-                    localStorage.clear();
-                    window.location.href = "/";
-                }}
+                onLogout={handleLogout}
+                onInicioClick={() => navigate("/admin-dashboard")}
                 activePage="reportes"
             />
 

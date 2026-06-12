@@ -1,15 +1,16 @@
 
 // src/Cliente/ClienteProductos.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import LandbotChat from "../Layout/LandbotChat";
 import Perfil from "../Layout/Perfil";
 import "./clienteProductos.css";
+import useGlobalLogout from "../../hooks/useGlobalLogout";
 
 // íconos de Productos
 import { FaCoffee, FaUtensils, FaIceCream } from "react-icons/fa";
@@ -18,18 +19,12 @@ import { LuSandwich } from "react-icons/lu";
 import { FaCookieBite } from "react-icons/fa6";
 
 const ClienteProductos = () => {
+    const navigate = useNavigate();
     const [showPerfil, setShowPerfil] = useState(false);
     const [productos, setProductos] = useState([]);
     const [criterio, setCriterio] = useState("todos");
     const [filtro, setFiltro] = useState("");
     const [categoriaVisible, setCategoriaVisible] = useState(null);
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/");
-    };
 
     useEffect(() => {
         let mounted = true;
@@ -123,6 +118,8 @@ const ClienteProductos = () => {
         toast.success("Se agregó el producto al carrito correctamente.");
     };
 
+    const handleLogout = useGlobalLogout();
+
     return (
         <div style={{ backgroundColor: "#FAF7F5", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
             {/* Navbar General */}
@@ -130,7 +127,7 @@ const ClienteProductos = () => {
                 onPerfilClick={() => setShowPerfil(true)}
                 onLogout={handleLogout}
                 onInicioClick={() => navigate("/cliente-dashboard")}
-                activePage="productos"
+                activePage="nuestros productos"
             />
 
             {/* === Contenido principal === */}
