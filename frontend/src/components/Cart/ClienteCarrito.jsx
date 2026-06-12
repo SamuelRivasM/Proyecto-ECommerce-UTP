@@ -28,13 +28,17 @@ const ClienteCarrito = () => {
     const [metodoPago, setMetodoPago] = useState("efectivo");
     const [fechaEntrega, setFechaEntrega] = useState("");
 
-    // Confirm modal + websocket state
+    // === Estados para el modal de confirmación de pedido (WebSockets) ===
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [confirmSwitch, setConfirmSwitch] = useState(false);
     const [showProgressModal, setShowProgressModal] = useState(false);
     const [progress, setProgress] = useState(0);
     const [pagoBilletera, setPagoBilletera] = useState(false); // Bandera para pago confirmado en billetera
     const socketRef = useRef(null);
+
+    // === Estados para el modal de confirmación de borrar producto ===
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [productoAEliminar, setProductoAEliminar] = useState(null);
 
     // === ESTADO NUEVO PARA EL MODAL QR ===
     const [showQrModal, setShowQrModal] = useState(false);
@@ -142,10 +146,45 @@ const ClienteCarrito = () => {
         toast.success("Producto agregado al carrito correctamente.");
     };
 
+    // === Solicitar confirmación antes de eliminar ===
+    const solicitarEliminarProducto = (producto) => {
+        setProductoAEliminar(producto);
+        setShowDeleteModal(true);
+    };
+
+    // === Cancelar eliminación ===
+    const cancelarEliminacion = () => {
+        setProductoAEliminar(null);
+        setShowDeleteModal(false);
+        toast.info("Eliminación cancelada. El producto permanece en el carrito.");
+    };
+
+    // === Confirmar eliminación ===
+    const confirmarEliminacion = () => {
+        if (!productoAEliminar) {
+            toast.error("No se seleccionó ningún producto para eliminar.");
+            return;
+        }
+
+        eliminarProducto(productoAEliminar.id);
+        setProductoAEliminar(null);
+        setShowDeleteModal(false);
+    };
+
     // === Eliminar producto del carrito ===
     const eliminarProducto = (id) => {
+        const productoExiste = carrito.some(
+            (item) => Number(item.id) === Number(id)
+        );
+
+        // CP-04: controlar un ID que no existe en el carrito
+        if (!productoExiste) {
+            toast.error("El producto indicado no existe en el carrito.");
+            return false;
+        }
+
         const nuevoCarrito = carrito
-            .filter((item) => item.id !== id)
+            .filter((item) => Number(item.id) !== Number(id))
             .map((item, index) => ({
                 ...item,
                 numero: index + 1,
@@ -153,12 +192,12 @@ const ClienteCarrito = () => {
 
         setCarrito(nuevoCarrito);
         localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-        window.dispatchEvent(new Event("cartUpdated")); // Actualizar contador del carrito en navbar
+        window.dispatchEvent(new Event("cartUpdated"));
 
-        // Si ya no queda ningún producto, reiniciamos el contador a 1
         setNumero(nuevoCarrito.length > 0 ? nuevoCarrito.length + 1 : 1);
 
         toast.info("Producto eliminado del carrito.");
+        return true;
     };
 
     // === Aumentar o disminuir cantidad ===
@@ -572,7 +611,8 @@ const ClienteCarrito = () => {
                                                         height: "36px",
                                                         borderRadius: "50%",
                                                     }}
-                                                    onClick={() => eliminarProducto(item.id)}
+                                                    onClick={() => solicitarEliminarProducto(item)}
+                                                    aria-label={`Eliminar ${item.nombre}`}
                                                 >
                                                     <FaTrashAlt />
                                                 </button>
@@ -645,6 +685,53 @@ const ClienteCarrito = () => {
                     </div>
                 </div>
             </section>
+
+            {/* === Modal de confirmación para eliminar producto === */}
+            {showDeleteModal && productoAEliminar && (
+                <>
+                    <div className="modal show d-block" tabIndex="-1">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header bg-danger text-white">
+                                    <h5 className="modal-title">
+                                        Confirmar eliminación
+                                    </h5>
+                                </div>
+
+                                <div className="modal-body">
+                                    <p className="mb-2">
+                                        ¿Estás seguro de eliminar este producto del carrito?
+                                    </p>
+
+                                    <p className="fw-bold mb-0">
+                                        {productoAEliminar.nombre}
+                                    </p>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={cancelarEliminacion}
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={confirmarEliminacion}
+                                    >
+                                        Sí, eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="modal-backdrop fade show"></div>
+                </>
+            )}
 
             {/* **=== Modal de Pago QR (Abre solo con Billetera Digital) ===** */}
             {showQrModal && (
