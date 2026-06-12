@@ -4,7 +4,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --config jest.config.js"
+    "start": "node server.js",
+    "test": "jest --runInBand",
+    "test:verbose": "jest --runInBand --verbose",
+    "test:auth": "jest tests/tdd/auth-test.js --runInBand",
+    "test:catalogo": "jest tests/tdd/catalogo-test.js --runInBand",
+    "test:carrito": "jest tests/tdd/carrito-test.js --runInBand",
+    "test:pedidos": "jest tests/tdd/pedidos-test.js --runInBand"
   },
   "keywords": [],
   "author": "",
