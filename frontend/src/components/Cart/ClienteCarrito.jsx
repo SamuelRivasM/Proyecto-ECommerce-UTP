@@ -279,17 +279,42 @@ const ClienteCarrito = () => {
 
     // Iniciar WebSocket UNA SOLA VEZ
     useEffect(() => {
-        socketRef.current = io(SOCKET_URL, { transports: ["websocket"] });
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-        // Eventos globales (solo se registran una vez)
-        socketRef.current.on("orderProgress", (data) => {
+        // Ajusta estas claves según cómo guardes el token en tu Login
+        const token =
+            localStorage.getItem("token") ||
+            localStorage.getItem("authToken") ||
+            user.token;
+
+        if (!token) {
+            console.warn("No hay token JWT para conectar Socket.IO.");
+            return;
+        }
+
+        const socket = io(SOCKET_URL, {
+            transports: ["websocket"],
+            auth: { token },
+        });
+
+        socketRef.current = socket;
+
+        socket.on("connect", () => {
+            console.log("Socket conectado:", socket.id);
+        });
+
+        socket.on("connect_error", (err) => {
+            console.error("Error Socket.IO:", err.message);
+        });
+
+        socket.on("orderProgress", (data) => {
             if (data && typeof data.percent === "number") {
                 setProgress(Math.min(100, Math.round(data.percent)));
                 setShowProgressModal(true);
             }
         });
 
-        socketRef.current.on("orderComplete", () => {
+        socket.on("orderComplete", () => {
             setProgress(100);
             toast.success("Pedido enviado correctamente");
 
@@ -304,8 +329,14 @@ const ClienteCarrito = () => {
             }, 800);
         });
 
+        socket.on("orderError", (data) => {
+            toast.error(data?.message || "Error al crear el pedido.");
+            setShowProgressModal(false);
+        });
+
         return () => {
-            socketRef.current.disconnect();
+            socket.disconnect();
+            socketRef.current = null;
         };
     }, []);
 
@@ -347,7 +378,7 @@ const ClienteCarrito = () => {
                 carrito,
                 total: parseFloat(total),
                 fechaEntrega: fechaEntregaFormatoMySQL,
-                socketId: socketRef.current.id,
+                socketId: socketRef.current?.connected ? socketRef.current.id : null,
             });
 
             // Actualizar estado_pago a 1 (pagado) según el método de pago
