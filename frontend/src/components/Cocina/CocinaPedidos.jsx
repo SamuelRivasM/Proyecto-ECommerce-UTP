@@ -23,22 +23,49 @@ const CocinaPedidos = () => {
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
     const [detallePedido, setDetallePedido] = useState([]);
 
-    // === Obtener pedidos desde el backend ===
+    // === Obtener y actualizar pedidos cada 4 segundos ===
     useEffect(() => {
+        let componenteActivo = true;
+
         const obtenerPedidos = async () => {
             try {
                 const response = await axios.get(
                     `${process.env.REACT_APP_API_URL}/pedidos/cocina/pedidos-ordenados`
                 );
+
+                if (!componenteActivo) return;
+
                 setPedidos(response.data);
+
+                // Actualizar también la información mostrada en el modal
+                setPedidoSeleccionado((pedidoActual) => {
+                    if (!pedidoActual) return null;
+
+                    return (
+                        response.data.find(
+                            (pedido) => pedido.id === pedidoActual.id
+                        ) || pedidoActual
+                    );
+                });
             } catch (error) {
                 console.error("Error al obtener pedidos:", error);
             } finally {
-                setLoading(false);
+                if (componenteActivo) {
+                    setLoading(false);
+                }
             }
         };
 
+        // Primera carga inmediata
         obtenerPedidos();
+
+        // Volver a consultar cada 4 segundos
+        const intervalo = setInterval(obtenerPedidos, 4000);
+
+        return () => {
+            componenteActivo = false;
+            clearInterval(intervalo);
+        };
     }, []);
 
     useEffect(() => {
