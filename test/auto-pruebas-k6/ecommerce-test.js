@@ -1,37 +1,69 @@
-
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
-export const options = {
-  stages: [
-    { duration: '30s', target: 25 },   // sube gradualmente a 25 usuarios
-    { duration: '30s', target: 50 },   // sube a 50 usuarios
-    { duration: '1m', target: 100 },   // sube hasta 100 usuarios
-    { duration: '1m', target: 100 },   // mantiene 100 usuarios
-    { duration: '30s', target: 0 },    // baja progresivamente a 0
-  ],
-  thresholds: {
-    http_req_failed: ['rate<0.05'],              // menos del 5% de errores HTTP
-    http_req_duration: ['p(95)<3000'],           // 95% de requests bajo 3 segundos,
+function cleanUrl(value, fallback) {
+  return (value || fallback).replace(/\/$/, '');
+}
+
+const FRONTEND_URL = cleanUrl(__ENV.K6_FRONTEND_URL, 'http://localhost:3001');
+const BACKEND_URL = cleanUrl(__ENV.K6_BACKEND_URL, 'http://localhost:3000');
+const PROFILE = (__ENV.K6_PROFILE || 'smoke').toLowerCase();
+
+const profiles = {
+  smoke: {
+    vus: 1,
+    duration: '20s',
+  },
+  load: {
+    stages: [
+      { duration: '30s', target: 10 },
+      { duration: '1m', target: 25 },
+      { duration: '30s', target: 50 },
+      { duration: '30s', target: 0 },
+    ],
+  },
+  stress: {
+    stages: [
+      { duration: '30s', target: 25 },
+      { duration: '30s', target: 50 },
+      { duration: '1m', target: 100 },
+      { duration: '1m', target: 100 },
+      { duration: '30s', target: 0 },
+    ],
   },
 };
 
-const FRONTEND = 'http://localhost:3001';
-const BACKEND = 'http://localhost:3000';
+export const options = {
+  ...(profiles[PROFILE] || profiles.smoke),
+  thresholds: {
+    http_req_failed: ['rate<0.05'],
+    http_req_duration: ['p(95)<3000'],
+    checks: ['rate>0.95'],
+  },
+  tags: {
+    suite: 'catalogo',
+    profile: PROFILE,
+  },
+};
 
 export default function () {
-  const home = http.get(`${FRONTEND}/`);
-
-  check(home, {
-    'Frontend responde con estado 200': (res) => res.status === 200,
-    'Frontend responde en menos de 3 segundos': (res) => res.timings.duration < 3000,
+  const frontendResponse = http.get(FRONTEND_URL, {
+    tags: { endpoint: 'frontend' },
+    timeout: '10s',
   });
 
-  const api = http.get(`${BACKEND}/api/productos/cliente`);
+  check(frontendResponse, {
+    'frontend responde HTTP 200': (response) => response.status === 200,
+  });
 
-  check(api, {
-    'Backend responde con estado 200': (res) => res.status === 200,
-    'Backend responde en menos de 3 segundos': (res) => res.timings.duration < 3000,
+  const productsResponse = http.get(`${BACKEND_URL}/api/productos/cliente`, {
+    tags: { endpoint: 'productos-cliente' },
+    timeout: '10s',
+  });
+
+  check(productsResponse, {
+    'productos responde HTTP 200': (response) => response.status === 200,
+    'productos devuelve contenido': (response) => Boolean(response.body),
   });
 
   sleep(1);
