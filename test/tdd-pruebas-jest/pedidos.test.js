@@ -20,6 +20,8 @@ const app = express();
 app.use(express.json());
 app.use("/api/pedidos", pedidoRoutes);
 
+jest.setTimeout(10000);
+
 // Datos ficticios para las pruebas
 const carritoMock = [
     {
@@ -329,4 +331,29 @@ describe("POST /api/pedidos/cliente/nuevo - Confirmar pedido", () => {
         expect(connectionMock.commit).not.toHaveBeenCalled();
         expect(connectionMock.release).toHaveBeenCalledTimes(1);
     });
+
+    test("genera un número de seguimiento con formato PED-000000", async () => {
+        connectionMock.query
+            .mockResolvedValueOnce([{ insertId: 250 }])
+            .mockResolvedValueOnce([{}])
+            .mockResolvedValueOnce([{}]);
+
+        const res = await request(app)
+            .post("/api/pedidos/cliente/nuevo")
+            .send({
+            usuarioId: 7,
+            metodoPago: "billetera",
+            carrito: [carritoMock[0]],
+            total: 7,
+            fechaEntrega: "2026-06-12 19:00:00",
+            socketId: null,
+            });
+
+        expect(res.status).toBe(201);
+        expect(res.body.pedidoId).toBe(250);
+
+        // Nueva funcionalidad todavía no implementada
+        expect(res.body.numeroSeguimiento).toBe("PED-000250");
+    });
+
 });

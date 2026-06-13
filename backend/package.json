@@ -7,10 +7,11 @@
     "start": "node server.js",
     "test": "jest --runInBand",
     "test:verbose": "jest --runInBand --verbose",
-    "test:auth": "jest tests/tdd/auth-test.js --runInBand",
-    "test:catalogo": "jest tests/tdd/catalogo-test.js --runInBand",
-    "test:carrito": "jest tests/tdd/carrito-test.js --runInBand",
-    "test:pedidos": "jest tests/tdd/pedidos-test.js --runInBand"
+    "test:auth": "jest test/tdd-pruebas-jest/auth.test.js --runInBand",
+    "test:catalogo": "jest test/tdd-pruebas-jest/catalogo.test.js --runInBand",
+    "test:carrito": "jest test/tdd-pruebas-jest/carrito.test.js --runInBand",
+    "test:pedidos": "jest test/tdd-pruebas-jest/pedidos.test.js --runInBand",
+    "test:coverage": "jest --runInBand --coverage"
   },
   "keywords": [],
   "author": "",

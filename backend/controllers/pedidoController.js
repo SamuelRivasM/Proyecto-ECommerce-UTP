@@ -2,6 +2,9 @@
 // backend/controllers/pedidoController.js
 const db = require("../models/db");
 
+// pedidoUtils para pruebas refactor
+const { generarNumeroSeguimiento } = require("../utils/pedidoUtils");
+
 // === Obtener pedidos de un cliente ===
 exports.obtenerPedidosPorCliente = async (req, res) => {
     const { usuarioId } = req.params;
@@ -82,6 +85,9 @@ exports.crearPedido = async (req, res) => {
         );
 
         const pedidoId = pedidoResult.insertId;
+        // Generar número de seguimiento (ejemplo: PED-000001) para pruebas, aunque no se almacena en la BD
+        // const numeroSeguimiento = `PED-${String(pedidoId).padStart(6, "0")}`; -> refactor a función utilitaria
+        const numeroSeguimiento = generarNumeroSeguimiento(pedidoId);
 
         // Emitir inicio SOLO a ese cliente
         if (io && socketId) {
@@ -120,7 +126,8 @@ exports.crearPedido = async (req, res) => {
 
         res.status(201).json({
             message: "Pedido registrado correctamente.",
-            pedidoId
+            pedidoId,
+            numeroSeguimiento // Solo para pruebas, no se guarda en la BD
         });
 
         console.log("Pedido creado correctamente, ID:", pedidoId);
