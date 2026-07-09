@@ -391,13 +391,18 @@ const AccessibilityWidget = () => {
             <div className="a11y-section-title">Texto y Fuentes</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div className="a11y-control-card">
-                <label>Tamaño del Texto</label>
-                <div className="a11y-flex-row">
+                <span className="a11y-control-label" id="a11y-font-size-label">Tamaño del Texto</span>
+                <div
+                  className="a11y-flex-row"
+                  role="group"
+                  aria-labelledby="a11y-font-size-label"
+                >
                   <div className="a11y-inc-dec-group" style={{ flexGrow: 1 }}>
                     <button
                       className="a11y-adjust-btn"
                       onClick={decreaseFontSize}
                       disabled={fontSizeStep === 0}
+                      aria-label="Disminuir tamaño de texto"
                     >
                       A-
                     </button>
@@ -408,6 +413,7 @@ const AccessibilityWidget = () => {
                       className="a11y-adjust-btn"
                       onClick={increaseFontSize}
                       disabled={fontSizeStep === 3}
+                      aria-label="Aumentar tamaño de texto"
                     >
                       A+
                     </button>

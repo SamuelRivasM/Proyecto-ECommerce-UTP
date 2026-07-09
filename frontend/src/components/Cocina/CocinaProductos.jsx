@@ -22,6 +22,15 @@ const CocinaProductos = () => {
     const itemsPorPagina = 15;
     const [productoEdit, setProductoEdit] = useState(null);
     const [categorias, setCategorias] = useState([]);
+    const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
+    const [nuevoProducto, setNuevoProducto] = useState({
+        nombre: "",
+        descripcion: "",
+        precio: "",
+        stock: "",
+        categoria: "",
+    });
+    const [imagenNueva, setImagenNueva] = useState(null);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_URL}/productos/categorias`)
@@ -54,6 +63,29 @@ const CocinaProductos = () => {
         setProductoEdit({ ...prod });
     };
 
+    // Función para Activar / Desactivar producto
+    const handleCambiarEstado = async (prod) => {
+        try {
+            const nuevoEstado = prod.disponible ? 0 : 1;
+
+            await axios.patch(
+                `${process.env.REACT_APP_API_URL}/productos/cocina/${prod.id}/estado`,
+                { disponible: nuevoEstado }
+            );
+
+            setProductos((prev) =>
+                prev.map((p) =>
+                    p.id === prod.id ? { ...p, disponible: nuevoEstado } : p
+                )
+            );
+
+            toast.success(`Producto ${nuevoEstado ? "activado" : "desactivado"} correctamente`);
+        } catch (error) {
+            console.error("Error al cambiar estado:", error);
+            toast.error("Error al cambiar el estado del producto");
+        }
+    };
+
     // Función para Guardar luego de Editar
     const handleGuardarCambios = async () => {
         try {
@@ -80,6 +112,57 @@ const CocinaProductos = () => {
         } catch (error) {
             console.error(error);
             toast.error("Error al actualizar");
+        }
+    };
+
+    // Función para Crear Producto
+    const handleCrearProducto = async () => {
+        if (!nuevoProducto.nombre || !nuevoProducto.precio) {
+            toast.warning("Nombre y precio son obligatorios");
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/productos/cocina`,
+                {
+                    nombre: nuevoProducto.nombre,
+                    descripcion: nuevoProducto.descripcion,
+                    precio: nuevoProducto.precio,
+                    stock: nuevoProducto.stock,
+                    categoria_id: categorias.find(c => c.nombre === nuevoProducto.categoria)?.id
+                }
+            );
+
+            const nuevoId = response.data.id;
+
+            // Si se seleccionó una imagen, se sube al producto recién creado
+            if (imagenNueva && nuevoId) {
+                const formData = new FormData();
+                formData.append("imagen", imagenNueva);
+
+                try {
+                    await axios.post(
+                        `${process.env.REACT_APP_API_URL}/productos/upload/${nuevoId}`,
+                        formData,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+                } catch (imgError) {
+                    console.error("Error al subir imagen del nuevo producto:", imgError);
+                    toast.warning("El producto se creó, pero hubo un error al subir la imagen");
+                }
+            }
+
+            const productosActualizados = await axios.get(`${process.env.REACT_APP_API_URL}/productos/cocina`);
+            setProductos(productosActualizados.data);
+
+            toast.success("Producto creado correctamente");
+            setMostrarModalCrear(false);
+            setNuevoProducto({ nombre: "", descripcion: "", precio: "", stock: "", categoria: "" });
+            setImagenNueva(null);
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al crear producto");
         }
     };
 
@@ -164,12 +247,24 @@ const CocinaProductos = () => {
 
             {/* === Contenido principal === */}
             <div className="container my-4">
+                <h1 className="sr-only">Lista de Productos - UTP Coffee Point (Cocina)</h1>
                 <h2 className="fw-bold text-center mb-4">Lista de Productos</h2>
+
+                <div className="d-flex justify-content-end mb-3">
+                    <button
+                        className="btn btn-danger fw-bold"
+                        onClick={() => setMostrarModalCrear(true)}
+                    >
+                        + Agregar Producto
+                    </button>
+                </div>
 
                 {/* === Filtro === */}
                 <div className="input-group mb-4 shadow-sm" style={{ maxWidth: "650px", height: "50px", margin: "0 auto" }}>
-                    <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }}>🔍</span>
+                    <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }} aria-hidden="true">🔍</span>
+                    <label htmlFor="cocina-productos-criterio" className="sr-only">Filtrar productos por</label>
                     <select
+                        id="cocina-productos-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -187,7 +282,11 @@ const CocinaProductos = () => {
                         <option value="categoria">Categoría</option>
                         <option value="estado">Estado</option>
                     </select>
+                    <label htmlFor="cocina-productos-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los productos" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="cocina-productos-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={criterio === "todos" ? "Mostrar todos" : `Buscar por ${criterio}...`}
@@ -226,7 +325,7 @@ const CocinaProductos = () => {
                                             {prod.imagen ? (
                                                 <img
                                                     src={prod.imagen}
-                                                    alt={prod.nombre}
+                                                    alt=""
                                                     className="product-image"
                                                 />
                                             ) : (
@@ -251,6 +350,12 @@ const CocinaProductos = () => {
                                                 onClick={() => handleCambiarImg(prod.id)}
                                             >
                                                 Cambiar IMG
+                                            </button>
+                                            <button
+                                                className="btn btn-sm btn-dark fw-bold"
+                                                onClick={() => handleCambiarEstado(prod)}
+                                            >
+                                                Cambiar Estado
                                             </button>
                                         </td>
                                     </tr>
@@ -319,6 +424,88 @@ const CocinaProductos = () => {
                                 Guardar
                             </button>
                             <button className="btn btn-danger fw-bold" onClick={() => setProductoEdit(null)}>
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {mostrarModalCrear && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h5 className="mb-3 fw-bold">Agregar Producto</h5>
+
+                        <label htmlFor="nuevo-producto-nombre" className="form-label">Nombre</label>
+                        <input
+                            id="nuevo-producto-nombre"
+                            className="form-control mb-2"
+                            value={nuevoProducto.nombre}
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, nombre: e.target.value }))}
+                        />
+
+                        <label htmlFor="nuevo-producto-descripcion" className="form-label">Descripción</label>
+                        <textarea
+                            id="nuevo-producto-descripcion"
+                            className="form-control mb-2"
+                            value={nuevoProducto.descripcion}
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, descripcion: e.target.value }))}
+                        />
+
+                        <label htmlFor="nuevo-producto-precio" className="form-label">Precio (S/)</label>
+                        <input
+                            id="nuevo-producto-precio"
+                            type="number"
+                            className="form-control mb-2"
+                            value={nuevoProducto.precio}
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio: e.target.value }))}
+                        />
+
+                        <label htmlFor="nuevo-producto-imagen" className="form-label">Imagen</label>
+                        <input
+                            id="nuevo-producto-imagen"
+                            type="file"
+                            accept="image/*"
+                            className="form-control mb-2"
+                            onChange={(e) => setImagenNueva(e.target.files[0] || null)}
+                        />
+
+                        <label htmlFor="nuevo-producto-stock" className="form-label">Stock</label>
+                        <input
+                            id="nuevo-producto-stock"
+                            type="number"
+                            className="form-control mb-1"
+                            value={nuevoProducto.stock}
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))}
+                        />
+                        <small className={`d-block mb-2 fw-semibold ${Number(nuevoProducto.stock) > 0 ? "text-success" : "text-danger"}`}>
+                            Estado: {Number(nuevoProducto.stock) > 0 ? "Activo" : "Inactivo"} (según el stock)
+                        </small>
+
+                        <label htmlFor="nuevo-producto-categoria" className="form-label">Categoría</label>
+                        <select
+                            id="nuevo-producto-categoria"
+                            className="form-control mb-4"
+                            value={nuevoProducto.categoria}
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, categoria: e.target.value }))}
+                        >
+                            <option value="">Selecciona una categoría</option>
+                            {categorias.map(c => (
+                                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+                            ))}
+                        </select>
+
+                        <div className="d-flex gap-3">
+                            <button className="btn btn-success fw-bold" onClick={handleCrearProducto}>
+                                Crear
+                            </button>
+                            <button
+                                className="btn btn-danger fw-bold"
+                                onClick={() => {
+                                    setMostrarModalCrear(false);
+                                    setNuevoProducto({ nombre: "", descripcion: "", precio: "", stock: "", categoria: "" });
+                                }}
+                            >
                                 Cancelar
                             </button>
                         </div>

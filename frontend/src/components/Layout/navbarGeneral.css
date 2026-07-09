@@ -10,7 +10,7 @@
     position: absolute;
     left: -10px;
     top: -6px;
-    background-color: #dc3545;
+    background-color: #A4001D;
     color: white;
     border-radius: 50%;
     font-size: 0.7rem;
@@ -24,4 +24,11 @@
 }
 .nav-link.active {
     color: #ffddcc !important;
+}
+
+/* Bootstrap aplica por defecto un blanco semitransparente (~rgba(255,255,255,.55))
+   a los .nav-link inactivos, lo que no cumple 4.5:1 sobre el fondo rojo (#A4001D).
+   Se usa blanco sólido para cumplir WCAG 2.1 AA sin alterar la paleta de marca. */
+.navbar-dark .navbar-nav .nav-link {
+    color: #ffffff;
 }

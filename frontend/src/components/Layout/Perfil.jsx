@@ -114,10 +114,11 @@ const Perfil = ({ onClose }) => {
                     </button>
 
                     <div className="ms-auto d-flex align-items-center">
-                        <FaUserCircle size={28} className="text-white me-3" />
+                        <FaUserCircle size={28} className="text-white me-3" aria-hidden="true" />
                         <button
                             className="btn btn-danger"
                             onClick={onClose}
+                            aria-label="Cerrar perfil"
                         >
                             ✖
                         </button>
@@ -131,8 +132,9 @@ const Perfil = ({ onClose }) => {
                     <div className="card-body">
                         <h2 className="fw-bold mb-4"> Mi Perfil</h2>
                         <div className="mb-3">
-                            <label className="form-label">Nombre</label>
+                            <label htmlFor="perfil-nombre" className="form-label">Nombre</label>
                             <input
+                                id="perfil-nombre"
                                 type="text"
                                 className="form-control"
                                 name="nombre"
@@ -143,8 +145,9 @@ const Perfil = ({ onClose }) => {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Correo</label>
+                            <label htmlFor="perfil-correo" className="form-label">Correo</label>
                             <input
+                                id="perfil-correo"
                                 type="email"
                                 className="form-control"
                                 value={formData.email}
@@ -153,8 +156,9 @@ const Perfil = ({ onClose }) => {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Teléfono</label>
+                            <label htmlFor="perfil-telefono" className="form-label">Teléfono</label>
                             <input
+                                id="perfil-telefono"
                                 type="text"
                                 className="form-control"
                                 name="telefono"
@@ -165,8 +169,9 @@ const Perfil = ({ onClose }) => {
                         </div>
 
                         <div className="mb-3 position-relative">
-                            <label className="form-label">Contraseña</label>
+                            <label htmlFor="perfil-password" className="form-label">Contraseña</label>
                             <input
+                                id="perfil-password"
                                 type={showPassword ? "text" : "password"}
                                 className="form-control"
                                 name="password"
@@ -175,8 +180,10 @@ const Perfil = ({ onClose }) => {
                                 disabled={!editable}
                                 placeholder="•••••• (dejar en blanco para no cambiar)"
                             />
-                            <span
+                            <button
+                                type="button"
                                 onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                                 style={{
                                     position: "absolute",
                                     top: "75%",
@@ -184,20 +191,24 @@ const Perfil = ({ onClose }) => {
                                     transform: "translateY(-50%)",
                                     cursor: "pointer",
                                     color: "#6c757d",
+                                    background: "none",
+                                    border: "none",
+                                    padding: 0,
                                 }}
                             >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
+                                {showPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
+                            </button>
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Rol</label>
-                            <input type="text" className="form-control" value={formData.rol} disabled />
+                            <label htmlFor="perfil-rol" className="form-label">Rol</label>
+                            <input id="perfil-rol" type="text" className="form-control" value={formData.rol} disabled />
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Fecha de Registro</label>
+                            <label htmlFor="perfil-fecha-registro" className="form-label">Fecha de Registro</label>
                             <input
+                                id="perfil-fecha-registro"
                                 type="text"
                                 className="form-control"
                                 value={new Date(formData.fecha_registro).toLocaleDateString("es-PE")}

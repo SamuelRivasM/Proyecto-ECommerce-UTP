@@ -182,6 +182,7 @@ const AdminDashboard = () => {
 
       {/* === Contenido principal === */}
       <main className="container my-5 flex-grow">
+        <h1 className="sr-only">Panel de Administración - UTP Coffee Point</h1>
         <h2 className="fw-bold mb-4">Panel de Administración</h2>
 
         {/* === Tarjetas de estadísticas === */}
@@ -190,8 +191,8 @@ const AdminDashboard = () => {
           <div className="col-md-4">
             <div className="card shadow-sm text-center">
               <div className="card-body">
-                <h5 className="card-title">Usuarios Registrados</h5>
-                <p className="display-6 fw-bold">{stats.totalUsuarios}</p>
+                <h3 className="fs-5 card-title">Usuarios Registrados</h3>
+                <h4 className="display-6 fw-bold">{stats.totalUsuarios}</h4>
                 <small>
                   Clientes: {stats.clientes} | Cocina: {stats.cocina} | Admins: {stats.admins}
                 </small>
@@ -204,11 +205,12 @@ const AdminDashboard = () => {
             <div className="card shadow-sm text-center position-relative">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                  <h5 className="card-title mb-0">Cantidad de Pedidos</h5>
+                  <h3 className="fs-5 card-title mb-0" id="admin-pedidos-label">Cantidad de Pedidos</h3>
                   <select
                     className="form-select form-select-sm w-auto"
                     value={filtroPedidos}
                     onChange={(e) => setFiltroPedidos(e.target.value)}
+                    aria-labelledby="admin-pedidos-label"
                   >
                     {opcionesFiltro.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -217,7 +219,7 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <p className="display-6 fw-bold">{stats.pedidosMes}</p>
+                <h4 className="display-6 fw-bold">{stats.pedidosMes}</h4>
                 <small>Periodo: {filtroPedidos}</small>
               </div>
             </div>
@@ -228,11 +230,12 @@ const AdminDashboard = () => {
             <div className="card shadow-sm text-center position-relative">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                  <h5 className="card-title mb-0">Ventas Totales</h5>
+                  <h3 className="fs-5 card-title mb-0" id="admin-ventas-label">Ventas Totales</h3>
                   <select
                     className="form-select form-select-sm w-auto"
                     value={filtroVentas}
                     onChange={(e) => setFiltroVentas(e.target.value)}
+                    aria-labelledby="admin-ventas-label"
                   >
                     {opcionesFiltro.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -241,7 +244,7 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <p className="display-6 fw-bold">S/ {stats.ventasMes}</p>
+                <h4 className="display-6 fw-bold">S/ {stats.ventasMes}</h4>
                 <small>Periodo: {filtroVentas}</small>
               </div>
             </div>
@@ -251,11 +254,12 @@ const AdminDashboard = () => {
         {/* === Productos más vendidos === */}
         <div className="mb-5">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="mb-0">Productos más vendidos</h4>
+            <h4 className="mb-0" id="admin-productos-label">Productos más vendidos</h4>
             <select
               className="form-select form-select-sm w-auto"
               value={filtroProductos}
               onChange={(e) => setFiltroProductos(e.target.value)}
+              aria-labelledby="admin-productos-label"
             >
               {opcionesFiltro.map((opt) => (
                 <option key={opt.value} value={opt.value}>

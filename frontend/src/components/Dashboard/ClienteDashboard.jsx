@@ -73,48 +73,57 @@ const ClienteDashboard = () => {
       />
 
       {/* === Contenido principal === */}
-      {/* Hero Section con carrusel */}
-      <div id="heroCarousel" className="carousel slide carousel-fade flex-grow">
-        <div className="carousel-inner" style={{ height: "90vh" }}>
-          {[cafeteriaEntrada, cafeteriaInterior, cafeteriaComida, cafeteriaMesa].map((img, i) => (
-            <div key={i} className={`carousel-item ${i === 0 ? "active" : ""}`}>
-              <img src={img} className="d-block w-100" alt={`Cafetería ${i}`} style={{ objectFit: "cover", height: "90vh" }} />
-            </div>
-          ))}
-          <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1 }}></div>
+      <main className="flex-grow-1">
+        <h1 className="sr-only">Panel principal del cliente - UTP Coffee Point</h1>
 
-          <div className="position-absolute top-50 start-50 translate-middle text-center text-white px-4" style={{ maxWidth: "800px", zIndex: 2 }}>
-            <h2 className="fw-bold mb-3">¿UN ANTOJO?</h2>
-            <p className="mb-4">
-              La cafetería de la Universidad Tecnológica del Perú (UTP) en Lima Sur busca mejorar la experiencia de sus estudiantes,
-              docentes y personal administrativo con pedidos en línea y pagos rápidos.
-            </p>
-            <div className="mb-4">
-              <button className="btn btn-danger me-3 fw-bold" onClick={() => navigate("/cliente-carrito")}>
-                Hacer un Pedido
-              </button>
-              <button className="btn btn-danger fw-bold" onClick={() => navigate("/cliente-productos")}>
-                Ver menú
-              </button>
-            </div>
-
-            <div className="d-flex justify-content-center gap-5">
-              <div>
-                <p className="fw-semibold mb-1 d-flex align-items-center justify-content-center gap-2">
-                  <FiClock size={18} /> Atención
-                </p>
-                <p className="mb-0">8:30 am - 20:30 pm</p>
+        {/* Hero Section con carrusel */}
+        <div id="heroCarousel" className="carousel slide carousel-fade flex-grow">
+          <div className="carousel-inner" style={{ height: "90vh" }}>
+            {[
+              { src: cafeteriaEntrada, alt: "Entrada de la cafetería UTP" },
+              { src: cafeteriaInterior, alt: "Interior de la cafetería UTP" },
+              { src: cafeteriaComida, alt: "Platillos preparados en la cafetería UTP" },
+              { src: cafeteriaMesa, alt: "Área de mesas de la cafetería UTP" },
+            ].map((slide, i) => (
+              <div key={i} className={`carousel-item ${i === 0 ? "active" : ""}`}>
+                <img src={slide.src} className="d-block w-100" alt={slide.alt} style={{ objectFit: "cover", height: "90vh" }} />
               </div>
-              <div>
-                <p className="fw-semibold mb-1 d-flex align-items-center justify-content-center gap-2">
-                  <FiMapPin size={18} /> Ubicación
+            ))}
+            <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: "rgba(0,0,0,0.65)", zIndex: 1 }}>
+              <div className="position-absolute top-50 start-50 translate-middle text-center text-white px-4" style={{ maxWidth: "800px" }}>
+                <h2 className="fw-bold mb-3">¿UN ANTOJO?</h2>
+                <p className="mb-4">
+                  La cafetería de la Universidad Tecnológica del Perú (UTP) en Lima Sur busca mejorar la experiencia de sus estudiantes,
+                  docentes y personal administrativo con pedidos en línea y pagos rápidos.
                 </p>
-                <p className="mb-0">1er piso torre C</p>
+                <div className="mb-4">
+                  <button className="btn btn-danger me-3 fw-bold" onClick={() => navigate("/cliente-carrito")}>
+                    Hacer un Pedido
+                  </button>
+                  <button className="btn btn-danger fw-bold" onClick={() => navigate("/cliente-productos")}>
+                    Ver menú
+                  </button>
+                </div>
+
+                <div className="d-flex justify-content-center gap-5">
+                  <div>
+                    <p className="fw-semibold mb-1 d-flex align-items-center justify-content-center gap-2">
+                      <FiClock size={18} aria-hidden="true" /> Atención
+                    </p>
+                    <p className="mb-0">8:30 am - 20:30 pm</p>
+                  </div>
+                  <div>
+                    <p className="fw-semibold mb-1 d-flex align-items-center justify-content-center gap-2">
+                      <FiMapPin size={18} aria-hidden="true" /> Ubicación
+                    </p>
+                    <p className="mb-0">1er piso torre C</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Footer */}
       <FooterGeneral />

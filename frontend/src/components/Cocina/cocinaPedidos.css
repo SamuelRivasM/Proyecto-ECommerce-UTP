@@ -22,6 +22,24 @@
     color: white !important;
 }
 
+/* Los badges bg-success/bg-danger de Bootstrap con texto blanco quedan justo
+   en el límite de 4.5:1. Se oscurecen levemente para cumplir WCAG 2.1 AA
+   sin cambiar la paleta de colores. */
+.badge.bg-success {
+    background-color: #146c43 !important;
+}
+.badge.bg-danger {
+    background-color: #b02a37 !important;
+}
+
+/* El botón "Ver detalle" usa btn-primary de Bootstrap (#0d6efd + texto blanco),
+   cuyo contraste real es ~4.499:1, justo por debajo del mínimo 4.5:1.
+   Se oscurece solo dentro de esta tarjeta para no afectar btn-primary en otras páginas. */
+.card-footer .btn-primary {
+    background-color: #0a58ca;
+    border-color: #0a58ca;
+}
+
 /* ======== Filtros y paginación ======== */
 .pagination {
     margin-top: 20px;

@@ -89,6 +89,19 @@
     color: #5c4033;
 }
 
+/* Utilidad accesible: visible solo para lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Formularios */
 form {
     display: flex;
@@ -134,7 +147,7 @@ input {
 }
 
 .auth-links a {
-    color: #007bff;
+    color: #0056b3;
     text-decoration: none;
 }
 

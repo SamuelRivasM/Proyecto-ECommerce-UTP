@@ -60,12 +60,13 @@ const Login = () => {
   };
 
   return (
-    <div
+    <main
       className="auth-container"
       style={{
         backgroundImage: `linear-gradient(rgba(52,52,52,0.5), rgba(52,52,52,0.5)), url(${bgCafe})`,
       }}
     >
+      <h1 className="sr-only">Iniciar sesión - UTP Coffee Point</h1>
       <div className="auth-card login-card">
         <div className="auth-left">
           <img src={cafeImg} alt="Cafetería UTP" className="auth-image" />
@@ -81,30 +82,39 @@ const Login = () => {
 
           <h2 className="auth-heading">¡Bienvenido!</h2>
           <form onSubmit={handleLogin}>
-            <label>Ingresa tu Correo UTP:</label>
+            <label htmlFor="login-email">Ingresa tu Correo UTP:</label>
             <input
+              id="login-email"
               type="email"
               placeholder="correo@utp.edu.pe"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
               required
             />
 
-            <label>Ingresa tu Contraseña:</label>
+            <label htmlFor="login-password">Ingresa tu Contraseña:</label>
             <div className="password-container">
               <input
+                id="login-password"
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
               <button
                 type="button"
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {showPassword ? (
+                  <FaEyeSlash aria-hidden="true" />
+                ) : (
+                  <FaEye aria-hidden="true" />
+                )}
               </button>
             </div>
 
@@ -123,7 +133,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

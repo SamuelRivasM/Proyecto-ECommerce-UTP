@@ -204,6 +204,7 @@ const CocinaPedidos = () => {
 
             {/* === Contenido principal === */}
             <div className="container my-4">
+                <h1 className="sr-only">Lista de Pedidos - UTP Coffee Point (Cocina)</h1>
                 <h2 className="fw-bold text-center mb-4">Lista de Pedidos</h2>
 
                 {/* === Filtro === */}
@@ -214,10 +215,13 @@ const CocinaPedidos = () => {
                     <span
                         className="input-group-text bg-white border-end-0"
                         style={{ fontSize: "1.2rem", height: "50px" }}
+                        aria-hidden="true"
                     >
                         🔍
                     </span>
+                    <label htmlFor="cocina-pedidos-criterio" className="sr-only">Filtrar pedidos por</label>
                     <select
+                        id="cocina-pedidos-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -236,7 +240,11 @@ const CocinaPedidos = () => {
                         <option value="fecha_creacion">Fecha de Creación</option>
                         <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
+                    <label htmlFor="cocina-pedidos-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los pedidos" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="cocina-pedidos-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={
@@ -270,7 +278,7 @@ const CocinaPedidos = () => {
                                             : "danger"
                                     }`}>
                                     <div className="card-body">
-                                        <h5 className="card-title fw-bold">Pedido #{p.id}</h5>
+                                        <h3 className="fs-5 card-title fw-bold">Pedido #{p.id}</h3>
                                         <p><strong>Cliente: </strong>{p.cliente_nombre}</p>
                                         <p><strong>Método de pago: </strong>{capitalizarPrimeraLetra(p.metodo_pago)}</p>
                                         <p><strong>Total:</strong> S/ {parseFloat(p.total).toFixed(2)}</p>

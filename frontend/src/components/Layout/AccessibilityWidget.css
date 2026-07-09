@@ -31,6 +31,11 @@
   outline: none;
 }
 
+.a11y-trigger:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
 .a11y-trigger:hover {
   transform: scale(1.08) rotate(5deg);
   box-shadow: 0 6px 24px rgba(37, 99, 235, 0.4);
@@ -122,7 +127,7 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
+  color: #4b5563;
   margin: 0 0 8px 0;
   font-weight: 700;
   border-bottom: 1px solid #e5e7eb;
@@ -154,6 +159,11 @@
   min-height: 70px;
   gap: 6px;
   outline: none;
+}
+
+.a11y-option-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .a11y-option-btn svg {
@@ -197,7 +207,7 @@
   gap: 6px;
 }
 
-.a11y-control-card label {
+.a11y-control-card .a11y-control-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: #4b5563;
@@ -252,7 +262,7 @@
   background: #f3f4f6;
   text-align: center;
   font-size: 0.7rem;
-  color: #6b7280;
+  color: #4b5563;
   border-top: 1px solid #e5e7eb;
 }
 

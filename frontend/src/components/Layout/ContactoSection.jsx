@@ -50,6 +50,7 @@ const ContactoSection = () => {
 
             {/* Contenido central */}
             <section className="container my-5 flex-grow text-center">
+                <h1 className="sr-only">Contáctanos - UTP Coffee Point</h1>
                 <h2 className="fw-bold mb-4">Contáctanos</h2>
                 <p className="mb-3">Universidad Tecnológica del Perú - Sede Lima Sur</p>
                 <p>Inicio de la Panamericana Sur - ingreso a Villa El Salvador (VES), Lima Sur</p>

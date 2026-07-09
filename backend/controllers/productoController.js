@@ -104,6 +104,49 @@ exports.obtenerCategorias = async (req, res) => {
   }
 };
 
+// === Crear producto ===
+exports.crearProducto = async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, stock, categoria_id } = req.body;
+
+    if (!nombre || !precio) {
+      return res.status(400).json({ message: "Nombre y precio son obligatorios" });
+    }
+
+    const stockFinal = stock || 0;
+    // Disponibilidad automática según el stock: 0 = inactivo, 1 o más = activo
+    const disponible = Number(stockFinal) > 0 ? 1 : 0;
+
+    const [result] = await db.promise().query(`
+      INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id, disponible)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [nombre, descripcion || null, precio, stockFinal, categoria_id || null, disponible]);
+
+    res.status(201).json({ message: "Producto creado correctamente", id: result.insertId });
+  } catch (error) {
+    console.error("Error al crear producto:", error);
+    res.status(500).json({ message: "Error al crear producto" });
+  }
+};
+
+// === Activar / Desactivar producto ===
+exports.cambiarEstadoProducto = async (req, res) => {
+  const { id } = req.params;
+  const { disponible } = req.body;
+
+  try {
+    await db.promise().query(
+      "UPDATE productos SET disponible = ? WHERE id = ?",
+      [disponible, id]
+    );
+
+    res.json({ message: "Estado actualizado" });
+  } catch (error) {
+    console.error("Error cambiarEstadoProducto:", error);
+    res.status(500).json({ message: "Error al actualizar estado" });
+  }
+};
+
 // === Editar producto ===
 exports.editarProducto = async (req, res) => {
   try {

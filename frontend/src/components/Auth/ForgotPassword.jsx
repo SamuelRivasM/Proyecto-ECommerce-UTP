@@ -27,20 +27,22 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div
+        <main
             className="auth-container"
             style={{
                 backgroundImage: `linear-gradient(rgba(52,52,52,0.5), rgba(52,52,52,0.5)), url(${bgCafe})`,
             }}
         >
+            <h1 className="sr-only">Recuperar contraseña - UTP Coffee Point</h1>
             <ToastContainer position="top-center" autoClose={3000} />
             <div className="auth-card">
                 <h2 className="auth-heading">Recuperar contraseña</h2>
 
                 <form onSubmit={handleSubmit}>
-                    <label>Método de recuperación:</label>
+                    <label htmlFor="forgot-method">Método de recuperación:</label>
                     <div className="auth-select-wrapper">
                         <select
+                            id="forgot-method"
                             className="auth-select"
                             value={method}
                             onChange={(e) => setMethod(e.target.value)}
@@ -50,14 +52,16 @@ const ForgotPassword = () => {
                         </select>
                     </div>
 
-                    <label>
+                    <label htmlFor="forgot-value">
                         {method === "email" ? "Correo UTP:" : "Teléfono registrado:"}
                     </label>
                     <input
+                        id="forgot-value"
                         type={method === "email" ? "email" : "text"}
                         placeholder={method === "email" ? "correo@utp.edu.pe" : "987654321"}
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
+                        autoComplete={method === "email" ? "email" : "tel"}
                         required
                     />
 
@@ -75,7 +79,7 @@ const ForgotPassword = () => {
                     </p>
                 </div>
             </div>
-        </div>
+        </main>
     );
 };
 

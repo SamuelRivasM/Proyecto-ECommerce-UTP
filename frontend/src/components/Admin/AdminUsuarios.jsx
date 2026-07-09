@@ -152,6 +152,7 @@ const AdminUsuarios = () => {
 
             {/* === Contenido principal === */}
             <main className="container py-5 flex-grow-1">
+                <h1 className="sr-only">Gestión de Usuarios - UTP Coffee Point (Admin)</h1>
 
                 {/* Formulario */}
                 <div className="card shadow p-4 mb-4">
@@ -165,27 +166,28 @@ const AdminUsuarios = () => {
                         <div className="row g-3">
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Nombre *</label>
-                                <input type="text" name="nombre" className="form-control" value={formData.nombre} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-nombre" className="form-label fw-bold">Nombre *</label>
+                                <input id="admin-usuario-nombre" type="text" name="nombre" className="form-control" value={formData.nombre} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Correo *</label>
-                                <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-email" className="form-label fw-bold">Correo *</label>
+                                <input id="admin-usuario-email" type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Teléfono</label>
-                                <input type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-telefono" className="form-label fw-bold">Teléfono</label>
+                                <input id="admin-usuario-telefono" type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">
+                                <label htmlFor="admin-usuario-password" className="form-label fw-bold">
                                     Contraseña {modoEdicion ? "(opcional)" : "*"}
                                 </label>
 
                                 <div className="input-group">
                                     <input
+                                        id="admin-usuario-password"
                                         type={mostrarPassword ? "text" : "password"}
                                         name="password"
                                         className="form-control"
@@ -198,16 +200,17 @@ const AdminUsuarios = () => {
                                         className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
                                         style={{ height: "38px" }}
                                         onClick={() => setMostrarPassword(!mostrarPassword)}
+                                        aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                                     >
-                                        {mostrarPassword ? <FaEyeSlash /> : <FaEye />}
+                                        {mostrarPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
                                     </button>
 
                                 </div>
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Rol *</label>
-                                <select name="rol" className="form-select" value={formData.rol} onChange={handleChange}>
+                                <label htmlFor="admin-usuario-rol" className="form-label fw-bold">Rol *</label>
+                                <select id="admin-usuario-rol" name="rol" className="form-select" value={formData.rol} onChange={handleChange}>
                                     <option value="admin">Administrador</option>
                                     <option value="cliente">Cliente</option>
                                     <option value="cocina">Cocina</option>
@@ -243,11 +246,14 @@ const AdminUsuarios = () => {
                     <span
                         className="input-group-text bg-white border-end-0"
                         style={{ fontSize: "1.2rem", height: "50px" }}
+                        aria-hidden="true"
                     >
                         🔍
                     </span>
 
+                    <label htmlFor="admin-usuarios-criterio" className="sr-only">Filtrar usuarios por</label>
                     <select
+                        id="admin-usuarios-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -264,7 +270,11 @@ const AdminUsuarios = () => {
                         <option value="rol">Rol</option>
                     </select>
 
+                    <label htmlFor="admin-usuarios-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los usuarios" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="admin-usuarios-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={
