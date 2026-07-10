@@ -1,5 +1,5 @@
 # language: es
-@BDD @HU21 @S12 @FuncionesCocina
+@BDD @HU21 @S11 @FuncionesCocina
 Característica: Eliminación de productos del catálogo
   Como personal de cocina
   Quiero eliminar productos que ya no se ofrecen

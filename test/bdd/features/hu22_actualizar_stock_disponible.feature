@@ -1,5 +1,5 @@
 # language: es
-@BDD @HU22 @S13 @FuncionesCocina
+@BDD @HU22 @S11 @FuncionesCocina
 Característica: Actualización del stock de productos
   Como personal de cocina
   Quiero actualizar el stock disponible de cada producto

@@ -1,5 +1,5 @@
 # language: es
-@BDD @HU19 @S12 @FuncionesCocina
+@BDD @HU19 @S10 @FuncionesCocina
 Característica: Registro de nuevos productos en el catálogo
   Como personal de cocina
   Quiero agregar nuevos productos al catálogo con imagen y precio

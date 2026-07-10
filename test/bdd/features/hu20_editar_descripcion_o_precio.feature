@@ -1,5 +1,5 @@
 # language: es
-@BDD @HU20 @S12 @FuncionesCocina
+@BDD @HU20 @S10 @FuncionesCocina
 Característica: Edición de productos del catálogo
   Como personal de cocina
   Quiero editar la descripción o precio de productos existentes
