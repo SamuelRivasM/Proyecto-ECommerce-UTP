@@ -484,13 +484,15 @@ const ClienteCarrito = () => {
 
             {/* === Contenido principal === */}
             <section className="container my-5 flex-grow">
+                <h1 className="sr-only">Carrito de Compras - UTP Coffee Point</h1>
                 <h2 className="fw-bold text-center mb-4">Carrito de Compras</h2>
 
                 {/* === Filtros === */}
                 <div className="row mb-4">
                     <div className="col-md-5 mb-3 mb-md-0">
-                        <label className="form-label fw-semibold">Categoría</label>
+                        <label htmlFor="carrito-categoria" className="form-label fw-semibold">Categoría</label>
                         <select
+                            id="carrito-categoria"
                             className="form-select"
                             value={categoriaSeleccionada}
                             onChange={(e) => setCategoriaSeleccionada(e.target.value)}
@@ -504,8 +506,9 @@ const ClienteCarrito = () => {
                         </select>
                     </div>
                     <div className="col-md-5 mb-3 mb-md-0">
-                        <label className="form-label fw-semibold">Producto</label>
+                        <label htmlFor="carrito-producto" className="form-label fw-semibold">Producto</label>
                         <select
+                            id="carrito-producto"
                             className="form-select"
                             value={productoSeleccionado}
                             onChange={(e) => setProductoSeleccionado(e.target.value)}
@@ -532,6 +535,7 @@ const ClienteCarrito = () => {
                 {/* === Tabla del carrito === */}
                 <div className="table-responsive">
                     <table className="table table-bordered align-middle">
+                        <caption className="sr-only">Lista de productos agregados al carrito de compras</caption>
                         <thead className="table-light">
                             <tr className="text-center">
                                 <th>N°</th>
@@ -634,11 +638,12 @@ const ClienteCarrito = () => {
                 {/* === Total y botón === */}
                 <div className="d-flex flex-column align-items-end mt-4 gap-3">
                     <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Método de Pago:</h5>
+                        <h3 className="fs-5 fw-bold mb-0" id="carrito-metodo-pago-label">Método de Pago:</h3>
                         <select
                             className="form-select w-auto"
                             value={metodoPago}
                             onChange={handleMetodoPagoChange}
+                            aria-labelledby="carrito-metodo-pago-label"
                         >
                             <option value="efectivo">Efectivo</option>
                             <option value="tarjeta">Tarjeta</option>
@@ -647,11 +652,11 @@ const ClienteCarrito = () => {
                     </div>
                     {/* Campo de fecha y hora de entrega */}
                     <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Hora de entrega:</h5>
+                        <h3 className="fs-5 fw-bold mb-0">Hora de entrega:</h3>
 
                         {/* Selector de fecha (solo muestra el día actual y no editable) */}
                         <div className="d-flex align-items-center gap-2">
-                            <select className="form-select w-auto" disabled>
+                            <select className="form-select w-auto" disabled aria-label="Fecha de entrega">
                                 <option>
                                     {new Date().toLocaleDateString("es-PE", {
                                         weekday: "long",
@@ -666,6 +671,7 @@ const ClienteCarrito = () => {
                                 className="form-select w-auto"
                                 value={fechaEntrega}
                                 onChange={(e) => setFechaEntrega(e.target.value)}
+                                aria-label="Hora de entrega"
                                 required
                             >
                                 <option value="">Selecciona hora</option>
@@ -678,12 +684,14 @@ const ClienteCarrito = () => {
                         </div>
                     </div>
                     <div className="d-flex align-items-center gap-3">
-                        <h5 className="fw-bold mb-0">Total: S/ {total}</h5>
+                        <h3 className="fs-5 fw-bold mb-0">Total: S/ {total}</h3>
                         <button className="btn btn-success fw-bold" onClick={handleOpenConfirm}>
                             Solicitar Pedido
                         </button>
                     </div>
                 </div>
+                <br />
+                <br />
             </section>
 
             {/* === Modal de confirmación para eliminar producto === */}

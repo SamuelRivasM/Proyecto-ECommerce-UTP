@@ -120,12 +120,13 @@ const Register = () => {
     };
 
     return (
-        <div
+        <main
             className="auth-container"
             style={{
                 backgroundImage: `linear-gradient(rgba(52, 52, 52, 0.5), rgba(52, 52, 52, 0.5)), url(${bgCafe})`,
             }}
         >
+            <h1 className="sr-only">Regístrate - UTP Coffee Point</h1>
             <ToastContainer position="top-center" autoClose={3000} />
             <div className="auth-card login-card">
                 {/* Panel izquierdo */}
@@ -144,48 +145,57 @@ const Register = () => {
 
                     <h2 className="auth-heading">¡Regístrate!</h2>
                     <form onSubmit={handleRegister}>
-                        <label>Nombre:</label>
+                        <label htmlFor="register-nombre">Nombre:</label>
                         <input
+                            id="register-nombre"
                             type="text"
                             placeholder="Tu nombre"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
+                            autoComplete="name"
                             required
                         />
 
-                        <label>Correo UTP:</label>
+                        <label htmlFor="register-email">Correo UTP:</label>
                         <input
+                            id="register-email"
                             type="email"
                             placeholder="correo@utp.edu.pe"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            autoComplete="email"
                             required
                         />
 
-                        <label>Teléfono:</label>
+                        <label htmlFor="register-telefono">Teléfono:</label>
                         <input
+                            id="register-telefono"
                             type="text"
                             placeholder="+51999888777"
                             value={telefono}
                             onChange={(e) => setTelefono(e.target.value)}
+                            autoComplete="tel"
                             required
                         />
 
-                        <label>Contraseña:</label>
+                        <label htmlFor="register-password">Contraseña:</label>
                         <div className="password-input-wrapper">
                             <input
+                                id="register-password"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="********"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="new-password"
                                 required
                             />
                             <button
                                 type="button"
                                 className="password-toggle"
                                 onClick={() => setShowPassword(!showPassword)}
+                                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                             >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                {showPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
                             </button>
                         </div>
 
@@ -208,21 +218,24 @@ const Register = () => {
                             </div>
                         )}
 
-                        <label>Confirmar contraseña:</label>
+                        <label htmlFor="register-confirm-password">Confirmar contraseña:</label>
                         <div className="password-input-wrapper">
                             <input
+                                id="register-confirm-password"
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="********"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
+                                autoComplete="new-password"
                                 required
                             />
                             <button
                                 type="button"
                                 className="password-toggle"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                             >
-                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                {showConfirmPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
                             </button>
                         </div>
 
@@ -247,7 +260,7 @@ const Register = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     );
 };
 

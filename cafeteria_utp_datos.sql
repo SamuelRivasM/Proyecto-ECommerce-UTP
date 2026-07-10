@@ -62,7 +62,7 @@ VALUES
 ('Mix de Frutos Secos', 'Mezcla saludable de frutos secos', 5.00, 'frutos_secos.jpg', 30, 5);
 
 -- ==========================================================
--- PEDIDOS (Enero - Octubre 2025)
+-- PEDIDOS (Enero - Octubre 2026)
 -- ==========================================================
 DELIMITER $$
 
@@ -83,7 +83,7 @@ BEGIN
         SET producto = FLOOR(1 + RAND() * 25);
         SET cantidad = FLOOR(1 + RAND() * 3);
         SET total = cantidad * (SELECT precio FROM productos WHERE id = producto);
-        SET fecha_pedido = DATE_ADD('2025-01-01', INTERVAL FLOOR(RAND() * 288) DAY);
+        SET fecha_pedido = DATE_ADD('2026-01-01', INTERVAL FLOOR(RAND() * 288) DAY);
         SET fecha_entrega = DATE_ADD(fecha_pedido, INTERVAL FLOOR(RAND() * 3) DAY);
         SET metodo = ELT(FLOOR(1 + RAND()*3), 'tarjeta', 'efectivo', 'billetera');
         SET estado = ELT(FLOOR(1 + RAND()*3), 'entregado', 'en preparación', 'listo');

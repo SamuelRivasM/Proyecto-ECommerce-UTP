@@ -2,7 +2,11 @@
 // backend/routes/adminRoutes.js
 const express = require("express");
 const router = express.Router();
+
+const auth = require("../middlewares/auth");
 const adminController = require("../controllers/adminController");
+
+router.use(auth);
 
 // Nuevas rutas independientes
 router.get("/stats/usuarios", adminController.getUsuariosStats);

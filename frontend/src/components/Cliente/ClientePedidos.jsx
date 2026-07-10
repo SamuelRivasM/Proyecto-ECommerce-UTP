@@ -181,6 +181,7 @@ const ClientePedidos = () => {
 
             {/* === Contenido principal === */}
             <div className="container my-4">
+                <h1 className="sr-only">Mis Pedidos - UTP Coffee Point</h1>
                 <h2 className="fw-bold text-center mb-4">Mis Pedidos</h2>
 
                 {/* === Filtro === */}
@@ -191,10 +192,13 @@ const ClientePedidos = () => {
                     <span
                         className="input-group-text bg-white border-end-0"
                         style={{ fontSize: "1.2rem", height: "50px" }}
+                        aria-hidden="true"
                     >
                         🔍
                     </span>
+                    <label htmlFor="pedidos-filtro-criterio" className="sr-only">Filtrar pedidos por</label>
                     <select
+                        id="pedidos-filtro-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -213,7 +217,11 @@ const ClientePedidos = () => {
                         <option value="fecha_creacion">Fecha de Creación</option>
                         <option value="fecha_entrega">Fecha de Entrega</option>
                     </select>
+                    <label htmlFor="pedidos-filtro-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los pedidos" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="pedidos-filtro-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={
@@ -289,6 +297,8 @@ const ClientePedidos = () => {
                     </table>
                 </div>
             </div>
+            <br />
+            <br />
 
             {/* === Modal Detalle === */}
             {showModal && pedidoSeleccionado && (

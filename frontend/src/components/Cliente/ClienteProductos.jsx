@@ -132,6 +132,7 @@ const ClienteProductos = () => {
 
             {/* === Contenido principal === */}
             <section className="container my-5 flex-grow">
+                <h1 className="sr-only">Nuestros Productos - UTP Coffee Point</h1>
                 <h2 className="fw-bold text-center mb-4">Nuestros Productos</h2>
                 <p className="text-center mb-4 text-muted">
                     Explora nuestras opciones deliciosas y realiza tu pedido en línea.
@@ -139,8 +140,10 @@ const ClienteProductos = () => {
 
                 {/* === Filtro === */}
                 <div className="input-group mb-5 shadow-sm" style={{ maxWidth: "650px", margin: "0 auto", height: "50px" }}>
-                    <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }}>🔍</span>
+                    <span className="input-group-text bg-white border-end-0" style={{ fontSize: "1.2rem", height: "50px" }} aria-hidden="true">🔍</span>
+                    <label htmlFor="filtro-criterio" className="sr-only">Filtrar productos por</label>
                     <select
+                        id="filtro-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -155,7 +158,11 @@ const ClienteProductos = () => {
                         <option value="precio">Precio</option>
                         <option value="categoria">Categoría</option>
                     </select>
+                    <label htmlFor="filtro-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los productos" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="filtro-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={criterio === "todos" ? "Mostrar todos" : `Buscar por ${criterio}...`}
@@ -181,23 +188,25 @@ const ClienteProductos = () => {
                                         ) : (
                                             <div className="product-image">Sin imagen</div>
                                         )}
-                                        <div
+                                        <button
+                                            type="button"
                                             className="category-icon"
                                             onClick={() => toggleCategoria(prod.id)}
-                                            style={{ cursor: "pointer" }}
+                                            aria-label={`Categoría: ${prod.categoria || "General"}`}
                                         >
                                             {obtenerIcono(prod.categoria)}
 
                                             {/* Franja deslizante de categoría */}
                                             <div
                                                 className={`categoria-slide ${categoriaVisible === prod.id ? "visible" : ""}`}
+                                                aria-hidden="true"
                                             >
                                                 {prod.categoria}
                                             </div>
-                                        </div>
+                                        </button>
                                     </div>
                                     <div className="card-body text-center">
-                                        <h5 className="fw-bold mb-2">{prod.nombre}</h5>
+                                        <h3 className="fs-5 fw-bold mb-2">{prod.nombre}</h3>
                                         <p className="text-muted mb-3">{prod.descripcion}</p>
                                         <p className="fw-semibold mb-3">S/ {parseFloat(prod.precio).toFixed(2)}</p>
                                         <button
@@ -214,6 +223,8 @@ const ClienteProductos = () => {
                         <p className="text-center text-muted">No se encontraron productos.</p>
                     )}
                 </div>
+                <br />
+                <br />
             </section>
 
             {/* Chatbot de Landbot */}

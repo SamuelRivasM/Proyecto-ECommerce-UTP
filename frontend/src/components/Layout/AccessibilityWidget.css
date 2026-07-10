@@ -1,0 +1,382 @@
+/* src/components/Layout/AccessibilityWidget.css */
+
+/* ==========================================================================
+   Estilos del Widget de Accesibilidad (UI del Panel)
+   ========================================================================== */
+
+/* Contenedor principal flotante */
+.a11y-widget {
+  position: fixed;
+  bottom: 100px;
+  right: 29.5px;
+  z-index: 999999;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+}
+
+/* Botón flotante que abre/cierra el panel */
+.a11y-trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.a11y-trigger:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.a11y-trigger:hover {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.4);
+}
+
+.a11y-trigger.active {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: rotate(45deg);
+}
+
+/* Panel de control */
+.a11y-panel {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 340px;
+  max-width: 90vw;
+  max-height: 70vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: bottom right;
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  pointer-events: none;
+}
+
+.a11y-panel.open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+/* Encabezado del panel */
+.a11y-header {
+  padding: 16px;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.a11y-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.a11y-reset-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.a11y-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Cuerpo del panel */
+.a11y-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Grupos y controles individuales */
+.a11y-section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4b5563;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 4px;
+}
+
+.a11y-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Botones de opción / Toggles */
+.a11y-option-btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
+  min-height: 70px;
+  gap: 6px;
+  outline: none;
+}
+
+.a11y-option-btn:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.a11y-option-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: #4b5563;
+  transition: stroke 0.2s ease;
+}
+
+.a11y-option-btn:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
+}
+
+.a11y-option-btn.active {
+  background: #dbeafe;
+  border-color: #2563eb;
+  color: #1e40af;
+}
+
+.a11y-option-btn.active svg {
+  stroke: #2563eb;
+}
+
+/* Control de fuentes y espaciado */
+.a11y-flex-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.a11y-control-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.a11y-control-card .a11y-control-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* Botones de incremento / decremento */
+.a11y-inc-dec-group {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.a11y-adjust-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background 0.2s;
+  color: #374151;
+}
+
+.a11y-adjust-btn:hover {
+  background: #f3f4f6;
+}
+
+.a11y-adjust-btn:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.a11y-adjust-value {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #f9fafb;
+  border-left: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+/* Pie del panel */
+.a11y-footer {
+  padding: 10px;
+  background: #f3f4f6;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #4b5563;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ==========================================================================
+   Clases Globales de Accesibilidad Inyectadas en el Body
+   ========================================================================== */
+
+/* 1. Monocromo / Escala de Grises */
+body.a11y-grayscale-mode {
+  filter: grayscale(1) !important;
+}
+
+/* 2. Invertir Colores */
+body.a11y-inverted-mode {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+/* Re-invertir imágenes y vídeos para mantener fidelidad visual */
+body.a11y-inverted-mode img,
+body.a11y-inverted-mode video,
+body.a11y-inverted-mode iframe,
+body.a11y-inverted-mode canvas,
+body.a11y-inverted-mode [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg) !important;
+}
+
+/* 3. Alto Contraste (Fondo Negro / Texto Amarillo / Enlaces Celestes) */
+body.a11y-high-contrast-mode {
+  background: #000000 !important;
+  color: #ffff00 !important;
+}
+body.a11y-high-contrast-mode *,
+body.a11y-high-contrast-mode *::before,
+body.a11y-high-contrast-mode *::after {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+body.a11y-high-contrast-mode a,
+body.a11y-high-contrast-mode a *,
+body.a11y-high-contrast-mode button,
+body.a11y-high-contrast-mode button * {
+  color: #00ffff !important;
+  text-decoration: underline !important;
+}
+body.a11y-high-contrast-mode button {
+  border: 2px solid #00ffff !important;
+}
+
+/* 4. Tipografía Legible para Dislexia */
+body.a11y-dyslexic-mode {
+  font-family: 'Comic Sans MS', 'Courier New', sans-serif !important;
+}
+body.a11y-dyslexic-mode * {
+  font-family: 'Comic Sans MS', 'Courier New', sans-serif !important;
+}
+
+/* 5. Espaciado Ampliado (Legibilidad / TDAH) */
+body.a11y-spaced-mode * {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.2em !important;
+  line-height: 1.8 !important;
+}
+
+/* 6. Cursor Grande */
+body.a11y-large-cursor-mode,
+body.a11y-large-cursor-mode * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='%232563eb' stroke='white' stroke-width='2'%3E%3Cpath d='M3 3l7.07 16.97 2.51-6.16 6.16-2.51L3 3z'/%3E%3C/svg%3E"), auto !important;
+}
+
+/* 7. Detener Animaciones y Transiciones */
+body.a11y-stop-animations-mode *,
+body.a11y-stop-animations-mode *::before,
+body.a11y-stop-animations-mode *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* 8. Estilo de lectura de voz (Borde que resalta lo que se lee) */
+.a11y-reading-highlight {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 4px;
+  background-color: rgba(37, 99, 235, 0.08) !important;
+  transition: outline 0.1s ease;
+}
+
+/* 9. Guía de Lectura (Línea Horizontal) */
+.a11y-reading-guide-line {
+  position: fixed;
+  left: 0;
+  width: 100vw;
+  height: 4px;
+  background-color: #e11d48; /* Rojo brillante */
+  z-index: 9999999;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.8);
+}
+
+/* 10. Máscara de Lectura (Foco) */
+.a11y-reading-mask-top,
+.a11y-reading-mask-bottom {
+  position: fixed;
+  left: 0;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999998;
+  pointer-events: none;
+}
+.a11y-reading-mask-top {
+  top: 0;
+}
+.a11y-reading-mask-bottom {
+  bottom: 0;
+}

@@ -37,6 +37,7 @@ import CocinaPedidos from "./components/Cocina/CocinaPedidos";
 // Rutas Globales
 import ContactoSection from "./components/Layout/ContactoSection";
 import LandbotChat from "./components/Layout/LandbotChat";
+import AccessibilityWidget from "./components/Layout/AccessibilityWidget";
 
 // Subcomponente para controlar cuándo se muestra el chatbot
 const ConditionalLandbot = () => {
@@ -67,6 +68,9 @@ function App() {
 
         {/* Render condicional del chatbot */}
         <ConditionalLandbot />
+
+        {/* Widget de Accesibilidad Global */}
+        <AccessibilityWidget />
 
         <Routes>
           {/* Vista de Autenticación */}

@@ -23,6 +23,8 @@ router.get("/cliente", productoController.obtenerProductosDisponibles);
 router.get("/cocina", productoController.obtenerTodosProductos);
 router.post("/upload/:id", upload.single("imagen"), productoController.actualizarImagenProducto);
 router.get("/categorias", productoController.obtenerCategorias);
+router.post("/cocina", productoController.crearProducto);
 router.put("/cocina/:id", productoController.editarProducto);
+router.patch("/cocina/:id/estado", productoController.cambiarEstadoProducto);
 
 module.exports = router;

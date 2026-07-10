@@ -19,37 +19,55 @@ const NavbarGeneral = ({
     // Opciones visibles según el rol (todos aplicados :D)
     const menuPorRol = {
         admin: [
-            { nombre: "Inicio", accion: () => navigate("/admin-dashboard") },
-            { nombre: "Usuarios", accion: () => navigate("/admin-usuarios") },
-            { nombre: "Reportes", accion: () => navigate("/admin-reportes") },
-            { nombre: "Contacto", accion: () => navigate("/contacto") },
+            { nombre: "Inicio", ruta: "/admin-dashboard", accion: () => navigate("/admin-dashboard") },
+            { nombre: "Usuarios", ruta: "/admin-usuarios", accion: () => navigate("/admin-usuarios") },
+            { nombre: "Reportes", ruta: "/admin-reportes", accion: () => navigate("/admin-reportes") },
+            { nombre: "Contacto", ruta: "/contacto", accion: () => navigate("/contacto") },
         ],
         cocina: [
-            { nombre: "Inicio", accion: () => navigate("/cocina-dashboard") },
-            { nombre: "Lista de Pedidos", accion: () => navigate("/cocina-pedidos") },
-            { nombre: "Lista de Productos", accion: () => navigate("/cocina-productos") },
-            { nombre: "Contacto", accion: () => navigate("/contacto") },
+            { nombre: "Inicio", ruta: "/cocina-dashboard", accion: () => navigate("/cocina-dashboard") },
+            { nombre: "Lista de Pedidos", ruta: "/cocina-pedidos", accion: () => navigate("/cocina-pedidos") },
+            { nombre: "Lista de Productos", ruta: "/cocina-productos", accion: () => navigate("/cocina-productos") },
+            { nombre: "Contacto", ruta: "/contacto", accion: () => navigate("/contacto") },
         ],
         cliente: [
-            { nombre: "Inicio", accion: () => navigate("/cliente-dashboard") },
-            { nombre: "Productos", accion: () => navigate("/cliente-productos") },
-            { nombre: "Mis Pedidos", accion: () => navigate("/cliente-pedidos") },
-            { nombre: "Carrito", accion: () => navigate("/cliente-carrito"), esCarrito: true },
-            { nombre: "Contacto", accion: () => navigate("/contacto") },
+            { nombre: "Inicio", ruta: "/cliente-dashboard", accion: () => navigate("/cliente-dashboard") },
+            { nombre: "Productos", ruta: "/cliente-productos", accion: () => navigate("/cliente-productos") },
+            { nombre: "Mis Pedidos", ruta: "/cliente-pedidos", accion: () => navigate("/cliente-pedidos") },
+            { nombre: "Carrito", ruta: "/cliente-carrito", accion: () => navigate("/cliente-carrito"), esCarrito: true },
+            { nombre: "Contacto", ruta: "/contacto", accion: () => navigate("/contacto") },
         ],
     };
 
     const opciones = menuPorRol[rol] || menuPorRol["cliente"];
 
+    const inicioRutaPorRol = {
+        admin: "/admin-dashboard",
+        cocina: "/cocina-dashboard",
+        cliente: "/cliente-dashboard",
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: "#A4001D" }}>
             <div className="container">
-                <Link to="" className="navbar-brand fw-bold" onClick={(e) => { e.preventDefault(); onInicioClick(); }}>
+                <Link
+                    to={inicioRutaPorRol[rol] || "/cliente-dashboard"}
+                    className="navbar-brand fw-bold"
+                    onClick={(e) => { e.preventDefault(); onInicioClick(); }}
+                >
                     UTP COFFEE POINT{" "}
                     {rol !== "cliente" && `- ${rol.charAt(0).toUpperCase() + rol.slice(1)}`}
                 </Link>
 
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Abrir menú de navegación"
+                >
                     <span className="navbar-toggler-icon"></span>
                 </button>
 
@@ -58,7 +76,7 @@ const NavbarGeneral = ({
                         {opciones.map((op, i) => (
                             <li className="nav-item position-relative" key={i}>
                                 <Link
-                                    to=""
+                                    to={op.ruta}
                                     className={`nav-link ${activePage === op.nombre.toLowerCase() ? "active fw-semibold" : ""} d-flex align-items-center gap-1`}
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -71,7 +89,7 @@ const NavbarGeneral = ({
                                             {cartCount > 0 && (
                                                 <span className="carrito-badge">{cartCount}</span>
                                             )}
-                                            <FaShoppingCart size={18} className="me-1" />
+                                            <FaShoppingCart size={18} className="me-1" aria-hidden="true" />
                                             {op.nombre}
                                         </div>
                                     ) : (
@@ -82,8 +100,16 @@ const NavbarGeneral = ({
                         ))}
 
                         <li className="nav-item dropdown ms-3">
-                            <Link to="" className="nav-link dropdown-toggle d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown">
-                                <FaUserCircle size={22} className="me-1" />
+                            <Link
+                                to="#"
+                                className="nav-link dropdown-toggle d-flex align-items-center"
+                                id="userDropdown"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                aria-label="Menú de usuario"
+                            >
+                                <FaUserCircle size={22} className="me-1" aria-hidden="true" />
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><button className="dropdown-item" onClick={onPerfilClick}>Perfil</button></li>

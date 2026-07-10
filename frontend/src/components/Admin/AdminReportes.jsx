@@ -26,6 +26,7 @@ const AdminReportes = () => {
 
             {/* === Contenido principal === */}
             <main className="container py-5">
+                <h1 className="sr-only">Reportes del Sistema - UTP Coffee Point (Admin)</h1>
                 <h2 className="fw-bold mb-4">Reportes del Sistema</h2>
                 <p className="text-muted mb-4">
                     Aquí podrás generar y descargar reportes sobre usuarios, ventas y pedidos.
@@ -35,7 +36,7 @@ const AdminReportes = () => {
                     <div className="col-md-4">
                         <div className="card shadow-sm h-100">
                             <div className="card-body text-center">
-                                <h5 className="card-title">📈 Reporte de Ventas</h5>
+                                <h3 className="fs-5 card-title">📈 Reporte de Ventas</h3>
                                 <p className="text-muted">Resumen mensual de ingresos y ventas totales.</p>
                                 <button className="btn btn-primary fw-bold">Generar PDF</button>
                             </div>
@@ -45,7 +46,7 @@ const AdminReportes = () => {
                     <div className="col-md-4">
                         <div className="card shadow-sm h-100">
                             <div className="card-body text-center">
-                                <h5 className="card-title">👥 Reporte de Usuarios</h5>
+                                <h3 className="fs-5 card-title">👥 Reporte de Usuarios</h3>
                                 <p className="text-muted">Usuarios activos, roles y fechas de registro.</p>
                                 <button className="btn btn-success fw-bold">Generar PDF</button>
                             </div>
@@ -55,7 +56,7 @@ const AdminReportes = () => {
                     <div className="col-md-4">
                         <div className="card shadow-sm h-100">
                             <div className="card-body text-center">
-                                <h5 className="card-title">🛍️ Reporte de Pedidos</h5>
+                                <h3 className="fs-5 card-title">🛍️ Reporte de Pedidos</h3>
                                 <p className="text-muted">Pedidos por estado, método de pago y cliente.</p>
                                 <button className="btn btn-danger fw-bold">Generar PDF</button>
                             </div>
@@ -97,6 +98,8 @@ const AdminReportes = () => {
                         </tbody>
                     </table>
                 </div>
+                <br />
+                <br />
             </main>
 
             {/* Chatbot de Landbot */}

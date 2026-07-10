@@ -9,8 +9,8 @@ import Perfil from "../Layout/Perfil";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "./adminUsuarios.css";
 import useGlobalLogout from "../../hooks/useGlobalLogout";
-
 
 const AdminUsuarios = () => {
     const navigate = useNavigate();
@@ -30,7 +30,16 @@ const AdminUsuarios = () => {
     });
     const [mensaje, setMensaje] = useState("");
 
+    // Estados para el modal de confirmación
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmData, setConfirmData] = useState(null);
+
     const token = localStorage.getItem("token");
+
+    // Obtener datos del usuario logueado
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentUserId = userData.id;
+    const currentUserRol = userData.rol;
 
     const cargarUsuarios = useCallback(async () => {
         try {
@@ -56,8 +65,52 @@ const AdminUsuarios = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Función que realiza el submit real (crear o editar)
+    const realizarSubmit = async (data) => {
+        const { debeLogout, formData: dataForm, modoEdicion: editMode } = data;
+
+        try {
+            if (editMode) {
+                await axios.put(
+                    `${process.env.REACT_APP_API_URL}/admin/editar-usuario/${dataForm.id}`,
+                    dataForm,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setMensaje("Usuario actualizado con éxito");
+            } else {
+                await axios.post(
+                    `${process.env.REACT_APP_API_URL}/admin/crear-usuario`,
+                    dataForm,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setMensaje("Usuario creado correctamente");
+            }
+
+            // Limpiar formulario y recargar lista
+            setFormData({ id: null, nombre: "", email: "", telefono: "", rol: "cliente", password: "" });
+            setModoEdicion(false);
+            await cargarUsuarios();
+
+            // Si cambió su propio rol, forzar logout
+            if (debeLogout) {
+                toast.info("Cambio de rol aplicado. Cerrando sesión...");
+                setTimeout(() => handleLogout(), 500);
+            }
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            const msg = error.response?.data?.message;
+            if (msg === "El teléfono ya está registrado") {
+                toast.error("El teléfono ya está registrado por otro usuario");
+            } else if (msg === "El correo ya está registrado") {
+                toast.error("El correo ya está registrado");
+            } else {
+                toast.error("Ocurrió un error al guardar el usuario");
+            }
+        }
+    };
+
     // Enviar formulario (crear o editar)
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setMensaje("");
 
@@ -66,42 +119,24 @@ const AdminUsuarios = () => {
             return;
         }
 
-        try {
-            if (modoEdicion) {
-                await axios.put(
-                    `${process.env.REACT_APP_API_URL}/admin/editar-usuario/${formData.id}`,
-                    formData,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                setMensaje("Usuario actualizado con éxito");
-            } else {
-                await axios.post(
-                    `${process.env.REACT_APP_API_URL}/admin/crear-usuario`,
-                    formData,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                setMensaje("Usuario creado correctamente");
-            }
-
-            setFormData({ id: null, nombre: "", email: "", telefono: "", rol: "cliente", password: "" });
-            setModoEdicion(false);
-            cargarUsuarios();
-
-        } catch (error) {
-            console.error("Error al guardar:", error);
-
-            const msg = error.response?.data?.message;
-            if (msg === "El teléfono ya está registrado") {
-                toast.error("El teléfono ya está registrado por otro usuario");
-            }
-            else if (msg === "El correo ya está registrado") {
-                toast.error("El correo ya está registrado");
-            }
-            else {
-                toast.error("Ocurrió un error al guardar el usuario");
-            }
+        // --- VALIDACIÓN DE ROL PROPIO ---
+        if (modoEdicion && formData.id === currentUserId && formData.rol !== currentUserRol) {
+            // Abrir el modal de confirmación en lugar de window.confirm
+            setConfirmData({
+                debeLogout: true,
+                formData: { ...formData },
+                modoEdicion: true
+            });
+            setShowConfirmModal(true);
+            return;
         }
 
+        // Si no aplica la condición, ejecutar directamente
+        realizarSubmit({
+            debeLogout: false,
+            formData: { ...formData },
+            modoEdicion
+        });
     };
 
     const editarUsuario = (u) => {
@@ -116,7 +151,6 @@ const AdminUsuarios = () => {
         setModoEdicion(true);
         window.scrollTo(0, 0);
     };
-
 
     const cambiarEstado = async (u) => {
         try {
@@ -152,6 +186,7 @@ const AdminUsuarios = () => {
 
             {/* === Contenido principal === */}
             <main className="container py-5 flex-grow-1">
+                <h1 className="sr-only">Gestión de Usuarios - UTP Coffee Point (Admin)</h1>
 
                 {/* Formulario */}
                 <div className="card shadow p-4 mb-4">
@@ -165,27 +200,28 @@ const AdminUsuarios = () => {
                         <div className="row g-3">
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Nombre *</label>
-                                <input type="text" name="nombre" className="form-control" value={formData.nombre} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-nombre" className="form-label fw-bold">Nombre *</label>
+                                <input id="admin-usuario-nombre" type="text" name="nombre" className="form-control" value={formData.nombre} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Correo *</label>
-                                <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-email" className="form-label fw-bold">Correo *</label>
+                                <input id="admin-usuario-email" type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Teléfono</label>
-                                <input type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} />
+                                <label htmlFor="admin-usuario-telefono" className="form-label fw-bold">Teléfono</label>
+                                <input id="admin-usuario-telefono" type="text" name="telefono" className="form-control" value={formData.telefono} onChange={handleChange} />
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">
+                                <label htmlFor="admin-usuario-password" className="form-label fw-bold">
                                     Contraseña {modoEdicion ? "(opcional)" : "*"}
                                 </label>
 
                                 <div className="input-group">
                                     <input
+                                        id="admin-usuario-password"
                                         type={mostrarPassword ? "text" : "password"}
                                         name="password"
                                         className="form-control"
@@ -198,16 +234,16 @@ const AdminUsuarios = () => {
                                         className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
                                         style={{ height: "38px" }}
                                         onClick={() => setMostrarPassword(!mostrarPassword)}
+                                        aria-label={mostrarPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                                     >
-                                        {mostrarPassword ? <FaEyeSlash /> : <FaEye />}
+                                        {mostrarPassword ? <FaEyeSlash aria-hidden="true" /> : <FaEye aria-hidden="true" />}
                                     </button>
-
                                 </div>
                             </div>
 
                             <div className="col-md-4">
-                                <label className="form-label fw-bold">Rol *</label>
-                                <select name="rol" className="form-select" value={formData.rol} onChange={handleChange}>
+                                <label htmlFor="admin-usuario-rol" className="form-label fw-bold">Rol *</label>
+                                <select id="admin-usuario-rol" name="rol" className="form-select" value={formData.rol} onChange={handleChange}>
                                     <option value="admin">Administrador</option>
                                     <option value="cliente">Cliente</option>
                                     <option value="cocina">Cocina</option>
@@ -235,6 +271,7 @@ const AdminUsuarios = () => {
                         </div>
                     </form>
                 </div>
+
                 {/* Barra de búsqueda */}
                 <div
                     className="input-group mb-4 shadow-sm"
@@ -243,11 +280,14 @@ const AdminUsuarios = () => {
                     <span
                         className="input-group-text bg-white border-end-0"
                         style={{ fontSize: "1.2rem", height: "50px" }}
+                        aria-hidden="true"
                     >
                         🔍
                     </span>
 
+                    <label htmlFor="admin-usuarios-criterio" className="sr-only">Filtrar usuarios por</label>
                     <select
+                        id="admin-usuarios-criterio"
                         className="form-select border-start-0 border-end-0"
                         value={criterio}
                         onChange={(e) => {
@@ -264,7 +304,11 @@ const AdminUsuarios = () => {
                         <option value="rol">Rol</option>
                     </select>
 
+                    <label htmlFor="admin-usuarios-valor" className="sr-only">
+                        {criterio === "todos" ? "Mostrar todos los usuarios" : `Buscar por ${criterio}`}
+                    </label>
                     <input
+                        id="admin-usuarios-valor"
                         type="text"
                         className="form-control border-start-0"
                         placeholder={
@@ -297,19 +341,21 @@ const AdminUsuarios = () => {
                             {usuariosFiltrados.length > 0 ? (
                                 usuariosFiltrados.map((u) => (
                                     <tr key={u.id}>
-                                        <td>{u.id}</td>
-                                        <td>{u.nombre}</td>
-                                        <td>{u.email}</td>
-                                        <td>{u.telefono}</td>
-                                        <td className="text-capitalize">{u.rol}</td>
-                                        <td>{u.fecha_registro}</td>
-                                        <td>{u.ultimo_login || "—"}</td>
-                                        <td>
+                                        <td data-label="ID:">{u.id}</td>
+                                        <td data-label="Nombre:">{u.nombre}</td>
+                                        <td data-label="Email:">{u.email}</td>
+                                        <td data-label="Teléfono:">{u.telefono}</td>
+                                        <td className="text-capitalize" data-label="Rol:">
+                                            {u.rol}
+                                        </td>
+                                        <td data-label="Fecha de Registro:">{u.fecha_registro}</td>
+                                        <td data-label="Último Login:">{u.ultimo_login || "—"}</td>
+                                        <td data-label="Estado:">
                                             <span className={`badge ${u.estado ? "bg-success" : "bg-secondary"}`}>
                                                 {u.estado ? "Activo" : "Inactivo"}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Acciones:">
                                             <button className="btn btn-sm btn-warning me-2" onClick={() => editarUsuario(u)}>
                                                 Editar
                                             </button>
@@ -329,12 +375,48 @@ const AdminUsuarios = () => {
                     </table>
                 </div>
 
+                <br />
+                <br />
             </main>
 
             <LandbotChat />
             <FooterGeneral />
 
             {showPerfil && <Perfil onClose={() => setShowPerfil(false)} />}
+
+            {/* Modal de confirmación personalizado */}
+            {showConfirmModal && (
+                <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h4 className="modal-title">⚠️ Advertencia importante</h4>
+                        <div className="modal-body">
+                            <p>
+                                Estás cambiando <strong>tu propio rol</strong> de <span className="badge bg-secondary">{currentUserRol}</span> a <span className="badge bg-primary">{formData.rol}</span>.
+                            </p>
+                            <p className="text-danger fw-bold">
+                                Perderás acceso de administrador y tu sesión se cerrará automáticamente.
+                            </p>
+                            <p className="mb-0">¿Estás seguro de continuar?</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn btn-danger"
+                                onClick={() => {
+                                    setShowConfirmModal(false);
+                                    if (confirmData) {
+                                        realizarSubmit(confirmData);
+                                    }
+                                }}
+                            >
+                                Sí, continuar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

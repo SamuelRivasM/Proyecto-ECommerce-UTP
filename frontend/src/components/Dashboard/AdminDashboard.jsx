@@ -7,6 +7,7 @@ import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import { toast } from "react-toastify";
+import "../Admin/adminUsuarios.css";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -182,6 +183,7 @@ const AdminDashboard = () => {
 
       {/* === Contenido principal === */}
       <main className="container my-5 flex-grow">
+        <h1 className="sr-only">Panel de Administración - UTP Coffee Point</h1>
         <h2 className="fw-bold mb-4">Panel de Administración</h2>
 
         {/* === Tarjetas de estadísticas === */}
@@ -190,8 +192,8 @@ const AdminDashboard = () => {
           <div className="col-md-4">
             <div className="card shadow-sm text-center">
               <div className="card-body">
-                <h5 className="card-title">Usuarios Registrados</h5>
-                <p className="display-6 fw-bold">{stats.totalUsuarios}</p>
+                <h3 className="fs-5 card-title">Usuarios Registrados</h3>
+                <h4 className="display-6 fw-bold">{stats.totalUsuarios}</h4>
                 <small>
                   Clientes: {stats.clientes} | Cocina: {stats.cocina} | Admins: {stats.admins}
                 </small>
@@ -204,11 +206,12 @@ const AdminDashboard = () => {
             <div className="card shadow-sm text-center position-relative">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                  <h5 className="card-title mb-0">Cantidad de Pedidos</h5>
+                  <h3 className="fs-5 card-title mb-0" id="admin-pedidos-label">Cantidad de Pedidos</h3>
                   <select
                     className="form-select form-select-sm w-auto"
                     value={filtroPedidos}
                     onChange={(e) => setFiltroPedidos(e.target.value)}
+                    aria-labelledby="admin-pedidos-label"
                   >
                     {opcionesFiltro.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -217,7 +220,7 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <p className="display-6 fw-bold">{stats.pedidosMes}</p>
+                <h4 className="display-6 fw-bold">{stats.pedidosMes}</h4>
                 <small>Periodo: {filtroPedidos}</small>
               </div>
             </div>
@@ -228,11 +231,12 @@ const AdminDashboard = () => {
             <div className="card shadow-sm text-center position-relative">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                  <h5 className="card-title mb-0">Ventas Totales</h5>
+                  <h3 className="fs-5 card-title mb-0" id="admin-ventas-label">Ventas Totales</h3>
                   <select
                     className="form-select form-select-sm w-auto"
                     value={filtroVentas}
                     onChange={(e) => setFiltroVentas(e.target.value)}
+                    aria-labelledby="admin-ventas-label"
                   >
                     {opcionesFiltro.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -241,7 +245,7 @@ const AdminDashboard = () => {
                     ))}
                   </select>
                 </div>
-                <p className="display-6 fw-bold">S/ {stats.ventasMes}</p>
+                <h4 className="display-6 fw-bold">S/ {stats.ventasMes}</h4>
                 <small>Periodo: {filtroVentas}</small>
               </div>
             </div>
@@ -251,11 +255,12 @@ const AdminDashboard = () => {
         {/* === Productos más vendidos === */}
         <div className="mb-5">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="mb-0">Productos más vendidos</h4>
+            <h4 className="mb-0" id="admin-productos-label">Productos más vendidos</h4>
             <select
               className="form-select form-select-sm w-auto"
               value={filtroProductos}
               onChange={(e) => setFiltroProductos(e.target.value)}
+              aria-labelledby="admin-productos-label"
             >
               {opcionesFiltro.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -276,8 +281,8 @@ const AdminDashboard = () => {
               {productosTop.length > 0 ? (
                 productosTop.map((p, i) => (
                   <tr key={i}>
-                    <td>{p.nombre}</td>
-                    <td>{p.cantidad}</td>
+                    <td data-label="Producto:">{p.nombre}</td>
+                    <td data-label="Ventas:">{p.cantidad}</td>
                   </tr>
                 ))
               ) : (
@@ -307,10 +312,10 @@ const AdminDashboard = () => {
               {usuariosRecientes.length > 0 ? (
                 usuariosRecientes.map((u, i) => (
                   <tr key={i}>
-                    <td>{u.nombre}</td>
-                    <td>{u.email}</td>
-                    <td>{u.rol}</td>
-                    <td>{new Date(u.fecha_registro).toLocaleDateString("es-PE")}</td>
+                    <td data-label="Nombre:">{u.nombre}</td>
+                    <td data-label="Email:">{u.email}</td>
+                    <td data-label="Rol:">{u.rol}</td>
+                    <td data-label="Fecha de Registro:">{new Date(u.fecha_registro).toLocaleDateString("es-PE")}</td>
                   </tr>
                 ))
               ) : (
@@ -323,6 +328,8 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
+        <br />
+        <br />
       </main>
 
       {/* Footer */}
