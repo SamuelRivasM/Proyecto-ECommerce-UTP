@@ -7,8 +7,8 @@
 /* Contenedor principal flotante */
 .a11y-widget {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 100px;
+  right: 29.5px;
   z-index: 999999;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #333;
@@ -53,7 +53,7 @@
   right: 0;
   width: 340px;
   max-width: 90vw;
-  max-height: 80vh;
+  max-height: 70vh;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
