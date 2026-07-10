@@ -88,14 +88,27 @@ const CocinaProductos = () => {
 
     // Función para Guardar luego de Editar
     const handleGuardarCambios = async () => {
+        // Validación de precio
+        const precioNum = Number(productoEdit.precio);
+        if (isNaN(precioNum) || precioNum <= 0) {
+            toast.warning("El precio debe ser un número mayor a 0");
+            return;
+        }
+        // Validación de stock (opcional, pero evita negativos)
+        const stockNum = Number(productoEdit.stock);
+        if (isNaN(stockNum) || stockNum < 0) {
+            toast.warning("El stock no puede ser negativo");
+            return;
+        }
+
         try {
             await axios.put(
                 `${process.env.REACT_APP_API_URL}/productos/cocina/${productoEdit.id}`,
                 {
                     nombre: productoEdit.nombre,
                     descripcion: productoEdit.descripcion,
-                    precio: productoEdit.precio,
-                    stock: productoEdit.stock,
+                    precio: precioNum,
+                    stock: stockNum,
                     categoria_id: categorias.find(c => c.nombre === productoEdit.categoria)?.id
                 }
             );
@@ -116,27 +129,41 @@ const CocinaProductos = () => {
     };
 
     // Función para Crear Producto
+    // Función para Crear Producto
     const handleCrearProducto = async () => {
         if (!nuevoProducto.nombre || !nuevoProducto.precio) {
             toast.warning("Nombre y precio son obligatorios");
             return;
         }
 
+        const precioNum = Number(nuevoProducto.precio);
+        if (isNaN(precioNum) || precioNum <= 0) {
+            toast.warning("El precio debe ser un número mayor a 0");
+            return;
+        }
+
+        const stockNum = Number(nuevoProducto.stock);
+        if (isNaN(stockNum) || stockNum < 0) {
+            toast.warning("El stock no puede ser negativo");
+            return;
+        }
+
         try {
+            // 1. Crear el producto
             const response = await axios.post(
                 `${process.env.REACT_APP_API_URL}/productos/cocina`,
                 {
                     nombre: nuevoProducto.nombre,
                     descripcion: nuevoProducto.descripcion,
-                    precio: nuevoProducto.precio,
-                    stock: nuevoProducto.stock,
+                    precio: precioNum,
+                    stock: stockNum,
                     categoria_id: categorias.find(c => c.nombre === nuevoProducto.categoria)?.id
                 }
             );
 
             const nuevoId = response.data.id;
 
-            // Si se seleccionó una imagen, se sube al producto recién creado
+            // 2. Si hay imagen, subirla
             if (imagenNueva && nuevoId) {
                 const formData = new FormData();
                 formData.append("imagen", imagenNueva);
@@ -153,15 +180,18 @@ const CocinaProductos = () => {
                 }
             }
 
+            // 3. Refrescar la lista de productos desde el servidor
             const productosActualizados = await axios.get(`${process.env.REACT_APP_API_URL}/productos/cocina`);
             setProductos(productosActualizados.data);
 
+            // 4. Limpiar y cerrar modal
             toast.success("Producto creado correctamente");
             setMostrarModalCrear(false);
             setNuevoProducto({ nombre: "", descripcion: "", precio: "", stock: "", categoria: "" });
-            setImagenNueva(null);
+            setImagenNueva(null); // Limpiar también la imagen seleccionada
+
         } catch (error) {
-            console.error(error);
+            console.error("Error al crear producto:", error);
             toast.error("Error al crear producto");
         }
     };
@@ -385,6 +415,7 @@ const CocinaProductos = () => {
                 </div>
             </div>
 
+            {/* Modal para editar producto */}
             {productoEdit && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -401,12 +432,12 @@ const CocinaProductos = () => {
                             onChange={(e) => setProductoEdit(prev => ({ ...prev, descripcion: e.target.value }))} />
 
                         <label>Precio (S/)</label>
-                        <input type="number" className="form-control mb-2"
+                        <input type="number" step="0.01" min="0.01" className="form-control mb-2"
                             value={productoEdit.precio}
                             onChange={(e) => setProductoEdit(prev => ({ ...prev, precio: e.target.value }))} />
 
                         <label>Stock</label>
-                        <input type="number" className="form-control mb-2"
+                        <input type="number" min="0" className="form-control mb-2"
                             value={productoEdit.stock}
                             onChange={(e) => setProductoEdit(prev => ({ ...prev, stock: e.target.value }))} />
 
@@ -453,13 +484,10 @@ const CocinaProductos = () => {
                         />
 
                         <label htmlFor="nuevo-producto-precio" className="form-label">Precio (S/)</label>
-                        <input
+                        <input type="number" step="0.01" min="0.01" className="form-control mb-2"
                             id="nuevo-producto-precio"
-                            type="number"
-                            className="form-control mb-2"
                             value={nuevoProducto.precio}
-                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio: e.target.value }))}
-                        />
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, precio: e.target.value }))} />
 
                         <label htmlFor="nuevo-producto-imagen" className="form-label">Imagen</label>
                         <input
@@ -471,13 +499,10 @@ const CocinaProductos = () => {
                         />
 
                         <label htmlFor="nuevo-producto-stock" className="form-label">Stock</label>
-                        <input
+                        <input type="number" min="0" className="form-control mb-1"
                             id="nuevo-producto-stock"
-                            type="number"
-                            className="form-control mb-1"
                             value={nuevoProducto.stock}
-                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))}
-                        />
+                            onChange={(e) => setNuevoProducto(prev => ({ ...prev, stock: e.target.value }))} />
                         <small className={`d-block mb-2 fw-semibold ${Number(nuevoProducto.stock) > 0 ? "text-success" : "text-danger"}`}>
                             Estado: {Number(nuevoProducto.stock) > 0 ? "Activo" : "Inactivo"} (según el stock)
                         </small>

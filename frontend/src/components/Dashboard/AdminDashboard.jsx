@@ -7,6 +7,7 @@ import Perfil from "../Layout/Perfil";
 import NavbarGeneral from "../Layout/NavbarGeneral";
 import FooterGeneral from "../Layout/FooterGeneral";
 import { toast } from "react-toastify";
+import "../Admin/adminUsuarios.css";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -280,8 +281,8 @@ const AdminDashboard = () => {
               {productosTop.length > 0 ? (
                 productosTop.map((p, i) => (
                   <tr key={i}>
-                    <td>{p.nombre}</td>
-                    <td>{p.cantidad}</td>
+                    <td data-label="Producto:">{p.nombre}</td>
+                    <td data-label="Ventas:">{p.cantidad}</td>
                   </tr>
                 ))
               ) : (
@@ -311,10 +312,10 @@ const AdminDashboard = () => {
               {usuariosRecientes.length > 0 ? (
                 usuariosRecientes.map((u, i) => (
                   <tr key={i}>
-                    <td>{u.nombre}</td>
-                    <td>{u.email}</td>
-                    <td>{u.rol}</td>
-                    <td>{new Date(u.fecha_registro).toLocaleDateString("es-PE")}</td>
+                    <td data-label="Nombre:">{u.nombre}</td>
+                    <td data-label="Email:">{u.email}</td>
+                    <td data-label="Rol:">{u.rol}</td>
+                    <td data-label="Fecha de Registro:">{new Date(u.fecha_registro).toLocaleDateString("es-PE")}</td>
                   </tr>
                 ))
               ) : (
