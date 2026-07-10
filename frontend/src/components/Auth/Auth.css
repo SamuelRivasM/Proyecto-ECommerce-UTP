@@ -1,11 +1,15 @@
-
 /* src/Auth/Auth.css */
 /* Fondo café */
 .auth-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+    background-position: center;
+    background-size: cover;
+    overflow-y: auto;
 }
 
 /* Card general */
@@ -20,10 +24,11 @@
 
 /* Versión login con panel doble */
 .login-card {
+    width: min(960px, 100%);
+    min-height: 560px;
     display: flex;
-    width: 850px;
     padding: 0;
-    text-align: left;
+    overflow: hidden;
 }
 
 /* Panel izquierdo */
@@ -77,14 +82,16 @@
 
 /* Panel derecho */
 .auth-right {
-    flex: 1.2;
-    padding: 40px;
+    flex: 1;
+    padding: 28px 34px;
+
 }
 
 /* Titulos */
 .auth-heading {
-    margin-bottom: 20px;
-    font-size: 26px;
+    font-size: 2rem;
+    margin-top: 5px;
+    margin-bottom: 14px;
     font-weight: bold;
     color: #5c4033;
 }
@@ -109,28 +116,27 @@ form {
 }
 
 label {
-    margin: 10px 0 5px;
+    margin: 8px 0 5px;
     text-align: left;
     font-weight: bold;
     color: #333;
 }
 
-input {
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #aaa;
-    margin-bottom: 15px;
-    outline: none;
-    font-size: 14px;
+input,
+.auth-select {
+    height: 44px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-size: .95rem;
 }
 
 .auth-btn {
     background: #a0001e;
     color: white;
-    padding: 12px;
+    padding: 8px;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     transition: background 0.3s;
 }
@@ -141,7 +147,7 @@ input {
 
 /* Links */
 .auth-links {
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 14px;
     text-align: center;
 }
@@ -153,47 +159,6 @@ input {
 
 .auth-links a:hover {
     text-decoration: underline;
-}
-
-/* Responsividad */
-@media (max-width: 768px) {
-    .login-card {
-        flex-direction: column;
-        width: 95%;
-        max-width: 450px;
-    }
-
-    .auth-left {
-        display: none;
-    }
-
-    .auth-right {
-        flex: 1;
-        padding: 30px 20px;
-        border-radius: 12px;
-        text-align: center;
-    }
-
-    .auth-heading {
-        font-size: 22px;
-    }
-
-    input {
-        font-size: 15px;
-    }
-
-    .auth-btn {
-        font-size: 15px;
-        padding: 10px;
-    }
-
-    /* Overlay móvil visible solo aquí */
-    .auth-overlay-mobile {
-        display: block;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-    }
 }
 
 .auth-overlay-mobile {
@@ -259,8 +224,8 @@ select.auth-select {
 }
 
 select.auth-select:focus {
-    border-color: #a0001e;
-    box-shadow: 0 0 5px rgba(160, 0, 30, 0.3);
+    border-color: #000000;
+    border-width: 2px;
 }
 
 /* Flechita personalizada */
@@ -378,4 +343,103 @@ select.auth-select:focus {
     margin: 5px 0 10px 0;
     color: #dc3545;
     font-size: 12px;
+}
+
+/* Responsividad */
+@media (max-width:992px) {
+
+    .login-card {
+
+        width: 100%;
+
+    }
+
+    .auth-left {
+
+        flex: .9;
+
+    }
+
+    .auth-right {
+
+        flex: 1.1;
+
+        padding: 24px;
+
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .login-card {
+
+        flex-direction: column;
+
+        width: 100%;
+
+        max-width: 430px;
+
+    }
+
+    .auth-left {
+
+        display: none;
+
+    }
+
+    .auth-right {
+
+        padding: 24px;
+
+    }
+
+    .auth-overlay-mobile {
+
+        display: block;
+
+    }
+
+}
+
+@media (max-width:480px) {
+
+    .auth-container {
+
+        padding: 10px;
+
+    }
+
+    .auth-card {
+
+        width: 100%;
+
+        padding: 20px;
+
+    }
+
+    .auth-right {
+
+        padding: 20px;
+
+    }
+
+    .auth-heading {
+
+        font-size: 1.7rem;
+
+    }
+
+    input {
+
+        height: 42px;
+
+    }
+
+    .auth-btn {
+
+        height: 44px;
+
+    }
+
 }

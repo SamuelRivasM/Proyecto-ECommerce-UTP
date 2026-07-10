@@ -297,6 +297,8 @@ const ClientePedidos = () => {
                     </table>
                 </div>
             </div>
+            <br />
+            <br />
 
             {/* === Modal Detalle === */}
             {showModal && pedidoSeleccionado && (

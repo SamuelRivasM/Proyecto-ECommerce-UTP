@@ -327,6 +327,8 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
+        <br />
+        <br />
       </main>
 
       {/* Footer */}

@@ -223,6 +223,8 @@ const ClienteProductos = () => {
                         <p className="text-center text-muted">No se encontraron productos.</p>
                     )}
                 </div>
+                <br />
+                <br />
             </section>
 
             {/* Chatbot de Landbot */}

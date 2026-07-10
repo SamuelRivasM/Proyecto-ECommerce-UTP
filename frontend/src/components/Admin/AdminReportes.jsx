@@ -98,6 +98,8 @@ const AdminReportes = () => {
                         </tbody>
                     </table>
                 </div>
+                <br />
+                <br />
             </main>
 
             {/* Chatbot de Landbot */}

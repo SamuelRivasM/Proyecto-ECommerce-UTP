@@ -690,6 +690,8 @@ const ClienteCarrito = () => {
                         </button>
                     </div>
                 </div>
+                <br />
+                <br />
             </section>
 
             {/* === Modal de confirmación para eliminar producto === */}

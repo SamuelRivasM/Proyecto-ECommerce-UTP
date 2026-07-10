@@ -42,11 +42,28 @@
    ================================ */
 
 /* Asegura que el contenido no quede oculto detrás del footer fijo */
-body {
+html,
+body,
+#root {
+  height: 100%;
   margin: 0;
-  padding-bottom: 40px;
-  background-color: #faf7f5;
 }
+
+body {
+  background: #faf7f5;
+  padding-bottom:55px;
+}
+
+.app-layout{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.app-content{
+  flex:1;
+}
+
 .Toastify__toast-container {
   z-index: 9999 !important;
 }

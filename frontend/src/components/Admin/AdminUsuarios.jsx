@@ -339,6 +339,8 @@ const AdminUsuarios = () => {
                     </table>
                 </div>
 
+                <br />
+                <br />
             </main>
 
             <LandbotChat />
