@@ -1,5 +1,6 @@
 /* src/Cocina/cocinaProductos.css */
 
+/* ======== Estilos base de tabla (sin cambios) ======== */
 .table-container {
   overflow-x: auto;
   background: white;
@@ -8,7 +9,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* ======== Estilos base de tabla ======== */
 .table th,
 .table td {
   vertical-align: middle !important;
@@ -49,7 +49,6 @@
   color: white !important;
 }
 
-/* ======== Botones de acciones ======== */
 .action-buttons {
   display: flex;
   justify-content: center;
@@ -70,7 +69,6 @@
   justify-content: center;
 }
 
-/* ======== Input y paginación ======== */
 .filter-input {
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -104,32 +102,136 @@
   background: #ddd;
 }
 
+/* ======== MODALES ESPECÍFICOS PARA COCINA (con overlay) ======== */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 9999;
+  padding: 1rem;
+  animation: fadeInOverlay 0.25s ease;
 }
 
-.modal-content {
-  background: white;
-  padding: 20px;
+/* Ahora todos los estilos de .modal-content están bajo .modal-overlay */
+.modal-overlay .modal-content {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.8rem 2rem;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-overlay .modal-content h5 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #1a1a1a;
+  border-bottom: 2px solid #a4001d;
+  padding-bottom: 0.5rem;
+}
+
+.modal-overlay .modal-content label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.modal-overlay .modal-content .form-control,
+.modal-overlay .modal-content .form-select {
   border-radius: 8px;
-  width: 400px;
-  max-width: 95%;
+  border: 1px solid #ced4da;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.15s ease;
 }
 
-/* ======== DISEÑO RESPONSIVO ======== */
+.modal-overlay .modal-content .form-control:focus,
+.modal-overlay .modal-content .form-select:focus {
+  border-color: #a4001d;
+  box-shadow: 0 0 0 3px rgba(164, 0, 29, 0.15);
+}
+
+.modal-overlay .modal-content textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-overlay .modal-content small {
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.modal-overlay .modal-content .d-flex.gap-3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.2rem;
+}
+
+.modal-overlay .modal-content .btn {
+  flex: 1 1 auto;
+  min-width: 100px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-overlay .modal-content .btn-success {
+  background: #28a745;
+  border: none;
+  color: #fff;
+}
+
+.modal-overlay .modal-content .btn-success:hover {
+  background: #218838;
+}
+
+.modal-overlay .modal-content .btn-danger {
+  background: #dc3545;
+  border: none;
+  color: #fff;
+}
+
+.modal-overlay .modal-content .btn-danger:hover {
+  background: #c82333;
+}
+
+/* Animaciones */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ======== RESPONSIVE ======== */
 @media (max-width: 992px) {
   .table thead {
     display: none;
   }
-
   .table,
   .table tbody,
   .table tr,
@@ -137,7 +239,6 @@
     display: block;
     width: 100%;
   }
-
   .table tr {
     margin-bottom: 16px;
     border: 1px solid #ddd;
@@ -145,7 +246,6 @@
     padding: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   }
-
   .table td {
     text-align: left;
     padding: 10px;
@@ -153,7 +253,6 @@
     white-space: normal;
     height: auto;
   }
-
   .table td::before {
     content: attr(data-label);
     font-weight: bold;
@@ -161,19 +260,16 @@
     display: block;
     margin-bottom: 4px;
   }
-
   .table img {
     width: 80px;
     height: 80px;
     margin: 0 auto;
   }
-
   .action-buttons {
     justify-content: flex-start;
     min-height: auto;
     height: auto;
   }
-
   .action-buttons button {
     flex: unset;
     min-width: auto;
@@ -187,27 +283,22 @@
   .table-container {
     padding: 10px;
   }
-
   .table tr {
     padding: 8px;
   }
-
   .table td {
     font-size: 13px;
     padding: 8px;
   }
-
   .filter-input {
     width: 100%;
     margin-bottom: 10px;
   }
-
   .action-buttons {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-
   .action-buttons button {
     width: 100%;
     font-size: 12px;
@@ -215,179 +306,31 @@
   }
 }
 
-/* ============================================================
-   MODALES RESPONSIVOS (Crear y Editar Producto)
-   ============================================================ */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  /* equivale a top:0; left:0; width:100%; height:100% */
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 1rem;
-  animation: fadeInOverlay 0.25s ease;
-}
-
-.modal-content {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 1.8rem 2rem;
-  max-width: 520px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
-}
-
-/* Título del modal */
-.modal-content h5 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  color: #1a1a1a;
-  border-bottom: 2px solid #a4001d;
-  padding-bottom: 0.5rem;
-}
-
-/* Etiquetas */
-.modal-content label {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #333;
-  margin-top: 0.5rem;
-  display: block;
-}
-
-/* Campos de entrada */
-.modal-content .form-control,
-.modal-content .form-select {
-  border-radius: 8px;
-  border: 1px solid #ced4da;
-  padding: 0.6rem 0.75rem;
-  font-size: 0.95rem;
-  width: 100%;
-  transition: border-color 0.15s ease;
-}
-
-.modal-content .form-control:focus,
-.modal-content .form-select:focus {
-  border-color: #a4001d;
-  box-shadow: 0 0 0 3px rgba(164, 0, 29, 0.15);
-}
-
-/* Textarea */
-.modal-content textarea.form-control {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* Mensaje de estado del stock (small) */
-.modal-content small {
-  font-size: 0.85rem;
-  margin-top: 0.2rem;
-  display: block;
-}
-
-/* Contenedor de botones */
-.modal-content .d-flex.gap-3 {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid #eee;
-  padding-top: 1.2rem;
-}
-
-.modal-content .btn {
-  flex: 1 1 auto;
-  min-width: 100px;
-  padding: 0.6rem 1.2rem;
-  font-weight: 600;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.modal-content .btn-success {
-  background: #28a745;
-  border: none;
-  color: #fff;
-}
-
-.modal-content .btn-success:hover {
-  background: #218838;
-}
-
-.modal-content .btn-danger {
-  background: #dc3545;
-  border: none;
-  color: #fff;
-}
-
-.modal-content .btn-danger:hover {
-  background: #c82333;
-}
-
-/* Animaciones */
-@keyframes fadeInOverlay {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* ============================================================
-   RESPONSIVE: PANTALLAS PEQUEÑAS (móviles)
-   ============================================================ */
+/* Modales responsivos */
 @media (max-width: 576px) {
-  .modal-content {
+  .modal-overlay .modal-content {
     padding: 1.2rem 1.2rem;
     max-width: 100%;
     border-radius: 12px;
     max-height: 95vh;
   }
-
-  .modal-content h5 {
+  .modal-overlay .modal-content h5 {
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
-
-  .modal-content .form-control,
-  .modal-content .form-select {
+  .modal-overlay .modal-content .form-control,
+  .modal-overlay .modal-content .form-select {
     font-size: 0.9rem;
     padding: 0.5rem 0.6rem;
   }
-
-  .modal-content label {
+  .modal-overlay .modal-content label {
     font-size: 0.85rem;
   }
-
-  /* Botones en columna en móviles */
-  .modal-content .d-flex.gap-3 {
+  .modal-overlay .modal-content .d-flex.gap-3 {
     flex-direction: column;
     gap: 0.5rem;
   }
-
-  .modal-content .btn {
+  .modal-overlay .modal-content .btn {
     width: 100%;
     min-width: unset;
     padding: 0.7rem;
@@ -395,16 +338,12 @@
   }
 }
 
-/* ============================================================
-   RESPONSIVE: PANTALLAS MEDIANAS (tablets)
-   ============================================================ */
 @media (min-width: 577px) and (max-width: 768px) {
-  .modal-content {
+  .modal-overlay .modal-content {
     padding: 1.5rem 1.8rem;
     max-width: 90%;
   }
-
-  .modal-content .btn {
+  .modal-overlay .modal-content .btn {
     min-width: 90px;
     padding: 0.5rem 1rem;
   }

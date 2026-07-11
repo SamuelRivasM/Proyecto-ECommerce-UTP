@@ -414,6 +414,8 @@ const CocinaProductos = () => {
                     </div>
                 </div>
             </div>
+            <br />
+            <br />
 
             {/* Modal para editar producto */}
             {productoEdit && (
@@ -462,6 +464,7 @@ const CocinaProductos = () => {
                 </div>
             )}
 
+            {/* Modal para crear producto */}
             {mostrarModalCrear && (
                 <div className="modal-overlay">
                     <div className="modal-content">

@@ -79,7 +79,7 @@
 .modal-dialog {
     max-width: 900px !important;
 }
-.modal-content {
+.modal-overlay .modal-content {
     border-radius: 12px;
 }
 

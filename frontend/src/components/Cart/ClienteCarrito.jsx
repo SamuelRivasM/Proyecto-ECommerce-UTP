@@ -252,17 +252,8 @@ const ClienteCarrito = () => {
         if (carrito.length === 0) return toast.warning("El carrito está vacío.");
         if (!fechaEntrega) return toast.warning("Debe seleccionar la hora de entrega.");
 
-        if (metodoPago === "billetera") {
-            if (parseFloat(total) > 0) {
-                // Si es Billetera Digital y el total es > 0, abrir el modal QR
-                setShowQrModal(true);
-                return;
-            } else {
-                return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
-            }
-        }
         try {
-            // Verificar stock
+            // Verificar stock (para todos los métodos de pago, incluida Billetera Digital)
             const verificarRes = await axios.post(
                 `${process.env.REACT_APP_API_URL}/pedidos/cliente/verificar-stock`,
                 { carrito }
@@ -272,6 +263,17 @@ const ClienteCarrito = () => {
                 toast.error("Error al verificar stock.");
                 return;
             }
+
+            if (metodoPago === "billetera") {
+                if (parseFloat(total) > 0) {
+                    // Si es Billetera Digital y el total es > 0, abrir el modal QR
+                    setShowQrModal(true);
+                    return;
+                } else {
+                    return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
+                }
+            }
+
             setConfirmSwitch(false);
             // Abrir el modal de Confirmación para Efectivo/Tarjeta
             setShowConfirmModal(true);
@@ -698,10 +700,10 @@ const ClienteCarrito = () => {
             {showDeleteModal && productoAEliminar && (
                 <>
                     <div className="modal show d-block" tabIndex="-1">
-                        <div className="modal-dialog modal-dialog-centered">
+                        <div className="custom-modal-backdrop">
                             <div className="modal-content">
                                 <div className="modal-header bg-danger text-white">
-                                    <h5 className="modal-title">
+                                    <h5 className="fs-5 fw-bold w-100">
                                         Confirmar eliminación
                                     </h5>
                                 </div>
@@ -745,10 +747,10 @@ const ClienteCarrito = () => {
             {showQrModal && (
                 <>
                     <div className="modal show d-block" tabIndex="-1">
-                        <div className="modal-dialog modal-dialog-centered modal-sm">
+                        <div className="custom-modal-backdrop">
                             <div className="modal-content text-center">
                                 <div className="modal-header bg-danger text-white border-0 p-3">
-                                    <h5 className="modal-title fs-5 fw-bold w-100">
+                                    <h5 className="fs-5 fw-bold w-100">
                                         Pago con Billetera Digital
                                     </h5>
                                     <button
@@ -807,10 +809,10 @@ const ClienteCarrito = () => {
             {/* === Modal de Confirmación (advertencia) === */}
             {showConfirmModal && (
                 <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-dialog-centered">
+                    <div className="custom-modal-backdrop">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Confirmación del Pedido</h5>
+                                <h5 className="fs-5 fw-bold w-100">Confirmación del Pedido</h5>
                                 <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)} />
                             </div>
                             <div className="modal-body">
@@ -864,10 +866,10 @@ const ClienteCarrito = () => {
             {/* === Modal de Progreso WebSocket === */}
             {showProgressModal && (
                 <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-sm modal-dialog-centered">
+                    <div className="custom-modal-backdrop">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Enviando pedido...</h5>
+                                <h5 className="fs-5 fw-bold w-100">Enviando pedido...</h5>
                             </div>
                             <div className="modal-body">
                                 <p className="mb-2">Procesando pedido. Esto puede tardar unos segundos.</p>
