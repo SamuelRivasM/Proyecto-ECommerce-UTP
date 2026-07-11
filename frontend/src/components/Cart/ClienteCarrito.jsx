@@ -252,17 +252,8 @@ const ClienteCarrito = () => {
         if (carrito.length === 0) return toast.warning("El carrito está vacío.");
         if (!fechaEntrega) return toast.warning("Debe seleccionar la hora de entrega.");
 
-        if (metodoPago === "billetera") {
-            if (parseFloat(total) > 0) {
-                // Si es Billetera Digital y el total es > 0, abrir el modal QR
-                setShowQrModal(true);
-                return;
-            } else {
-                return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
-            }
-        }
         try {
-            // Verificar stock
+            // Verificar stock (para todos los métodos de pago, incluida Billetera Digital)
             const verificarRes = await axios.post(
                 `${process.env.REACT_APP_API_URL}/pedidos/cliente/verificar-stock`,
                 { carrito }
@@ -272,6 +263,17 @@ const ClienteCarrito = () => {
                 toast.error("Error al verificar stock.");
                 return;
             }
+
+            if (metodoPago === "billetera") {
+                if (parseFloat(total) > 0) {
+                    // Si es Billetera Digital y el total es > 0, abrir el modal QR
+                    setShowQrModal(true);
+                    return;
+                } else {
+                    return toast.warning("No se puede pagar con Billetera Digital si el total es S/ 0.00. Añade productos o cambia el método de pago.");
+                }
+            }
+
             setConfirmSwitch(false);
             // Abrir el modal de Confirmación para Efectivo/Tarjeta
             setShowConfirmModal(true);
