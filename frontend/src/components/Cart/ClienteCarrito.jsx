@@ -700,10 +700,10 @@ const ClienteCarrito = () => {
             {showDeleteModal && productoAEliminar && (
                 <>
                     <div className="modal show d-block" tabIndex="-1">
-                        <div className="modal-dialog modal-dialog-centered">
+                        <div className="custom-modal-backdrop">
                             <div className="modal-content">
                                 <div className="modal-header bg-danger text-white">
-                                    <h5 className="modal-title">
+                                    <h5 className="fs-5 fw-bold w-100">
                                         Confirmar eliminación
                                     </h5>
                                 </div>
@@ -747,10 +747,10 @@ const ClienteCarrito = () => {
             {showQrModal && (
                 <>
                     <div className="modal show d-block" tabIndex="-1">
-                        <div className="modal-dialog modal-dialog-centered modal-sm">
+                        <div className="custom-modal-backdrop">
                             <div className="modal-content text-center">
                                 <div className="modal-header bg-danger text-white border-0 p-3">
-                                    <h5 className="modal-title fs-5 fw-bold w-100">
+                                    <h5 className="fs-5 fw-bold w-100">
                                         Pago con Billetera Digital
                                     </h5>
                                     <button
@@ -809,10 +809,10 @@ const ClienteCarrito = () => {
             {/* === Modal de Confirmación (advertencia) === */}
             {showConfirmModal && (
                 <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-dialog-centered">
+                    <div className="custom-modal-backdrop">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Confirmación del Pedido</h5>
+                                <h5 className="fs-5 fw-bold w-100">Confirmación del Pedido</h5>
                                 <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)} />
                             </div>
                             <div className="modal-body">
@@ -866,10 +866,10 @@ const ClienteCarrito = () => {
             {/* === Modal de Progreso WebSocket === */}
             {showProgressModal && (
                 <div className="modal show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-sm modal-dialog-centered">
+                    <div className="custom-modal-backdrop">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title">Enviando pedido...</h5>
+                                <h5 className="fs-5 fw-bold w-100">Enviando pedido...</h5>
                             </div>
                             <div className="modal-body">
                                 <p className="mb-2">Procesando pedido. Esto puede tardar unos segundos.</p>

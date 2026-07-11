@@ -43,3 +43,27 @@
     margin-bottom: 4px;
   }
 }
+
+/* El contenedor ocupa toda la pantalla y centra el contenido */
+.custom-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro */
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center;     /* Centrado vertical */
+    z-index: 1055;           /* Asegura que esté al frente */
+}
+
+/* El contenido del modal */
+.custom-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 400px; /* Tamaño del modal */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}

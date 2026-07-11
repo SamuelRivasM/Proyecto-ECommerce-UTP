@@ -364,14 +364,24 @@ const CocinaPedidos = () => {
                     </div>
                 )}
             </div>
+            <br />
+            <br />
 
             {/* === Modal Detalle === */}
             {showModal && pedidoSeleccionado && (
                 <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
+                    <div className="custom-modal-backdrop">
+                        <div className="custom-modal-content" style={{
+                            width: "95%",
+                            maxWidth: "1000px",
+                            maxHeight: "90vh",
+                            overflowY: "auto",
+                            display: "flex",
+                            flexDirection: "column",
+                            padding: "20px"
+                        }}>
                             <div className="modal-header bg-dark text-white">
-                                <h5 className="modal-title">
+                                <h5 className="fw-bold">
                                     Detalle del Pedido N° {pedidoSeleccionado.id}
                                 </h5>
                             </div>
