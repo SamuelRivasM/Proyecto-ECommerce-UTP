@@ -54,6 +54,8 @@ const NavbarGeneral = ({
                     to={inicioRutaPorRol[rol] || "/cliente-dashboard"}
                     className="navbar-brand fw-bold"
                     onClick={(e) => { e.preventDefault(); onInicioClick(); }}
+                    aria-hidden="true"
+                    tabIndex="-1"
                 >
                     UTP COFFEE POINT{" "}
                     {rol !== "cliente" && `- ${rol.charAt(0).toUpperCase() + rol.slice(1)}`}
