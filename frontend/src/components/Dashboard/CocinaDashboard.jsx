@@ -119,17 +119,17 @@ const CocinaDashboard = () => {
           <div
             className="position-absolute top-0 start-0 w-100 h-100"
             style={{
-              backgroundColor: "rgba(0,0,0,0.5)",
+              backgroundColor: "rgba(0,0,0,0.6)",
               zIndex: 1,
             }}
           ></div>
 
           {/* Texto sobre el overlay */}
           <div
-            className="position-absolute top-50 start-50 translate-middle text-center text-white px-4"
-            style={{ maxWidth: "800px", zIndex: 2 }}
+            className="position-absolute top-50 start-50 translate-middle text-center text-white px-4 py-4 rounded"
+            style={{ maxWidth: "800px", zIndex: 2, backgroundColor: "rgba(0,0,0,0.55)" }}
           >
-            <h2 className="fw-bold mb-3">Panel de Cocina</h2>
+            <h1 className="fw-bold mb-3">Panel de Cocina</h1>
             <p className="mb-4">
               Administra pedidos en tiempo real y gestiona los productos de la
               cafetería UTP Lima Sur para optimizar la atención a clientes.
